@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 class HashMap:
     def __init__(self):
         self.map = {}
@@ -23,6 +25,9 @@ class HashMap:
     
     def get_values(self):
         return list(self.map.values())
+    
+    def copy(self):
+        return deepcopy(self.map)
     
     def __str__(self):
         return str(self.map)

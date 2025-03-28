@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 class Stack:
     def __init__(self):
         self.items = []
@@ -20,6 +22,9 @@ class Stack:
 
     def size(self):
         return len(self.items)
+    
+    def copy(self):
+        return deepcopy(self.items)
     
     def __str__(self):
         return str(self.items)

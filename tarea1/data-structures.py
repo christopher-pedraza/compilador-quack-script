@@ -23,9 +23,14 @@ elemento = stack.pop()
 print(f'Elemento sacado del Stack: {elemento}')
 # Checar si el Stack está vacío
 print(f'¿Está vacío el Stack? {stack.is_empty()}')
+# Realizar una copia del Stack
+copia_stack = stack.copy()
 # Recorrer el Stack sacando elementos hasta que esté vacío
 while not stack.is_empty():
     print(f'Elemento sacado del Stack: {stack.pop()}')
+# Desplegar ambas versiones del Stack
+print(f'Contenido del Stack original: {stack.__str__()}')
+print(f'Contenido de la copia del Stack: {copia_stack.__str__()}')
 
 print('\n' + '-'*50 + '\n')
 ####################################
@@ -51,9 +56,14 @@ elemento = queue.dequeue()
 print(f'Elemento sacado del Queue: {elemento}')
 # Checar si el Queue está vacío
 print(f'¿Está vacío el Queue? {queue.is_empty()}')
+# Realizar una copia del Queue
+copia_queue = queue.copy()
 # Recorrer el Queue sacando elementos hasta que esté vacío
 while not queue.is_empty():
     print(f'Elemento sacado del Queue: {queue.dequeue()}')
+# Desplegar ambas versiones del Queue
+print(f'Contenido del Queue original: {queue.__str__()}')
+print(f'Contenido de la copia del Queue: {copia_queue.__str__()}')
 
 print('\n' + '-'*50 + '\n')
 ####################################
@@ -84,3 +94,16 @@ print(f'Tamaño del HashMap después de sacar un elemento: {hash_map.size()}')
 print(f'¿Contiene la llave "ciudad"? {hash_map.contains_key("ciudad")}')
 # Checar si el HashMap contiene una llave que no existe
 print(f'¿Contiene la llave "nombre"? {hash_map.contains_key("nombre")}')
+# Desplegar todas las llaves del HashMap
+print(f'Llaves del HashMap: {hash_map.get_keys()}')
+# Desplegar todos los valores del HashMap
+print(f'Valores del HashMap: {hash_map.get_values()}')
+# Crear una copia del HashMap
+hash_map_copia = hash_map.copy()
+# Recorrer el HashMap sacando elementos hasta que esté vacío
+for key in hash_map.get_keys():
+    print(f'Elemento sacado del HashMap: {hash_map.get(key)}')
+    hash_map.remove(key)
+# Desplegar ambas versiones del HashMap
+print(f'Contenido del HashMap original: {hash_map.__str__()}')
+print(f'Contenido de la copia del HashMap: {hash_map_copia.__str__()}')

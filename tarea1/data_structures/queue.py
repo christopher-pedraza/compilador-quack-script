@@ -1,18 +1,21 @@
+from collections import deque
+from copy import deepcopy
+
 class Queue:
     def __init__(self):
-        self.items = []
+        self.items = deque()
 
     def enqueue(self, item):
-        self.items.insert(0, item)
+        self.items.append(item)
 
     def dequeue(self):
         if not self.is_empty():
-            return self.items.pop()
+            return self.items.popleft()
         return None
 
     def peek(self):
         if not self.is_empty():
-            return self.items[-1]
+            return self.items[0]
         return None
 
     def is_empty(self):
@@ -20,6 +23,9 @@ class Queue:
 
     def size(self):
         return len(self.items)
+    
+    def copy(self):
+        return deepcopy(self.items)
     
     def __str__(self):
         return str(self.items)
