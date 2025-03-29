@@ -24,7 +24,9 @@ class Stack:
         return len(self.items)
     
     def copy(self):
-        return deepcopy(self.items)
+        new_stack = Stack()
+        new_stack.items = deepcopy(self.items)
+        return new_stack
     
     def __str__(self):
         return str(self.items)

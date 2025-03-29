@@ -12,7 +12,10 @@ class HashMap:
 
     def remove(self, key):
         if self.contains_key(key):
+            item = self.map[key]
             del self.map[key]
+            return item
+        return None
 
     def contains_key(self, key):
         return key in self.map
@@ -27,7 +30,9 @@ class HashMap:
         return list(self.map.values())
     
     def copy(self):
-        return deepcopy(self.map)
+        new_hash_map = HashMap()
+        new_hash_map.map = deepcopy(self.map)
+        return new_hash_map
     
     def __str__(self):
         return str(self.map)

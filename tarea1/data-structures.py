@@ -1,4 +1,4 @@
-from data_structures import Stack, Queue, HashMap
+from utils.data_structures import Stack, Queue, HashMap
 
 ####################################
 #    Ejemplos de uso del Stack     #

@@ -25,7 +25,9 @@ class Queue:
         return len(self.items)
     
     def copy(self):
-        return deepcopy(self.items)
+        new_queue = Queue()
+        new_queue.items = deepcopy(self.items)
+        return new_queue
     
     def __str__(self):
-        return str(self.items)
+        return str(list(self.items))
