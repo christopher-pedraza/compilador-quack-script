@@ -1,8 +1,4 @@
-import sys
-import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
-
-from tarea1.utils.data_structures import Stack, Queue, HashMap
+from utils.data_structures import Stack, Queue, HashMap
 
 # Stack Tests
 stack = Stack()
