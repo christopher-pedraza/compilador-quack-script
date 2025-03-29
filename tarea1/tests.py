@@ -1,26 +1,34 @@
 from utils.data_structures import Stack, Queue, HashMap
 
+#
 # Stack Tests
+#
+
+# Importación y Creación de la Pila
 stack = Stack()
 assert stack.is_empty() == True, "Error: La pila debería estar vacía al inicio."
 assert stack.size() == 0, "Error: El tamaño de la pila debería ser 0."
 
+# Prueba de Inserción (push) y Consulta (peek)
 stack.push(10)
 assert stack.peek() == 10, "Error: El tope de la pila debería ser 10."
 stack.push(20)
 assert stack.peek() == 20, "Error: El tope de la pila debería ser 20."
 
+# Prueba de Eliminación (pop)
 valor = stack.pop()
 assert valor == 20, "Error: El valor extraído debería ser 20."
 assert stack.peek() == 10, "Error: El nuevo tope debería ser 10."
 stack.pop()
 assert stack.is_empty() == True, "Error: La pila debería estar vacía después de eliminar todos los elementos."
 
+# Prueba de Copia (copy)
 stack.push(30)
 stack.push(40)
 copied_stack = stack.copy()
 assert copied_stack != stack, "Error: La copia no debería ser la misma referencia."
 
+# Prueba de Representación en Cadena (**str**)
 assert str(stack) == "[30, 40]", "Error: La representación de la pila no es correcta."
 
 #
