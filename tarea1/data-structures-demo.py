@@ -13,7 +13,7 @@ stack.push(3)
 stack.push('cuatro')
 stack.push(5.0)
 # Desplegar la información del Stack
-print(f'Contenido del Stack: {stack.__str__()}')
+print(f'Contenido del Stack: {stack}')
 # Desplegar el tamaño del Stack
 print(f'Tamaño del Stack: {stack.size()}')
 # Desplegar el elemento en la cima del Stack
@@ -29,8 +29,8 @@ copia_stack = stack.copy()
 while not stack.is_empty():
     print(f'Elemento sacado del Stack: {stack.pop()}')
 # Desplegar ambas versiones del Stack
-print(f'Contenido del Stack original: {stack.__str__()}')
-print(f'Contenido de la copia del Stack: {copia_stack.__str__()}')
+print(f'Contenido del Stack original: {stack}')
+print(f'Contenido de la copia del Stack: {copia_stack}')
 
 print('\n' + '-'*50 + '\n')
 ####################################
@@ -46,7 +46,7 @@ queue.enqueue(3)
 queue.enqueue('cuatro')
 queue.enqueue(5.0)
 # Desplegar la información del Queue
-print(f'Contenido del Queue: {queue.__str__()}')
+print(f'Contenido del Queue: {queue}')
 # Desplegar el tamaño del Queue
 print(f'Tamaño del Queue: {queue.size()}')
 # Desplegar el elemento en la cabeza del Queue
@@ -62,8 +62,8 @@ copia_queue = queue.copy()
 while not queue.is_empty():
     print(f'Elemento sacado del Queue: {queue.dequeue()}')
 # Desplegar ambas versiones del Queue
-print(f'Contenido del Queue original: {queue.__str__()}')
-print(f'Contenido de la copia del Queue: {copia_queue.__str__()}')
+print(f'Contenido del Queue original: {queue}')
+print(f'Contenido de la copia del Queue: {copia_queue}')
 
 print('\n' + '-'*50 + '\n')
 ####################################
@@ -78,7 +78,7 @@ hash_map.put('edad', 22)
 hash_map.put('ciudad', 'Santiago')
 hash_map.put('pais', 'México')
 # Desplegar la información del HashMap
-print(f'Contenido del HashMap: {hash_map.__str__()}')
+print(f'Contenido del HashMap: {hash_map}')
 # Desplegar el tamaño del HashMap
 print(f'Tamaño del HashMap: {hash_map.size()}')
 # Desplegar el valor de una llave específica
@@ -105,5 +105,5 @@ for key in hash_map.get_keys():
     print(f'Elemento sacado del HashMap: {hash_map.get(key)}')
     hash_map.remove(key)
 # Desplegar ambas versiones del HashMap
-print(f'Contenido del HashMap original: {hash_map.__str__()}')
-print(f'Contenido de la copia del HashMap: {hash_map_copia.__str__()}')
+print(f'Contenido del HashMap original: {hash_map}')
+print(f'Contenido de la copia del HashMap: {hash_map_copia}')
