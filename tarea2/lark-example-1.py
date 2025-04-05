@@ -16,8 +16,8 @@ grammar = """
         | NAME   -> var
 
     NAME: /[a-zA-Z_][a-zA-Z0-9_]*/
-    NUMBER: /\d+/
 
+    %import common.SIGNED_NUMBER -> NUMBER
     %import common.WS
     %ignore WS
 """
@@ -27,7 +27,7 @@ parser = Lark(grammar, parser='lalr')
     
 # Example input code
 code = """
-var x = 5;
+var x = -5e10;
 func add(a, b) {
     var result = a;
 }
