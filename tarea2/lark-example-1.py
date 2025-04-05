@@ -1,4 +1,4 @@
-from lark import Lark, Token, Tree
+from lark import Lark
 
 # Define the grammar
 grammar = """
