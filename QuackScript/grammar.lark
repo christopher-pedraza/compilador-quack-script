@@ -1,6 +1,6 @@
 ?start: program
 
-program: PROGRAM ID SEMICOLON const_decl* function* MAIN body END
+program: PROGRAM ID SEMICOLON (const_decl | var_decl)* function* MAIN body END
 
 const_decl: CONST ID COLON TYPE ASSIGN expresion SEMICOLON
 
@@ -25,12 +25,12 @@ condition: IF LPAREN expresion RPAREN body (ELSE body)? SEMICOLON
 factor: LPAREN expresion RPAREN
       | (PLUS | MINUS)? (ID | CTE_NUM)
 
-term: factor ((MULT | DIV) factor)*
+?term: factor ((MULT | DIV) factor)*
 
-exp: term ((PLUS | MINUS) term)*
+?exp: term ((PLUS | MINUS) term)*
 
 // DUDA!!!
-expresion: exp (TYPE_COND exp)? (LOGIC_COND exp)?
+?expresion: exp (TYPE_COND exp)? (LOGIC_COND expresion)?
 
 function: VOID ID LPAREN params? RPAREN LBRACKET var_decl? body RBRACKET SEMICOLON
 

@@ -1,0 +1,13 @@
+program main;
+const a:int = 5;
+var count:float = 2.5;
+void sum(x:int, y:int) [
+    var z:int=2;
+{
+    print (x + y * z);
+}];
+main
+{
+    if (2>5 and 3!=count){};
+}
+end

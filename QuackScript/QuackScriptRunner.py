@@ -1,4 +1,5 @@
 from lark import Lark, UnexpectedInput
+from QuackTransformer import QuackTransformer
 
 # Import grammar from file
 with open('grammar.lark', 'r') as file:
@@ -16,6 +17,9 @@ def parse_program(program):
         tree = parser.parse(program)
         print("Parsing successful!")
         print(tree.pretty())
+        # Transform the parse tree using QuackTransformer
+        transformed_tree = QuackTransformer().transform(tree)
+        print(transformed_tree)
     except UnexpectedInput as e:
         print(f"Parsing failed: {e}")
 

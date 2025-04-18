@@ -1,10 +1,6 @@
 program main;
-const a:int = 5;
-void sum(x:int, y:int) [
-    var z:int=2;
-{
-    print (x + y * z);
-}];
+var a:int = 5;
 main
-{}
+{
+}
 end
