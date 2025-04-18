@@ -1,0 +1,86 @@
+?start: program
+
+program: PROGRAM ID SEMICOLON const_decl* function* MAIN body END
+
+const_decl: CONST ID COLON TYPE ASSIGN expresion SEMICOLON
+
+var_decl: VAR ID (COMMA ID)* COLON TYPE [ASSIGN expresion] SEMICOLON
+
+assign: ID ASSIGN expresion SEMICOLON
+
+body: LBRACE statement* RBRACE
+
+statement: assign
+         | condition
+         | cycle
+         | func_call
+         | print
+
+print: PRINT LPAREN (expresion | CTE_STRING) (COMMA (expresion | CTE_STRING))* RPAREN SEMICOLON
+
+cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
+
+condition: IF LPAREN expresion RPAREN body (ELSE body)? SEMICOLON
+
+factor: LPAREN expresion RPAREN
+      | (PLUS | MINUS)? (ID | CTE_NUM)
+
+term: factor ((MULT | DIV) factor)*
+
+exp: term ((PLUS | MINUS) term)*
+
+// DUDA!!!
+expresion: exp (TYPE_COND exp)? (LOGIC_COND exp)?
+
+function: VOID ID LPAREN params? RPAREN LBRACKET var_decl? body RBRACKET SEMICOLON
+
+params: ID COLON TYPE (COMMA ID COLON TYPE)*
+
+func_call: ID LPAREN (expresion (COMMA expresion)*)? RPAREN SEMICOLON
+
+// 
+// Tokens 
+// 
+
+// PALABRAS RESERVADAS
+PROGRAM: "program"
+MAIN: "main"
+END: "end"
+CONST: "const"
+VAR: "var"
+VOID: "void"
+WHILE: "while"
+DO: "do"
+IF: "if"
+ELSE: "else"
+PRINT: "print"
+TYPE: "float" | "int"
+
+// SIMBOLOS
+ASSIGN: "="
+COLON: ":"
+SEMICOLON: ";"
+COMMA: ","
+LPAREN: "("
+RPAREN: ")"
+LBRACE: "{"
+RBRACE: "}"
+LBRACKET: "["
+RBRACKET: "]"
+PLUS: "+"
+MINUS: "-"
+MULT: "*"
+DIV: "/"
+TYPE_COND: ">" | "<" | "!=" | "==" | ">=" | "<="
+LOGIC_COND: "and" | "or" | "not"
+DOT: "."
+
+CTE_NUM: INT | FLOAT
+
+%import common.WS
+%import common.CNAME -> ID
+%import common.INT
+%import common.FLOAT
+%import common.ESCAPED_STRING -> CTE_STRING
+
+%ignore WS
