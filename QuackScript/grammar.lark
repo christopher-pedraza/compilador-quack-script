@@ -22,21 +22,24 @@ cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
 
 condition: IF LPAREN expresion RPAREN body (ELSE body)? SEMICOLON
 
-factor: LPAREN expresion RPAREN
-      | (PLUS | MINUS)? (ID | CTE_NUM)
+factor: (LPAREN expresion RPAREN) | (PLUS | MINUS)? (ID | cte_num)
 
 ?term: factor ((MULT | DIV) factor)*
 
 ?exp: term ((PLUS | MINUS) term)*
 
 // DUDA!!!
-?expresion: exp (TYPE_COND exp)? (LOGIC_COND expresion)?
+?expresion: exp (type_cond exp)? (logic_cond expresion)?
 
 function: VOID ID LPAREN params? RPAREN LBRACKET var_decl? body RBRACKET SEMICOLON
 
 params: ID COLON TYPE (COMMA ID COLON TYPE)*
 
 func_call: ID LPAREN (expresion (COMMA expresion)*)? RPAREN SEMICOLON
+
+?type_cond: GT | LT | NE | EE | GTE | LTE
+?logic_cond: AND | OR | NOT
+?cte_num: INT | FLOAT
 
 // 
 // Tokens 
@@ -55,6 +58,9 @@ IF: "if"
 ELSE: "else"
 PRINT: "print"
 TYPE: "float" | "int"
+AND: "and"
+OR: "or"
+NOT: "not"
 
 // SIMBOLOS
 ASSIGN: "="
@@ -71,11 +77,13 @@ PLUS: "+"
 MINUS: "-"
 MULT: "*"
 DIV: "/"
-TYPE_COND: ">" | "<" | "!=" | "==" | ">=" | "<="
-LOGIC_COND: "and" | "or" | "not"
+GT: ">"
+LT: "<"
+GTE: ">="
+LTE: "<="
+NE: "!="
+EE: "=="
 DOT: "."
-
-CTE_NUM: INT | FLOAT
 
 %import common.WS
 %import common.CNAME -> ID

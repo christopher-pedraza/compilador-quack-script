@@ -1,5 +1,6 @@
 program main;
-var a:int = 5;
+var c:int = 23;
+const a:int = (5.0>c and 3!=4);
 main
 {
 }
