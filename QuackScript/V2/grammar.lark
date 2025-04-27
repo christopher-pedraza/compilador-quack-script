@@ -1,4 +1,4 @@
-?start: assign
+?start: body
 
 id: CNAME
 
@@ -37,6 +37,19 @@ factor: id -> factor_id
          | "int" -> int_type
 
 assign: id ASSIGN expresion SEMICOLON
+
+print: PRINT LPAREN (expresion | cte_string) RPAREN SEMICOLON -> print_single
+     | PRINT LPAREN (expresion | cte_string) (COMMA (expresion | cte_string))+ RPAREN SEMICOLON -> print_multiple
+
+
+body: LBRACE RBRACE -> empty_body
+    | LBRACE statement+ RBRACE -> body_statements
+
+statement: assign
+//         | condition
+//         | cycle
+//         | func_call
+         | print
 
 // 
 // Tokens 

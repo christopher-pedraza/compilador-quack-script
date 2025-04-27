@@ -135,3 +135,27 @@ class QuackTransformer(Transformer):
         # Update the symbol table with the new value
         self.symbol_table.update_variable(name=id, value=expresion, containerName=self.current_container)
         return ("assign", id, expresion)
+    
+    """
+    body: LBRACE RBRACE -> empty_body
+    | LBRACE statement+ RBRACE -> body_statements
+    """
+    def empty_body(self, lbrace, rbrace):
+        return ("empty_body",)
+    
+    def body_statements(self, lbrace, statements, rbrace):
+        return ("body_statements", statements)
+    
+    """
+    print: PRINT LPAREN (expresion | cte_string) RPAREN SEMICOLON -> print_single
+         | PRINT LPAREN (expresion | cte_string) (COMMA (expresion | cte_string))+ RPAREN SEMICOLON -> print_multiple
+    """
+    def print_single(self, print_, lpar, content, rpar, semicolon):
+        print(content)
+        return ("print", content)
+    
+    def print_multiple(self, print_, lpar, content, *args):
+        odd_args = args[1:len(args)-1:2]  # This slices the args list to get elements at odd indexes
+        print(content, *odd_args)
+        return ("print", content, odd_args)
+    
