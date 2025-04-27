@@ -1,4 +1,4 @@
-?start: factor
+?start: exp
 
 id: CNAME
 
@@ -10,6 +10,18 @@ cte_string: ESCAPED_STRING
 factor: id -> factor_id
       | PLUS id -> positive_factor_id
       | MINUS id -> negative_factor_id
+      | cte_num -> factor_cte_num
+      | PLUS cte_num -> positive_cte_num
+      | MINUS cte_num -> negative_cte_num
+//      | LPAREN expresion RPAREN -> parenthesis_expresion
+
+?term: factor
+    | factor (MULT factor)+ -> term_mult
+    | factor (DIV factor)+ -> term_div
+
+?exp: term
+   | term (PLUS term)+ -> exp_plus
+   | term (MINUS term)+ -> exp_minus
 
 // 
 // Tokens 
