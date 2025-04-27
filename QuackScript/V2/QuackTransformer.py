@@ -46,21 +46,21 @@ class QuackTransformer(Transformer):
     def exp_minus(self, term1, minus, term2):
         return term1 - term2
     
-    def expresion_type_cond(self, exp1, type_cond, exp2):
-        if type_cond == "==":
+    def expresion_comparison_op(self, exp1, comparison_op, exp2):
+        if comparison_op == "==":
             return exp1 == exp2
-        elif type_cond == "!=":
+        elif comparison_op == "!=":
             return exp1 != exp2
-        elif type_cond == "<":
+        elif comparison_op == "<":
             return exp1 < exp2
-        elif type_cond == "<=":
+        elif comparison_op == "<=":
             return exp1 <= exp2
-        elif type_cond == ">":
+        elif comparison_op == ">":
             return exp1 > exp2
-        elif type_cond == ">=":
+        elif comparison_op == ">=":
             return exp1 >= exp2
         else:
-            raise ValueError(f"Unknown type condition: {type_cond}")
+            raise ValueError(f"Unknown type condition: {comparison_op}")
         
     def expresion_logic_cond(self, exp1, logic_cond, exp2):
         if logic_cond == "and":

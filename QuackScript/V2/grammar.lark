@@ -24,11 +24,11 @@ factor: id -> factor_id
     | term (MINUS term)+ -> exp_minus
 
 ?expresion: exp
-          | exp type_cond exp -> expresion_type_cond
+          | exp comparison_op exp -> expresion_comparison_op
           | exp logic_cond exp -> expresion_logic_cond
 
 
-?type_cond: GT | LT | NE | EE | GTE | LTE
+?comparison_op: GT | LT | NE | EE | GTE | LTE
 ?logic_cond: AND | OR
 
 // 
