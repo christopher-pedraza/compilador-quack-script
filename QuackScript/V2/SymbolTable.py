@@ -29,7 +29,7 @@ class Container:
             raise ValueError(f"Cannot modify constant {name}.")
         symbol.value = value
 
-    def isSymbolDeclared(self, name: str) -> bool:
+    def is_symbol_declared(self, name: str) -> bool:
         """Check if a symbol is declared in the container."""
         return name in self.symbols
 
@@ -58,7 +58,7 @@ class SymbolTable:
     def __get_symbol(self, name: str, containerName: str) -> Symbol:
         """Get a symbol from the specified container."""
         container = self.get_container(containerName)
-        if container.isSymbolDeclared(name):
+        if container.is_symbol_declared(name):
             return container.get_symbol(name)
         else:
             container = self.containers["global"]
@@ -67,10 +67,10 @@ class SymbolTable:
             else:
                 raise ValueError(f"Symbol {name} not found in {containerName} or global container.")
 
-    def update_symbol(self, name: str, value, containerName: str) -> None:
+    def __update_symbol(self, name: str, value, containerName: str) -> None:
         """Update the value of a symbol in the specified container."""
         container = self.get_container(containerName)
-        if container.isSymbolDeclared(name):
+        if container.is_symbol_declared(name):
             container.update_symbol(name, value)
         else:
             container = self.containers["global"]
@@ -87,3 +87,7 @@ class SymbolTable:
     def get_variable(self, name: str, containerName: str) -> Symbol:
         """Get a variable from the specified container."""
         return self.__get_symbol(name, containerName).value
+    
+    def update_variable(self, name: str, value, containerName: str) -> None:
+        """Update the value of a variable in the specified container."""
+        self.__update_symbol(name, value, containerName)
