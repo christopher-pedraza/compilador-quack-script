@@ -1,4 +1,4 @@
-?start: exp
+?start: expresion
 
 id: CNAME
 
@@ -16,12 +16,20 @@ factor: id -> factor_id
 //      | LPAREN expresion RPAREN -> parenthesis_expresion
 
 ?term: factor
-    | factor (MULT factor)+ -> term_mult
-    | factor (DIV factor)+ -> term_div
+     | factor (MULT factor)+ -> term_mult
+     | factor (DIV factor)+ -> term_div
 
 ?exp: term
-   | term (PLUS term)+ -> exp_plus
-   | term (MINUS term)+ -> exp_minus
+    | term (PLUS term)+ -> exp_plus
+    | term (MINUS term)+ -> exp_minus
+
+?expresion: exp
+          | exp type_cond exp -> expresion_type_cond
+          | exp logic_cond exp -> expresion_logic_cond
+
+
+?type_cond: GT | LT | NE | EE | GTE | LTE
+?logic_cond: AND | OR
 
 // 
 // Tokens 
@@ -40,6 +48,8 @@ IF: "if"
 ELSE: "else"
 PRINT: "print"
 TYPE: "float" | "int"
+AND: "and"
+OR: "or"
 
 // SIMBOLOS
 ASSIGN: "="

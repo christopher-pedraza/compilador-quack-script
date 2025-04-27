@@ -45,3 +45,27 @@ class QuackTransformer(Transformer):
     
     def exp_minus(self, term1, minus, term2):
         return term1 - term2
+    
+    def expresion_type_cond(self, exp1, type_cond, exp2):
+        if type_cond == "==":
+            return exp1 == exp2
+        elif type_cond == "!=":
+            return exp1 != exp2
+        elif type_cond == "<":
+            return exp1 < exp2
+        elif type_cond == "<=":
+            return exp1 <= exp2
+        elif type_cond == ">":
+            return exp1 > exp2
+        elif type_cond == ">=":
+            return exp1 >= exp2
+        else:
+            raise ValueError(f"Unknown type condition: {type_cond}")
+        
+    def expresion_logic_cond(self, exp1, logic_cond, exp2):
+        if logic_cond == "and":
+            return exp1 and exp2
+        elif logic_cond == "or":
+            return exp1 or exp2
+        else:
+            raise ValueError(f"Unknown logic condition: {logic_cond}")
