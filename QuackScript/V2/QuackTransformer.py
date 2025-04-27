@@ -132,6 +132,7 @@ class QuackTransformer(Transformer):
     assign: id ASSIGN expresion SEMICOLON
     """
     def assign(self, id, assign, expresion, semicolon):
+        print("assign", id, expresion)
         # Update the symbol table with the new value
         self.symbol_table.update_variable(name=id, value=expresion, containerName=self.current_container)
         return ("assign", id, expresion)
@@ -163,7 +164,31 @@ class QuackTransformer(Transformer):
     cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
     """
     def cycle(self, while_, lpar, expresion, rpar, do, body, semicolon):
-        while expresion:
+        """
+        Handles the WHILE loop:
+        - Dynamically evaluates the condition.
+        - Executes the body while the condition is True.
+        """
+        # Function to dynamically evaluate the expression
+        def evaluate_expression(expr):
+            print("expr", expr)
+            # If the expression is a variable, fetch its value from the symbol table
+            if isinstance(expr, str):  # Assume it's an id (variable name)
+                return self.symbol_table.get_variable(name=expr, containerName=self.current_container)
+            # If the expression is a constant or already evaluated value, return it directly
+            return expr
+
+        # Initial evaluation of the condition
+        evaluated_expression = evaluate_expression(expresion)
+        print("evaluated_expression", evaluated_expression)
+
+        # Loop while the condition is True
+        while evaluated_expression:
+            # Execute the body of the loop
             self.transform(body)
-            print("Cycle body executed")
+
+            # Re-evaluate the condition after executing the body
+            evaluated_expression = evaluate_expression(expresion)
+            # print("==evaluated_expression", evaluated_expression)
+
         return ("cycle", expresion, body)
