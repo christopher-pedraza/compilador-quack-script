@@ -6,7 +6,7 @@ from QuackTransformer import QuackTransformer
 logger.setLevel(logging.DEBUG)
 
 # Import grammar from file
-with open('grammar.lark', 'r') as file:
+with open('grammar_v1.lark', 'r') as file:
     grammar = file.read()
 
 # Create the Lark parser

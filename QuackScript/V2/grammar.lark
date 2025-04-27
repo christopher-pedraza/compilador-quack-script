@@ -1,44 +1,15 @@
-?start: program
+?start: factor
 
-program: PROGRAM id SEMICOLON (const_decl | var_decl)* function* MAIN body END
+id: CNAME
 
-const_decl: CONST id COLON TYPE ASSIGN expresion SEMICOLON
+cte_num: INT -> int
+       | FLOAT -> float
 
-var_decl: VAR id (COMMA id)* COLON TYPE [ASSIGN expresion] SEMICOLON
+cte_string: ESCAPED_STRING
 
-assign: id ASSIGN expresion SEMICOLON
-
-body: LBRACE statement* RBRACE
-
-statement: assign
-         | condition
-         | cycle
-         | func_call
-         | print
-
-print: PRINT LPAREN (expresion | CTE_STRING) (COMMA (expresion | CTE_STRING))* RPAREN SEMICOLON
-
-cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
-
-condition: IF LPAREN expresion RPAREN body (ELSE body)? SEMICOLON
-
-factor: (LPAREN expresion RPAREN) | (PLUS | MINUS)? (id | cte_num)
-
-?term: factor ((MULT | DIV) factor)*
-
-?exp: term ((PLUS | MINUS) term)*
-
-?expresion: exp (type_cond exp)?
-
-function: VOID id LPAREN params? RPAREN LBRACKET var_decl? body RBRACKET SEMICOLON
-
-params: id COLON TYPE (COMMA id COLON TYPE)*
-
-func_call: id LPAREN (expresion (COMMA expresion)*)? RPAREN SEMICOLON
-
-?type_cond: GT | LT | NE | EE | GTE | LTE
-// ?logic_cond: AND | OR | NOT
-?cte_num: INT | FLOAT
+factor: id -> factor_id
+      | PLUS id -> positive_factor_id
+      | MINUS id -> negative_factor_id
 
 // 
 // Tokens 
@@ -57,9 +28,6 @@ IF: "if"
 ELSE: "else"
 PRINT: "print"
 TYPE: "float" | "int"
-// AND: "and"
-// OR: "or"
-// NOT: "not"
 
 // SIMBOLOS
 ASSIGN: "="
@@ -82,9 +50,6 @@ GTE: ">="
 LTE: "<="
 NE: "!="
 EE: "=="
-
-id: CNAME
-CTE_STRING: ESCAPED_STRING
 
 %import common.WS
 %import common.CNAME
