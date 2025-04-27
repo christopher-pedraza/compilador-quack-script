@@ -143,7 +143,7 @@ class QuackTransformer(Transformer):
     def empty_body(self, lbrace, rbrace):
         return ("empty_body",)
     
-    def body_statements(self, lbrace, statements, rbrace):
+    def body_statements(self, lbrace, *statements):
         return ("body_statements", statements)
     
     """
@@ -159,3 +159,11 @@ class QuackTransformer(Transformer):
         print(content, *odd_args)
         return ("print", content, odd_args)
     
+    """
+    cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
+    """
+    def cycle(self, while_, lpar, expresion, rpar, do, body, semicolon):
+        while expresion:
+            self.transform(body)
+            print("Cycle body executed")
+        return ("cycle", expresion, body)

@@ -41,13 +41,15 @@ assign: id ASSIGN expresion SEMICOLON
 print: PRINT LPAREN (expresion | cte_string) RPAREN SEMICOLON -> print_single
      | PRINT LPAREN (expresion | cte_string) (COMMA (expresion | cte_string))+ RPAREN SEMICOLON -> print_multiple
 
+cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
 
-body: LBRACE RBRACE -> empty_body
-    | LBRACE statement+ RBRACE -> body_statements
 
-statement: assign
+?body: LBRACE RBRACE -> empty_body
+     | LBRACE statement+ RBRACE -> body_statements
+
+?statement: assign
 //         | condition
-//         | cycle
+         | cycle
 //         | func_call
          | print
 

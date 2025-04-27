@@ -1,3 +1,5 @@
 {
-    print(2+3, "hola", 23-8>15);
+    while (a - 1) do {
+        print("adios");
+    };
 }
