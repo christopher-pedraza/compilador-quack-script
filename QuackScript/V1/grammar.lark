@@ -1,12 +1,12 @@
 ?start: program
 
-program: PROGRAM ID SEMICOLON (const_decl | var_decl)* function* MAIN body END
+program: PROGRAM id SEMICOLON (const_decl | var_decl)* function* MAIN body END
 
-const_decl: CONST ID COLON TYPE ASSIGN expresion SEMICOLON
+const_decl: CONST id COLON TYPE ASSIGN expresion SEMICOLON
 
-var_decl: VAR ID (COMMA ID)* COLON TYPE [ASSIGN expresion] SEMICOLON
+var_decl: VAR id (COMMA id)* COLON TYPE [ASSIGN expresion] SEMICOLON
 
-assign: ID ASSIGN expresion SEMICOLON
+assign: id ASSIGN expresion SEMICOLON
 
 body: LBRACE statement* RBRACE
 
@@ -22,23 +22,22 @@ cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
 
 condition: IF LPAREN expresion RPAREN body (ELSE body)? SEMICOLON
 
-factor: (LPAREN expresion RPAREN) | (PLUS | MINUS)? (ID | cte_num)
+factor: (LPAREN expresion RPAREN) | (PLUS | MINUS)? (id | cte_num)
 
 ?term: factor ((MULT | DIV) factor)*
 
 ?exp: term ((PLUS | MINUS) term)*
 
-// DUDA!!!
-?expresion: exp (type_cond exp)? (logic_cond expresion)?
+?expresion: exp (type_cond exp)?
 
-function: VOID ID LPAREN params? RPAREN LBRACKET var_decl? body RBRACKET SEMICOLON
+function: VOID id LPAREN params? RPAREN LBRACKET var_decl? body RBRACKET SEMICOLON
 
-params: ID COLON TYPE (COMMA ID COLON TYPE)*
+params: id COLON TYPE (COMMA id COLON TYPE)*
 
-func_call: ID LPAREN (expresion (COMMA expresion)*)? RPAREN SEMICOLON
+func_call: id LPAREN (expresion (COMMA expresion)*)? RPAREN SEMICOLON
 
 ?type_cond: GT | LT | NE | EE | GTE | LTE
-?logic_cond: AND | OR | NOT
+// ?logic_cond: AND | OR | NOT
 ?cte_num: INT | FLOAT
 
 // 
@@ -58,9 +57,9 @@ IF: "if"
 ELSE: "else"
 PRINT: "print"
 TYPE: "float" | "int"
-AND: "and"
-OR: "or"
-NOT: "not"
+// AND: "and"
+// OR: "or"
+// NOT: "not"
 
 // SIMBOLOS
 ASSIGN: "="
@@ -83,12 +82,14 @@ GTE: ">="
 LTE: "<="
 NE: "!="
 EE: "=="
-DOT: "."
+
+id: CNAME
+CTE_STRING: ESCAPED_STRING
 
 %import common.WS
-%import common.CNAME -> ID
+%import common.CNAME
 %import common.INT
 %import common.FLOAT
-%import common.ESCAPED_STRING -> CTE_STRING
+%import common.ESCAPED_STRING
 
 %ignore WS
