@@ -1,6 +1,7 @@
 import logging
 from lark import Lark, logger, UnexpectedInput
 from QuackTransformer import QuackTransformer
+from QuackInterpreter import QuackInterpreter
 from SymbolTable import SymbolTable
 
 logger.setLevel(logging.DEBUG)
@@ -28,9 +29,14 @@ def parse_program(program):
         # Parse the input program
         tree = quack(program)
         print(tree.pretty())
+
         # Transform the parse tree using QuackTransformer
-        transformed_tree = QuackTransformer(symbol_table).transform(tree)
-        print(transformed_tree)
+        quack_transformer = QuackTransformer(symbol_table)
+        ir = quack_transformer.transform(tree)
+
+        # Execute the IR
+        quack_interpreter = QuackInterpreter(symbol_table)
+        quack_interpreter.execute(ir)
     except UnexpectedInput as e:
         print(f"Parsing failed: {e}")
 

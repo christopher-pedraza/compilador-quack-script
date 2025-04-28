@@ -5,74 +5,7 @@ from lark import Lark, Transformer, v_args, Tree, Token
 @v_args(inline=True)
 class QuackTransformer(Transformer):
     def __init__(self, symbol_table):
-        self.symbol_table = symbol_table
-        self.current_container = "global"  # Start in the global scope
-
-    def evaluate_expression(self, expr_tree):
-        """
-        Recursively evaluates an expression tree.
-        """
-        # print("Evaluating:", expr_tree)
-        if isinstance(expr_tree, tuple):
-            expr_type = expr_tree[0]
-            if expr_type == "id":  # Variable reference
-                var_name = expr_tree[1]
-                return self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
-            elif expr_type == "negative_id":  # Negative variable reference
-                var_name = expr_tree[1]
-                return -self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
-            elif expr_type == "cte_num":  # Constant number
-                return expr_tree[1]
-            elif expr_type == "negative_cte_num":  # Negative constant number
-                return expr_tree[1]
-            elif expr_type == "term_mult":  # Multiplication
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
-                return left * right
-            elif expr_type == "term_div":  # Division
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
-                if right == 0:
-                    raise ZeroDivisionError("Division by zero is not allowed.")
-                return left / right
-            elif expr_type == "exp_plus":  # Addition
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
-                return left + right
-            elif expr_type == "exp_minus":  # Subtraction
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
-                return left - right
-            elif expr_type == "expresion_comparison_op":  # Comparison
-                left = self.evaluate_expression(expr_tree[1])
-                op = expr_tree[2]
-                right = self.evaluate_expression(expr_tree[3])
-                if op == "==":
-                    return left == right
-                elif op == "!=":
-                    return left != right
-                elif op == "<":
-                    return left < right
-                elif op == "<=":
-                    return left <= right
-                elif op == ">":
-                    return left > right
-                elif op == ">=":
-                    return left >= right
-                else:
-                    raise ValueError(f"Unknown comparison operator: {op}")
-            elif expr_type == "expresion_logic_cond":  # Logical operation
-                left = self.evaluate_expression(expr_tree[1])
-                op = expr_tree[2]
-                right = self.evaluate_expression(expr_tree[3])
-                if op == "and":
-                    return left and right
-                elif op == "or":
-                    return left or right
-                else:
-                    raise ValueError(f"Unknown logical operator: {op}")
-        else:
-            raise ValueError(f"Unsupported expression type: {expr_tree}")
+        pass
 
     """
     id: CNAME
@@ -94,7 +27,7 @@ class QuackTransformer(Transformer):
     cte_string: ESCAPED_STRING
     """
     def cte_string(self, value):
-        return str(value[1:-1])
+        return ("cte_string", str(value)[1:-1]) 
     
     """
     factor: id -> factor_id
@@ -186,14 +119,7 @@ class QuackTransformer(Transformer):
     assign: id ASSIGN expresion SEMICOLON
     """
     def assign(self, id, assign, expresion, semicolon):
-        # Evaluate the expression
-        evaluated_expresion = self.evaluate_expression(expresion)
-        # Update the symbol table with the new value
-        self.symbol_table.update_variable(name=id, value=evaluated_expresion, containerName=self.current_container)
-        # return the assign as it was received (Tree(Token('RULE', 'assign'),
-        # ['a', Token('ASSIGN', '='), ('cte_num', 1), Token('SEMICOLON', ';')]))
-        return (Tree(Token('RULE', 'assign'), [id, Token('ASSIGN', '='), expresion, Token('SEMICOLON', ';')]))
-
+        return ("assign", id, expresion)
     
     """
     body: LBRACE RBRACE -> empty_body
@@ -211,32 +137,16 @@ class QuackTransformer(Transformer):
          | PRINT LPAREN (expresion | cte_string) (COMMA (expresion | cte_string))+ RPAREN SEMICOLON -> print_multiple
     """
     def print_single(self, print_, lpar, content, rpar, semicolon):
-        print("PRINTING:")
-        print(content)
-        return ("print", content)
+        return ("print", [content])
     
     def print_multiple(self, print_, lpar, content, *args):
-        print("PRINTING:")
-        odd_args = args[1:len(args)-1:2]  # This slices the args list to get elements at odd indexes
-        print(content, *odd_args)
-        return ("print", content, odd_args)
+        cont = [content]  # Start with the first content
+        for i in range(0, len(args)-1, 2):
+            cont.append(args[i + 1])
+        return ("print", cont)
 
     """
     cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
     """
     def cycle(self, while_, lpar, expresion, rpar, do, body, semicolon):
-        # Initial evaluation of the condition
-        evaluated_expression = self.evaluate_expression(expresion)
-
-        # Loop while the condition is True
-        while evaluated_expression:
-            # Execute the body of the loop
-            print("BODY CONTENT:", body[1][1])
-            for statement in body[1]:  # body[1] contains the list of statements
-                self.transform(statement)
-
-            # Re-evaluate the condition after executing the body
-            evaluated_expression = self.evaluate_expression(expresion)
-            # print("Re-evaluated condition:", evaluated_expression)
-
         return ("cycle", expresion, body)
