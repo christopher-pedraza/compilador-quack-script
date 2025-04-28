@@ -1,1 +1,16 @@
-const b: int = 5;
+void funcion (param1: int, param2: float) [
+    var x, y: int = 8;
+    var z: float = 15.7;
+    var n: int = 0;
+{
+    while(n < 3) do {
+        if (n<2) {
+            print(x + z);
+        } else {
+            print("Ya casi acabo");
+        };
+        n = n + 1;
+    };
+    
+
+}];

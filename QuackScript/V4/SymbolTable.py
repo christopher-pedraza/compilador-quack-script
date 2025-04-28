@@ -92,6 +92,15 @@ class SymbolTable:
         """Update the value of a variable in the specified container."""
         self.__update_symbol(name, value, containerName)
 
+    def add_function(self, name: str, params: list) -> None:
+        """Add a function as a container"""
+        self.add_container(Container(name))
+        
+        for param in params:
+            param_name, param_type = param
+            self.add_variable(name=param_name, var_type=param_type, containerName=name)
+        
+
     def display(self) -> None:
         """Display the contents of the symbol table."""
         for container_name, container in self.containers.items():

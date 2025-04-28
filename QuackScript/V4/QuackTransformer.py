@@ -91,19 +91,6 @@ class QuackTransformer(Transformer):
         
     def expresion_logic_cond(self, exp1, logic_cond, exp2):
         return ("expresion_logic_cond", exp1, logic_cond, exp2)
-        
-    """
-    ?params: id COLON var_type -> param
-           | id COLON var_type (COMMA id COLON var_type)+ -> params_list
-    """
-    def param(self, id, colon, type):
-        return ["params", (id, type.value)]
-    
-    def params_list(self, id, colon, type, comma, *args):
-        params = ["params", (id, type)] 
-        for i in range(0, len(args)-1, 4):  # args contains (comma, param) pairs
-            params.append((args[i], args[i + 2]))
-        return params
     
     """
     ?var_type: "float" -> float_type
@@ -190,3 +177,60 @@ class QuackTransformer(Transformer):
         for i in range(1, len(args)-5, 2):
             ids.append(args[i])
         return ("var_decl", ids, args[-4], args[-2], False)
+    
+    """
+    ?params: id COLON var_type -> param
+           | id COLON var_type (COMMA id COLON var_type)+ -> params_list
+    """
+    def param(self, id, colon, type):
+        return ("params", [(id, type.value)])
+    
+    def params_list(self, id, colon, type, comma, *args):
+        params = ("params", [(id, type)])
+        for i in range(0, len(args)-1, 4):
+            params[1].append((args[i], args[i + 2]))
+        return params
+    
+    """
+    function: VOID id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
+            | VOID id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
+            | VOID id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
+            | VOID id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
+    """
+    def function_no_params_no_var_decl(self, void, id, lpar, rpar, lbracket, body, rbracket, semicolon):
+        return ("function_decl", id, [], body, [])
+    
+    def function_no_var_decl(self, void, id, lpar, params, rpar, lbracket, body, rbracket, semicolon):
+        return ("function_decl", id, params, body, [])
+    
+    def function_params_var_decl(self, void, id, lpar, params, rpar, lbracket, *args):
+        body = args[-3]
+        var_decl = []
+        for i in range(0, len(args)-3):
+            var_decl.append(args[i])
+        return ("function_decl", id, params, body, var_decl)
+    
+    def function_no_params(self, void, id, lpar, rpar, lbracket, *args):
+        body = args[-3]
+        var_decl = []
+        for i in range(0, len(args)-3):
+            var_decl.append(args[i])
+        return ("function_decl", id, [], body, var_decl)
+
+    """
+    func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
+             | id LPAREN expresion RPAREN SEMICOLON -> func_call_single_param
+             | id LPAREN expresion (COMMA expresion)+ RPAREN SEMICOLON -> func_call_multiple_params
+    """
+    def func_call_no_params(self, id, lpar, rpar, semicolon):
+        return ("func_call", id, [])
+    
+    def func_call_single_param(self, id, lpar, expresion, rpar, semicolon):
+        return ("func_call", id, [expresion])
+    
+    def func_call_multiple_params(self, id, lpar, expresion, *args):
+        params = [expresion]
+        for i in range(1, len(args)-1, 2):
+            params.append(args[i])
+        return ("func_call", id, params)
+    

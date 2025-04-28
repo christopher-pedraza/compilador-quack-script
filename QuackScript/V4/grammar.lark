@@ -1,4 +1,4 @@
-?start: const_decl
+?start: statement
 
 id: CNAME
 
@@ -30,9 +30,6 @@ factor: id -> factor_id
 ?comparison_op: GT | LT | NE | EE | GTE | LTE
 ?logic_cond: AND | OR
 
-?params: id COLON var_type -> param
-       | id COLON var_type (COMMA id COLON var_type)+ -> params_list
-
 ?var_type: "float" -> float_type
          | "int" -> int_type
 
@@ -56,10 +53,23 @@ var_decl: VAR id COLON var_type SEMICOLON -> var_single_decl_no_assign
 ?body: LBRACE RBRACE -> empty_body
      | LBRACE statement+ RBRACE -> body_statements
 
+?params: id COLON var_type -> param
+       | id COLON var_type (COMMA id COLON var_type)+ -> params_list
+
+// TODO: modificar diagramas para que permita multiples variables
+function: VOID id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
+        | VOID id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
+        | VOID id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
+        | VOID id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
+
+func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
+         | id LPAREN expresion RPAREN SEMICOLON -> func_call_single_param
+         | id LPAREN expresion (COMMA expresion)+ RPAREN SEMICOLON -> func_call_multiple_params
+
 ?statement: assign
          | condition
          | cycle
-//         | func_call
+         | func_call
          | print
 
 // 

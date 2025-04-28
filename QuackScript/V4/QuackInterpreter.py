@@ -120,6 +120,20 @@ class QuackInterpreter:
                     self.execute(body_if)
                 else:
                     self.execute(body_else)
+            elif ir_type == "function_decl":
+                self.current_container = ir[1]
+                func_name = ir[1]
+                params_list = []
+                for param in ir[2][1]:
+                    param_name = param[0]
+                    param_type = param[1]
+                    params_list.append((param_name, param_type))
+                body = ir[3]
+                self.symbol_table.add_function(name=func_name, params=params_list)
+                for var in ir[4]:
+                    self.execute(var)
+                self.execute(body)
+                self.current_container = "global"
             else:
                 raise ValueError(f"Unknown IR type: {ir_type}")
         else:
