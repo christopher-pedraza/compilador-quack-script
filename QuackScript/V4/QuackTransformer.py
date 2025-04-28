@@ -226,13 +226,45 @@ class QuackTransformer(Transformer):
         return ("func_call", id, [])
     
     def func_call_single_param(self, id, lpar, expresion, rpar, semicolon):
-        print(("func_call", id, [expresion]))
         return ("func_call", id, [expresion])
     
     def func_call_multiple_params(self, id, lpar, expresion, *args):
         params = [expresion]
         for i in range(1, len(args)-1, 2):
             params.append(args[i])
-        print(("func_call", id, params))
         return ("func_call", id, params)
+        
+    """
+    program: PROGRAM id SEMICOLON MAIN body END -> program_no_decl
+           | PROGRAM id SEMICOLON (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
+           | PROGRAM id SEMICOLON function+ MAIN body END -> program_func_no_decl
+           | PROGRAM id SEMICOLON (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
+    """
+    def program_no_decl(self, program, id, semicolon, main, body, end):
+        return ("program", id, [], [], body)
+     
+    def program_decl_no_func(self, program, id, semicolon, *args):
+        body = args[-2]
+        decls = []
+        for i in range(0, len(args)-3):
+            decls.append(args[i])
+        return ("program", id, decls, [], body)
     
+    def program_func_no_decl(self, program, id, semicolon, *args):
+        body = args[-2]
+        funcs = []
+        for i in range(0, len(args)-3):
+            funcs.append(args[i])
+        return ("program", id, [], funcs, body)
+    
+    def program_decl_func(self, program, id, semicolon, *args):
+        body = args[-2]
+        decls = []
+        funcs = []
+        for i in range(0, len(args)-3):
+            if args[i][0] == "var_decl":
+                decls.append(args[i])
+            else:
+                funcs.append(args[i])
+        print(("program", id, decls, funcs, body))
+        return ("program", id, decls, funcs, body)

@@ -8,6 +8,9 @@ class QuackInterpreter:
             expr_type = expr_tree[0]
             if expr_type == "id":  # Variable reference
                 var_name = expr_tree[1]
+                print("CURRENT CONTAINER: ", self.current_container)
+                print("VAR NAME: ", var_name)
+                print("VALUE: ", self.symbol_table.get_variable(name=var_name, containerName=self.current_container))
                 return self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
             elif expr_type == "negative_id":  # Negative variable reference
                 var_name = expr_tree[1]
@@ -135,10 +138,10 @@ class QuackInterpreter:
                 self.symbol_table.add_function(name=func_name, params=params_list, body=body)
                 for var in ir[4]:
                     self.execute(var)
-                self.execute(body)
                 self.current_container = "global"
             
             elif ir_type == "func_call":
+                self.current_container = ir[1]
                 func_name = ir[1]
                 params = ir[2]
                 values = []
@@ -148,6 +151,17 @@ class QuackInterpreter:
                 self.symbol_table.update_params_values(values=values, containerName=func_name)
                 func_body = self.symbol_table.get_container(func_name).body
                 self.execute(func_body)
+                self.current_container = "global"
+
+            elif ir_type == "program":
+                # ("program", id, decls, funcs, body)
+                _, id, decls, funcs, body = ir
+                for decl in decls:
+                    self.execute(decl)
+                for func in funcs:
+                    self.execute(func)
+                self.execute(body)
+
             else:
                 raise ValueError(f"Unknown IR type: {ir_type}")
         else:

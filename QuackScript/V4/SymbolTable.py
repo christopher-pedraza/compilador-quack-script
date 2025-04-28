@@ -39,7 +39,9 @@ class Container:
 
     def get_symbol(self, name: str) -> Symbol:
         """Get a symbol from the container."""
+        print(self.name, self.params)
         if name in self.params:
+            print("* Check params")
             return self.params.get(name, None)
         elif name in self.symbols:
             return self.symbols.get(name, None)
@@ -57,7 +59,7 @@ class Container:
 
     def is_symbol_declared(self, name: str) -> bool:
         """Check if a symbol is declared in the container."""
-        return name in self.symbols
+        return name in self.symbols or name in self.params
 
 class SymbolTable:
     def __init__(self):
@@ -88,7 +90,7 @@ class SymbolTable:
             return container.get_symbol(name)
         else:
             container = self.containers["global"]
-            if container.isSymbolDeclared(name):
+            if container.is_symbol_declared(name):
                 return container.get_symbol(name)
             else:
                 raise ValueError(f"Symbol {name} not found in {containerName} or global container.")
@@ -100,7 +102,7 @@ class SymbolTable:
             container.update_symbol(name, value)
         else:
             container = self.containers["global"]
-            if container.isSymbolDeclared(name):
+            if container.is_symbol_declared(name):
                 container.update_symbol(name, value)
             else:
                 raise ValueError(f"Symbol {name} not found in {containerName} or global container.")
@@ -110,14 +112,16 @@ class SymbolTable:
         variable = Symbol(name=name, var_type=var_type, value=value, category=category, param_index=param_index)
         self.__add_symbol(variable, containerName)
 
-    def add_parameter(self, name: str, var_type: str, containerName: str = "global", param_index: int = None) -> None:
+    def add_parameter(self, name: str, var_type: str, containerName: str, param_index: int = None) -> None:
         """Add a parameter to the specified container."""
         variable = Symbol(name=name, var_type=var_type, category="param", param_index=param_index)
         container = self.get_container(containerName)
+        print(f"Adding parameter {name} to container {containerName}")
         container.add_param(variable)
 
     def get_variable(self, name: str, containerName: str) -> Symbol:
         """Get a variable from the specified container."""
+        print(f"Getting variable {name} from container {containerName}")
         return self.__get_symbol(name, containerName).value
     
     def update_variable(self, name: str, value, containerName: str) -> None:
@@ -134,6 +138,7 @@ class SymbolTable:
         
     def update_params_values(self, containerName: str, values: list) -> None:
         """Set the values of parameters in the specified container."""
+        print(f"Updating parameters values in container {containerName} with values {values}")
         container = self.get_container(containerName)
         container.set_params_values(values)
         

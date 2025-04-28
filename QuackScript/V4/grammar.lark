@@ -1,4 +1,4 @@
-?start: function
+?start: program
 
 id: CNAME
 
@@ -71,6 +71,11 @@ func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
          | cycle
          | func_call
          | print
+
+program: PROGRAM id SEMICOLON MAIN body END -> program_no_decl
+       | PROGRAM id SEMICOLON (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
+       | PROGRAM id SEMICOLON function+ MAIN body END -> program_func_no_decl
+       | PROGRAM id SEMICOLON (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
 
 // 
 // Tokens 
