@@ -1,12 +1,1 @@
-{
-    if (a==5) {
-        print("Body 1");
-    } else {
-        if (5*3 >= 20) {
-            print("Body 2");
-        }
-        else {
-            print("Body 3");
-        };
-    };
-}
+const b: int = 5;

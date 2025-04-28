@@ -91,3 +91,10 @@ class SymbolTable:
     def update_variable(self, name: str, value, containerName: str) -> None:
         """Update the value of a variable in the specified container."""
         self.__update_symbol(name, value, containerName)
+
+    def display(self) -> None:
+        """Display the contents of the symbol table."""
+        for container_name, container in self.containers.items():
+            print(f"Container: {container_name}")
+            for symbol_name, symbol in container.symbols.items():
+                print(f"  {symbol_name}: {symbol.var_type}, {symbol.value}, {'const' if symbol.is_const else 'var'}")

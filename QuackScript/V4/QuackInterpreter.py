@@ -72,6 +72,16 @@ class QuackInterpreter:
                 var_name = ir[1]
                 value = self.evaluate_expression(ir[2])
                 self.symbol_table.update_variable(name=var_name, value=value, containerName=self.current_container)
+            # elif ir_type == "const_decl":
+            #     var_name = ir[1]
+            #     var_type = ir[2]
+            #     value = self.evaluate_expression(ir[3])
+            #     self.symbol_table.add_variable(name=var_name, value=value, var_type=var_type, containerName=self.current_container, is_const=True)
+            elif ir_type == "var_decl":
+                var_type = ir[2]
+                for var in ir[1]:
+                    value = self.evaluate_expression(ir[3]) if ir[3] else None
+                    self.symbol_table.add_variable(name=var, value=value, var_type=var_type, containerName=self.current_container, is_const=ir[4])
             elif ir_type == "body_statements":
                 for statement in ir[1]:
                     self.execute(statement)

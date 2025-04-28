@@ -37,6 +37,10 @@ def parse_program(program):
         # Execute the IR
         quack_interpreter = QuackInterpreter(symbol_table)
         quack_interpreter.execute(ir)
+
+        # Display the symbol table after execution
+        print("\nSymbol Table after execution:")
+        symbol_table.display()
     except UnexpectedInput as e:
         print(f"Parsing failed: {e}")
 

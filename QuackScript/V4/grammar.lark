@@ -1,4 +1,4 @@
-?start: body
+?start: const_decl
 
 id: CNAME
 
@@ -45,6 +45,13 @@ cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
 
 condition: IF LPAREN expresion RPAREN body SEMICOLON -> condition_if
          | IF LPAREN expresion RPAREN body ELSE body SEMICOLON -> condition_if_else
+
+const_decl: CONST id COLON var_type ASSIGN expresion SEMICOLON
+
+var_decl: VAR id COLON var_type SEMICOLON -> var_single_decl_no_assign
+        | VAR id COLON var_type ASSIGN expresion SEMICOLON -> var_single_decl_assign
+        | VAR id (COMMA id)+ COLON var_type SEMICOLON -> var_multi_decl_no_assign
+        | VAR id (COMMA id)+ COLON var_type ASSIGN expresion SEMICOLON -> var_multi_decl_assign
 
 ?body: LBRACE RBRACE -> empty_body
      | LBRACE statement+ RBRACE -> body_statements
