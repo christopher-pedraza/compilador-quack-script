@@ -20,7 +20,6 @@ quack = quackParser.parse
 
 # Initialize the symbol table
 symbol_table = SymbolTable()
-symbol_table.add_variable(name="a", value=3, var_type="int", containerName="global", is_const=False)
 
 def parse_program(program):
     try:

@@ -152,7 +152,7 @@ class QuackTransformer(Transformer):
     const_decl: CONST id COLON var_type ASSIGN expresion SEMICOLON
     """
     def const_decl(self, const, id, colon, var_type, assign, expresion, semicolon):
-        return ("var_decl", id, var_type, expresion, True)
+        return ("var_decl", id, var_type, expresion, "const")
     
     """
     var_decl: VAR id COLON var_type SEMICOLON -> var_single_decl_no_assign
@@ -161,22 +161,22 @@ class QuackTransformer(Transformer):
             | VAR id (COMMA id)+ COLON var_type ASSIGN expresion SEMICOLON -> var_multi_decl_assign
     """
     def var_single_decl_no_assign(self, var, id, colon, var_type, semicolon):
-        return ("var_decl", [id], var_type, None, False)
+        return ("var_decl", [id], var_type, None, "var")
     
     def var_single_decl_assign(self, var, id, colon, var_type, assign, expresion, semicolon):
-        return ("var_decl", [id], var_type, expresion, False)
+        return ("var_decl", [id], var_type, expresion, "var")
     
     def var_multi_decl_no_assign(self, var, id, *args):
         ids = [id]
         for i in range(0, len(args)-1, 2):
             ids.append(args[i - 1])
-        return ("var_decl", ids, args[-1], None, False)
+        return ("var_decl", ids, args[-1], None, "var")
     
     def var_multi_decl_assign(self, var, id, *args):
         ids = [id]
         for i in range(1, len(args)-5, 2):
             ids.append(args[i])
-        return ("var_decl", ids, args[-4], args[-2], False)
+        return ("var_decl", ids, args[-4], args[-2], "var")
     
     """
     ?params: id COLON var_type -> param
@@ -226,11 +226,13 @@ class QuackTransformer(Transformer):
         return ("func_call", id, [])
     
     def func_call_single_param(self, id, lpar, expresion, rpar, semicolon):
+        print(("func_call", id, [expresion]))
         return ("func_call", id, [expresion])
     
     def func_call_multiple_params(self, id, lpar, expresion, *args):
         params = [expresion]
         for i in range(1, len(args)-1, 2):
             params.append(args[i])
+        print(("func_call", id, params))
         return ("func_call", id, params)
     

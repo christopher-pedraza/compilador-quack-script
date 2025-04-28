@@ -72,26 +72,26 @@ class QuackInterpreter:
                 var_name = ir[1]
                 value = self.evaluate_expression(ir[2])
                 self.symbol_table.update_variable(name=var_name, value=value, containerName=self.current_container)
-            # elif ir_type == "const_decl":
-            #     var_name = ir[1]
-            #     var_type = ir[2]
-            #     value = self.evaluate_expression(ir[3])
-            #     self.symbol_table.add_variable(name=var_name, value=value, var_type=var_type, containerName=self.current_container, is_const=True)
+
             elif ir_type == "var_decl":
                 var_type = ir[2]
                 for var in ir[1]:
                     value = self.evaluate_expression(ir[3]) if ir[3] else None
-                    self.symbol_table.add_variable(name=var, value=value, var_type=var_type, containerName=self.current_container, is_const=ir[4])
+                    self.symbol_table.add_variable(name=var, value=value, var_type=var_type, containerName=self.current_container, category=ir[4])
+            
             elif ir_type == "body_statements":
                 for statement in ir[1]:
                     self.execute(statement)
+            
             elif ir_type == "empty_body":
                 pass
+            
             elif ir_type == "cycle":
                 condition = ir[1]
                 body = ir[2]
                 while self.evaluate_expression(condition):
                     self.execute(body)
+           
             elif ir_type == "print":
                 n = 1 if len(ir[1])==1 else len(ir[1])-1
                 for i in range(n):
@@ -107,11 +107,13 @@ class QuackInterpreter:
                         value = self.evaluate_expression(item)
                         print(value, end=" ")
                 print()
+         
             elif ir_type == "condition_if":
                 condition = ir[1]
                 body = ir[2]
                 if self.evaluate_expression(condition):
                     self.execute(body)
+         
             elif ir_type == "condition_if_else":
                 condition = ir[1]
                 body_if = ir[2]
@@ -120,6 +122,7 @@ class QuackInterpreter:
                     self.execute(body_if)
                 else:
                     self.execute(body_else)
+          
             elif ir_type == "function_decl":
                 self.current_container = ir[1]
                 func_name = ir[1]
@@ -129,11 +132,22 @@ class QuackInterpreter:
                     param_type = param[1]
                     params_list.append((param_name, param_type))
                 body = ir[3]
-                self.symbol_table.add_function(name=func_name, params=params_list)
+                self.symbol_table.add_function(name=func_name, params=params_list, body=body)
                 for var in ir[4]:
                     self.execute(var)
                 self.execute(body)
                 self.current_container = "global"
+            
+            elif ir_type == "func_call":
+                func_name = ir[1]
+                params = ir[2]
+                values = []
+                for param in params:
+                    value = self.evaluate_expression(param)
+                    values.append(value)
+                self.symbol_table.update_params_values(values=values, containerName=func_name)
+                func_body = self.symbol_table.get_container(func_name).body
+                self.execute(func_body)
             else:
                 raise ValueError(f"Unknown IR type: {ir_type}")
         else:
