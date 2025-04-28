@@ -1,7 +1,12 @@
 {
-    if (a<5) {
+    if (a==5) {
         print("Body 1");
     } else {
-        print("Body 2");
+        if (5*3 >= 20) {
+            print("Body 2");
+        }
+        else {
+            print("Body 3");
+        };
     };
 }

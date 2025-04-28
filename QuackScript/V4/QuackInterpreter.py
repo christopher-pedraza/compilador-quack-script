@@ -106,9 +106,6 @@ class QuackInterpreter:
                 condition = ir[1]
                 body_if = ir[2]
                 body_else = ir[3]
-                print(condition)
-                print(body_if)
-                print(body_else)
                 if self.evaluate_expression(condition):
                     self.execute(body_if)
                 else:
