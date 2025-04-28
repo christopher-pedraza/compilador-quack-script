@@ -8,9 +8,6 @@ class QuackInterpreter:
             expr_type = expr_tree[0]
             if expr_type == "id":  # Variable reference
                 var_name = expr_tree[1]
-                print("CURRENT CONTAINER: ", self.current_container)
-                print("VAR NAME: ", var_name)
-                print("VALUE: ", self.symbol_table.get_variable(name=var_name, containerName=self.current_container))
                 return self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
             elif expr_type == "negative_id":  # Negative variable reference
                 var_name = expr_tree[1]

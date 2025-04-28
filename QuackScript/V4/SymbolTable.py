@@ -39,9 +39,7 @@ class Container:
 
     def get_symbol(self, name: str) -> Symbol:
         """Get a symbol from the container."""
-        print(self.name, self.params)
         if name in self.params:
-            print("* Check params")
             return self.params.get(name, None)
         elif name in self.symbols:
             return self.symbols.get(name, None)
@@ -116,12 +114,10 @@ class SymbolTable:
         """Add a parameter to the specified container."""
         variable = Symbol(name=name, var_type=var_type, category="param", param_index=param_index)
         container = self.get_container(containerName)
-        print(f"Adding parameter {name} to container {containerName}")
         container.add_param(variable)
 
     def get_variable(self, name: str, containerName: str) -> Symbol:
         """Get a variable from the specified container."""
-        print(f"Getting variable {name} from container {containerName}")
         return self.__get_symbol(name, containerName).value
     
     def update_variable(self, name: str, value, containerName: str) -> None:
@@ -138,7 +134,6 @@ class SymbolTable:
         
     def update_params_values(self, containerName: str, values: list) -> None:
         """Set the values of parameters in the specified container."""
-        print(f"Updating parameters values in container {containerName} with values {values}")
         container = self.get_container(containerName)
         container.set_params_values(values)
         

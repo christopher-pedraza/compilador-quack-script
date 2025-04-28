@@ -266,5 +266,4 @@ class QuackTransformer(Transformer):
                 decls.append(args[i])
             else:
                 funcs.append(args[i])
-        print(("program", id, decls, funcs, body))
         return ("program", id, decls, funcs, body)
