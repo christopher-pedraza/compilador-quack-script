@@ -1,7 +1,7 @@
 {
-    while(a<10) do {
-        print("Valor de a:", a);
-        print("Siguiente valor:", (a*2));
-        a=a*2;
+    if (a<5) {
+        print("Body 1");
+    } else {
+        print("Body 2");
     };
 }

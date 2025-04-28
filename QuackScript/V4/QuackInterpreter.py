@@ -75,13 +75,17 @@ class QuackInterpreter:
             elif ir_type == "body_statements":
                 for statement in ir[1]:
                     self.execute(statement)
+            elif ir_type == "empty_body":
+                pass
             elif ir_type == "cycle":
                 condition = ir[1]
                 body = ir[2]
                 while self.evaluate_expression(condition):
                     self.execute(body)
             elif ir_type == "print":
-                for item in ir[1][:-1]:
+                n = 1 if len(ir[1])==1 else len(ir[1])-1
+                for i in range(n):
+                    item = ir[1][i]
                     if isinstance(item, tuple) and item[0] == "id":
                         var_name = item[1]
                         value = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
@@ -93,6 +97,22 @@ class QuackInterpreter:
                         value = self.evaluate_expression(item)
                         print(value, end=" ")
                 print()
+            elif ir_type == "condition_if":
+                condition = ir[1]
+                body = ir[2]
+                if self.evaluate_expression(condition):
+                    self.execute(body)
+            elif ir_type == "condition_if_else":
+                condition = ir[1]
+                body_if = ir[2]
+                body_else = ir[3]
+                print(condition)
+                print(body_if)
+                print(body_else)
+                if self.evaluate_expression(condition):
+                    self.execute(body_if)
+                else:
+                    self.execute(body_else)
             else:
                 raise ValueError(f"Unknown IR type: {ir_type}")
         else:

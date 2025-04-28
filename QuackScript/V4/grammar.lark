@@ -43,12 +43,14 @@ print: PRINT LPAREN (expresion | cte_string) RPAREN SEMICOLON -> print_single
 
 cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
 
+condition: IF LPAREN expresion RPAREN body SEMICOLON -> condition_if
+         | IF LPAREN expresion RPAREN body ELSE body SEMICOLON -> condition_if_else
 
 ?body: LBRACE RBRACE -> empty_body
      | LBRACE statement+ RBRACE -> body_statements
 
 ?statement: assign
-//         | condition
+         | condition
          | cycle
 //         | func_call
          | print

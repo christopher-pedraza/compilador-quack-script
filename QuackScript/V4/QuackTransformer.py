@@ -150,3 +150,13 @@ class QuackTransformer(Transformer):
     """
     def cycle(self, while_, lpar, expresion, rpar, do, body, semicolon):
         return ("cycle", expresion, body)
+    
+    """
+    condition: IF LPAREN expresion RPAREN body SEMICOLON -> condition_if
+             | IF LPAREN expresion RPAREN body ELSE body SEMICOLON -> condition_if_else
+    """
+    def condition_if(self, if_, lpar, expresion, rpar, body, semicolon):
+        return ("condition_if", expresion, body)
+    
+    def condition_if_else(self, if_, lpar, expresion, rpar, body1, else_, body2, semicolon):
+        return ("condition_if_else", expresion, body1, body2)
