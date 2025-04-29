@@ -64,22 +64,59 @@ class QuackTransformer(Transformer):
          | factor (MULT factor)+ -> term_mult
          | factor (DIV factor)+ -> term_div
     """
-    def term_mult(self, factor1, mult, factor2):
-        return ("term_mult", factor1, factor2)
+    # def term_mult(self, factor1, mult, factor2):
+    #     return ("term_mult", factor1, factor2)
+    def term_mult(self, factor1, *args):
+        factors = [factor1]
+        for i in range(1, len(args), 2):
+            factors.append(args[i])
+        # Create a nested structure for multiplication
+        result = factors[0]
+        for factor in factors[1:]:
+            result = ("term_mult", result, factor)
+        return result
     
-    def term_div(self, factor1, div, factor2):
-        return ("term_div", factor1, factor2)
+    # def term_div(self, factor1, div, factor2):
+    #     return ("term_div", factor1, factor2)
+    def term_div(self, factor1, *args):
+        factors = [factor1]
+        for i in range(1, len(args), 2):
+            factors.append(args[i])
+        # Create a nested structure for division
+        result = factors[0]
+        for factor in factors[1:]:
+            result = ("term_div", result, factor)
+        return result
 
     """
     ?exp: term
         | term (PLUS term)+ -> exp_plus
         | term (MINUS term)+ -> exp_minus
     """
-    def exp_plus(self, term1, plus, term2):
-        return ("exp_plus", term1, term2)
+    # def exp_plus(self, term1, plus, term2):
+    #     return ("exp_plus", term1, term2)
+    def exp_plus(self, term1, *args):
+        terms = [term1]
+        for i in range(1, len(args), 2):
+            terms.append(args[i])
+        # Create a nested structure for addition
+        result = terms[0]
+        for term in terms[1:]:
+            result = ("exp_plus", result, term)
+        return result
     
-    def exp_minus(self, term1, minus, term2):
-        return ("exp_minus", term1, term2)
+    # def exp_minus(self, term1, minus, term2):
+    #     return ("exp_minus", term1, term2)
+    def exp_minus(self, term1, *args):
+        terms = [term1]
+        for i in range(1, len(args), 2):
+            terms.append(args[i])
+        # Create a nested structure for subtraction
+        result = terms[0]
+        for term in terms[1:]:
+            result = ("exp_minus", result, term)
+        return result
+
     
     """
     ?expresion: exp
@@ -152,7 +189,7 @@ class QuackTransformer(Transformer):
     const_decl: CONST id COLON var_type ASSIGN expresion SEMICOLON
     """
     def const_decl(self, const, id, colon, var_type, assign, expresion, semicolon):
-        return ("var_decl", id, var_type, expresion, "const")
+        return ("var_decl", [id], var_type, expresion, "const")
     
     """
     var_decl: VAR id COLON var_type SEMICOLON -> var_single_decl_no_assign

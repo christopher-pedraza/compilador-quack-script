@@ -1,0 +1,81 @@
+Parse Tree:
+program_decl_no_func
+  program
+  id	TestLogic
+  ;
+  var_single_decl_assign
+    var
+    id	x
+    :
+    int_type
+    =
+    factor_cte_num
+      int	10
+    ;
+  var_single_decl_no_assign
+    var
+    id	flag
+    :
+    int_type
+    ;
+  main
+  body_statements
+    {
+    assign
+      id	flag
+      =
+      expresion_logic_cond
+        parenthesis_expresion
+          (
+          expresion_logic_cond
+            parenthesis_expresion
+              (
+              expresion_comparison_op
+                factor_id
+                  id	x
+                >
+                factor_cte_num
+                  int	5
+              )
+            and
+            parenthesis_expresion
+              (
+              expresion_comparison_op
+                factor_id
+                  id	x
+                <
+                factor_cte_num
+                  int	20
+              )
+          )
+        or
+        parenthesis_expresion
+          (
+          expresion_comparison_op
+            factor_id
+              id	x
+            ==
+            factor_cte_num
+              int	0
+          )
+      ;
+    print_single
+      print
+      (
+      factor_id
+        id	flag
+      )
+      ;
+    }
+  end
+
+IR:
+('program', 'TestLogic', [('var_decl', ['x'], 'int', ('cte_num', 10), 'var'), ('var_decl', ['flag'], 'int', None, 'var')], [], ('body_statements', [('assign', 'flag', ('expresion_logic_cond', ('expresion_logic_cond', ('expresion_comparison_op', ('id', 'x'), Token('GT', '>'), ('cte_num', 5)), Token('AND', 'and'), ('expresion_comparison_op', ('id', 'x'), Token('LT', '<'), ('cte_num', 20))), Token('OR', 'or'), ('expresion_comparison_op', ('id', 'x'), Token('EE', '=='), ('cte_num', 0)))), ('print', [('id', 'flag')])]))
+
+Symbol Table:
+Container: global
+  Parameters:
+  Symbols:
+  x: int, 10, var, None
+  flag: int, True, var, None
+

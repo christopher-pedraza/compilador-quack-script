@@ -43,8 +43,8 @@ def parse_program(program):
         quack_interpreter.execute(ir)
 
         # Display the symbol table after execution
-        print("\nSymbol Table after execution:")
-        symbol_table.display()
+        # print("\nSymbol Table after execution:")
+        # symbol_table.display()
 
         return (tree.pretty(), ir, symbol_table.get_str_representation())
     except UnexpectedInput as e:
@@ -53,16 +53,20 @@ def parse_program(program):
 if __name__ == "__main__":
     # Toma todos los archivos de la carpeta ./tests, realiza el parseo y guarda
     # el output en un archivo .out por cada uno de los archivos .quack
+    # en la carpeta ./output
+
+    if not os.path.exists("./tests"):
+        os.makedirs("./tests")
+    if not os.path.exists("./output"):
+        os.makedirs("./output")
+
     for file in os.listdir("./tests"):
         if file.endswith(".quack"):
             with open(os.path.join("./tests", file), 'r') as input_file:
                 program = input_file.read()
                 tree, ir, symbol_table = parse_program(program)
-                print(tree)
-                print(ir)
-                print(symbol_table)
                 # Guarda el output en un archivo .out
-                with open(os.path.join("./tests", file.replace(".quack", ".out")), 'w') as output_file:
+                with open(os.path.join("./output", file.replace(".quack", ".out")), 'w') as output_file:
                     output_file.write("Parse Tree:\n")
                     output_file.write(str(tree))
                     output_file.write("\n")

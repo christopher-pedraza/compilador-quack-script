@@ -1,0 +1,11 @@
+// Prueba: Condicionales if y else
+program TestIfElse;
+var score: int = 85;
+main {
+    if (score >= 90) {
+        print("A");
+    } else {
+        print("B");
+    };
+}
+end

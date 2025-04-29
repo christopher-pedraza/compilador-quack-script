@@ -1,0 +1,9 @@
+// Prueba: Expresiones aritméticas básicas
+program TestExpr;
+var x: int = 5;
+var y: int;
+main {
+    y = (x + 3) * 2 - 4 / 2;
+    print(y);
+}
+end

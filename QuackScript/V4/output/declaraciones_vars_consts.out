@@ -1,0 +1,66 @@
+Parse Tree:
+program_decl_no_func
+  program
+  id	TestVars
+  ;
+  const_decl
+    const
+    id	PI
+    :
+    float_type
+    =
+    factor_cte_num
+      float	3.14159
+    ;
+  var_single_decl_assign
+    var
+    id	radius
+    :
+    float_type
+    =
+    factor_cte_num
+      float	5.0
+    ;
+  var_single_decl_no_assign
+    var
+    id	area
+    :
+    float_type
+    ;
+  main
+  body_statements
+    {
+    assign
+      id	area
+      =
+      term_mult
+        factor_id
+          id	PI
+        *
+        factor_id
+          id	radius
+        *
+        factor_id
+          id	radius
+      ;
+    print_single
+      print
+      (
+      factor_id
+        id	area
+      )
+      ;
+    }
+  end
+
+IR:
+('program', 'TestVars', [('var_decl', ['PI'], 'float', ('cte_num', 3.14159), 'const'), ('var_decl', ['radius'], 'float', ('cte_num', 5.0), 'var'), ('var_decl', ['area'], 'float', None, 'var')], [], ('body_statements', [('assign', 'area', ('term_mult', ('term_mult', ('id', 'PI'), ('id', 'radius')), ('id', 'radius'))), ('print', [('id', 'area')])]))
+
+Symbol Table:
+Container: global
+  Parameters:
+  Symbols:
+  PI: float, 3.14159, const, None
+  radius: float, 5.0, var, None
+  area: float, 78.53975, var, None
+

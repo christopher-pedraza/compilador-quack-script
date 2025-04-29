@@ -1,0 +1,9 @@
+// Prueba: Expresiones aritméticas básicas
+program TestExpr;
+var x: int = 2;
+var y: int;
+main {
+    y = 2 + 3 + 5;
+    print(y);
+}
+end

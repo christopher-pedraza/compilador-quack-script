@@ -1,0 +1,59 @@
+Parse Tree:
+program_decl_no_func
+  program
+  id	TestIfElse
+  ;
+  var_single_decl_assign
+    var
+    id	score
+    :
+    int_type
+    =
+    factor_cte_num
+      int	85
+    ;
+  main
+  body_statements
+    {
+    condition_if_else
+      if
+      (
+      expresion_comparison_op
+        factor_id
+          id	score
+        >=
+        factor_cte_num
+          int	90
+      )
+      body_statements
+        {
+        print_single
+          print
+          (
+          cte_string	"A"
+          )
+          ;
+        }
+      else
+      body_statements
+        {
+        print_single
+          print
+          (
+          cte_string	"B"
+          )
+          ;
+        }
+      ;
+    }
+  end
+
+IR:
+('program', 'TestIfElse', [('var_decl', ['score'], 'int', ('cte_num', 85), 'var')], [], ('body_statements', [('condition_if_else', ('expresion_comparison_op', ('id', 'score'), Token('GTE', '>='), ('cte_num', 90)), ('body_statements', [('print', [('cte_string', 'A')])]), ('body_statements', [('print', [('cte_string', 'B')])]))]))
+
+Symbol Table:
+Container: global
+  Parameters:
+  Symbols:
+  score: int, 85, var, None
+

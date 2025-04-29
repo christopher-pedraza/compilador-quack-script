@@ -1,0 +1,10 @@
+// Prueba: Declaración de constantes y variables
+program TestVars;
+const PI: float = 3.14159;
+var radius: float = 5.0;
+var area: float;
+main {
+    area = PI * radius * radius;
+    print(area);
+}
+end

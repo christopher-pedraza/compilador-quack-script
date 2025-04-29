@@ -1,0 +1,57 @@
+Parse Tree:
+program_decl_no_func
+  program
+  id	TestPrint
+  ;
+  var_single_decl_assign
+    var
+    id	num1
+    :
+    int_type
+    =
+    factor_cte_num
+      int	25
+    ;
+  var_single_decl_assign
+    var
+    id	num2
+    :
+    float_type
+    =
+    exp_plus
+      factor_cte_num
+        float	2.5
+      +
+      factor_id
+        id	num1
+    ;
+  main
+  body_statements
+    {
+    print_multiple
+      print
+      (
+      cte_string	"Num1:"
+      ,
+      factor_id
+        id	num1
+      ,
+      cte_string	", Num2:"
+      ,
+      factor_id
+        id	num2
+      )
+      ;
+    }
+  end
+
+IR:
+('program', 'TestPrint', [('var_decl', ['num1'], 'int', ('cte_num', 25), 'var'), ('var_decl', ['num2'], 'float', ('exp_plus', ('cte_num', 2.5), ('id', 'num1')), 'var')], [], ('body_statements', [('print', [('cte_string', 'Num1:'), ('id', 'num1'), ('cte_string', ', Num2:'), ('id', 'num2'), Token('SEMICOLON', ';')])]))
+
+Symbol Table:
+Container: global
+  Parameters:
+  Symbols:
+  num1: int, 25, var, None
+  num2: float, 27.5, var, None
+
