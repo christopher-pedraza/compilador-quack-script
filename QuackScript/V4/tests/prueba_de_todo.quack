@@ -24,22 +24,20 @@ void checkSign(value: int) [
     {
         if (value > 0) {
             print(value, " es positivo.");
-        } else if (value < 0) {
-            print(value, " es negativo.");
         } else {
-            print("El valor es cero.");
+            print("No es positivo");
         };
     }
 ];
 
-void countDown(int start) [
+void countDown(start: int) [
     {
         while (start >= 1) do {
             print(start);
             start = start - 1;
         };
     }
-]
+];
 
 main {
     greet();
@@ -66,6 +64,6 @@ main {
     countDown(5);
 
     // Print múltiple
-    print("Fin", "del", "programa", ".", "Gracias por usar All-In-One!");
+    print("Fin", "del", "programa.", "Gracias por usar All-In-One!");
 }
 end

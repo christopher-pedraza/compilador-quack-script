@@ -220,7 +220,7 @@ class QuackTransformer(Transformer):
            | id COLON var_type (COMMA id COLON var_type)+ -> params_list
     """
     def param(self, id, colon, type):
-        return ("params", [(id, type.value)])
+        return ("params", [(id, type)])
     
     def params_list(self, id, colon, type, comma, *args):
         params = ("params", [(id, type)])

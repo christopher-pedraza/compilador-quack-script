@@ -48,9 +48,9 @@ class Container:
     
     def update_symbol(self, name: str, value) -> None:
         """Update the value of a symbol in the container."""
-        if name not in self.symbols:
+        if name not in self.symbols and name not in self.params:
             raise ValueError(f"Symbol {name} not found in {self.name}.")
-        symbol = self.symbols[name]
+        symbol = self.get_symbol(name)
         if symbol.category == "const":
             raise ValueError(f"Cannot modify constant {name}.")
         symbol.value = value

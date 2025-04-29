@@ -28,7 +28,7 @@ def parse_program(program):
 
         # Parse the input program
         tree = quack(program)
-        print(tree.pretty())
+        # print(tree.pretty())
 
         # Initialize the symbol table
         symbol_table = SymbolTable()
@@ -36,7 +36,7 @@ def parse_program(program):
         # Transform the parse tree using QuackTransformer
         quack_transformer = QuackTransformer(symbol_table)
         ir = quack_transformer.transform(tree)
-        print(ir)
+        # print(ir)
 
         # Execute the IR
         quack_interpreter = QuackInterpreter(symbol_table)
@@ -62,11 +62,11 @@ if __name__ == "__main__":
 
     for file in os.listdir("./tests"):
         if file.endswith(".quack"):
-            with open(os.path.join("./tests", file), 'r') as input_file:
+            with open(os.path.join("./tests", file), 'r', encoding='utf-8') as input_file:
                 program = input_file.read()
                 tree, ir, symbol_table = parse_program(program)
                 # Guarda el output en un archivo .out
-                with open(os.path.join("./output", file.replace(".quack", ".out")), 'w') as output_file:
+                with open(os.path.join("./output", file.replace(".quack", ".out")), 'w', encoding='utf-8') as output_file:
                     output_file.write("Parse Tree:\n")
                     output_file.write(str(tree))
                     output_file.write("\n")
