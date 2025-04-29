@@ -67,10 +67,10 @@ func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
          | id LPAREN expresion (COMMA expresion)+ RPAREN SEMICOLON -> func_call_multiple_params
 
 ?statement: assign
-         | condition
-         | cycle
-         | func_call
-         | print
+          | condition
+          | cycle
+          | func_call
+          | print
 
 program: PROGRAM id SEMICOLON MAIN body END -> program_no_decl
        | PROGRAM id SEMICOLON (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
@@ -123,5 +123,7 @@ EE: "=="
 %import common.INT
 %import common.FLOAT
 %import common.ESCAPED_STRING
+%import common.CPP_COMMENT
 
 %ignore WS
+%ignore CPP_COMMENT

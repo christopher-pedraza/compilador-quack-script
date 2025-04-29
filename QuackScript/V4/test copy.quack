@@ -1,0 +1,17 @@
+program Prueba;
+const a: int = 5;
+var b: int = 6;
+const c: float = 10.5;
+var d: float = 10.5;
+
+void func (a: int, b: float)[{
+    print(a+b);
+    print(d);
+    d = a < b;
+}];
+// declaracion de main
+main {
+    func(1, 2);
+    func(1, 2);
+}
+end

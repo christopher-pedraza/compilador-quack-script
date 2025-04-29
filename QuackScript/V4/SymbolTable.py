@@ -148,3 +148,16 @@ class SymbolTable:
             print("  Symbols:")
             for symbol_name, symbol in container.symbols.items():
                 print(f"  {symbol_name}: {symbol.var_type}, {symbol.value}, {symbol.category}, {symbol.param_index}")
+
+    def get_str_representation(self):
+        """String representation of the symbol table."""
+        result = ""
+        for container_name, container in self.containers.items():
+            result += f"Container: {container_name}\n"
+            result += "  Parameters:\n"
+            for param_name, param in container.params.items():
+                result += f"  {param_name}: {param.var_type}, {param.value}, {param.category}, {param.param_index}\n"
+            result += "  Symbols:\n"
+            for symbol_name, symbol in container.symbols.items():
+                result += f"  {symbol_name}: {symbol.var_type}, {symbol.value}, {symbol.category}, {symbol.param_index}\n"
+        return result

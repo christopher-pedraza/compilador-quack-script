@@ -1,4 +1,6 @@
 import logging
+import argparse
+import os
 from lark import Lark, logger, UnexpectedInput
 from QuackTransformer import QuackTransformer
 from QuackInterpreter import QuackInterpreter
@@ -6,32 +8,35 @@ from SymbolTable import SymbolTable
 
 logger.setLevel(logging.DEBUG)
 
+# Parse command-line arguments
+# parser = argparse.ArgumentParser(description="Run a QuackScript program.")
+# parser.add_argument("input_file", help="Path to the QuackScript input file")
+# args = parser.parse_args()
+
 # Import grammar from file
 with open('grammar.lark', 'r') as file:
     grammar = file.read()
-
-# TODO: Define .lark file as an argument to the script
-with open('test.quack', 'r') as file:
-    input_program = file.read()
 
 # Create the Lark parser
 quackParser = Lark(grammar, start='start', parser='lalr', debug=True)
 quack = quackParser.parse
 
-# Initialize the symbol table
-symbol_table = SymbolTable()
-
 def parse_program(program):
     try:
         # clear console
         print("\033[H\033[J", end="")
+
         # Parse the input program
         tree = quack(program)
         print(tree.pretty())
 
+        # Initialize the symbol table
+        symbol_table = SymbolTable()
+
         # Transform the parse tree using QuackTransformer
         quack_transformer = QuackTransformer(symbol_table)
         ir = quack_transformer.transform(tree)
+        print(ir)
 
         # Execute the IR
         quack_interpreter = QuackInterpreter(symbol_table)
@@ -40,8 +45,42 @@ def parse_program(program):
         # Display the symbol table after execution
         print("\nSymbol Table after execution:")
         symbol_table.display()
+
+        return (tree.pretty(), ir, symbol_table.get_str_representation())
     except UnexpectedInput as e:
         print(f"Parsing failed: {e}")
 
-# Parse the example input program
-parse_program(input_program)
+if __name__ == "__main__":
+    # Toma todos los archivos de la carpeta ./tests, realiza el parseo y guarda
+    # el output en un archivo .out por cada uno de los archivos .quack
+    for file in os.listdir("./tests"):
+        if file.endswith(".quack"):
+            with open(os.path.join("./tests", file), 'r') as input_file:
+                program = input_file.read()
+                tree, ir, symbol_table = parse_program(program)
+                print(tree)
+                print(ir)
+                print(symbol_table)
+                # Guarda el output en un archivo .out
+                with open(os.path.join("./tests", file.replace(".quack", ".out")), 'w') as output_file:
+                    output_file.write("Parse Tree:\n")
+                    output_file.write(str(tree))
+                    output_file.write("\n")
+                    output_file.write("IR:\n")
+                    output_file.write(str(ir))
+                    output_file.write("\n\n")
+                    output_file.write("Symbol Table:\n")
+                    output_file.write(symbol_table)
+                    output_file.write("\n")
+
+    # Si se pasa un archivo como argumento, lo parsea y ejecuta
+    # el programa, mostrando el resultado en la consola
+    # if args.input_file:
+    #     # clear console
+    #     print("\033[H\033[J", end="")
+    #     # Parse the input program
+    #     with open(args.input_file, 'r') as input_file:
+    #         program = input_file.read()
+    #         parse_program(program)
+
+    

@@ -1,0 +1,25 @@
+Parse Tree:
+program_no_decl
+  program
+  id	TestProgram
+  ;
+  main
+  body_statements
+    {
+    print_single
+      print
+      (
+      cte_string	"Hola"
+      )
+      ;
+    }
+  end
+
+IR:
+('program', 'TestProgram', [], [], ('body_statements', [('print', [('cte_string', 'Hola')])]))
+
+Symbol Table:
+Container: global
+  Parameters:
+  Symbols:
+

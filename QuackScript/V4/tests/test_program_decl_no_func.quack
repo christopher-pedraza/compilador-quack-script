@@ -1,0 +1,6 @@
+// Program with variable and constant declarations, no functions
+program TestProgram;
+main {
+    print("Hola");
+}
+end
