@@ -72,8 +72,8 @@ Container: global
   Symbols:
 Container: add_and_print
   Parameters:
-  x: int, 10, param, 0
-  y: int, 20, param, 1
+  x: int, None, param, 0
+  y: int, None, param, 1
   Symbols:
   result: int, 30, var, None
 

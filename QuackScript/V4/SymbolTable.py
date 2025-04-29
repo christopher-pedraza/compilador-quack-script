@@ -58,6 +58,11 @@ class Container:
     def is_symbol_declared(self, name: str) -> bool:
         """Check if a symbol is declared in the container."""
         return name in self.symbols or name in self.params
+    
+    def clean_params_values(self) -> None:
+        """Reset the values of parameters in the container."""
+        for param in self.params.values():
+            param.value = None
 
 class SymbolTable:
     def __init__(self):
@@ -136,8 +141,12 @@ class SymbolTable:
         """Set the values of parameters in the specified container."""
         container = self.get_container(containerName)
         container.set_params_values(values)
-        
 
+    def clean_params_values(self, containerName: str) -> None:
+        """Reset the values of parameters in the specified container."""
+        container = self.get_container(containerName)
+        container.clean_params_values()
+        
     def display(self) -> None:
         """Display the contents of the symbol table."""
         for container_name, container in self.containers.items():

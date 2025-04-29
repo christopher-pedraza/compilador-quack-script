@@ -149,6 +149,7 @@ class QuackInterpreter:
                 self.symbol_table.update_params_values(values=values, containerName=func_name)
                 func_body = self.symbol_table.get_container(func_name).body
                 self.execute(func_body)
+                self.symbol_table.clean_params_values(containerName=func_name)
                 self.current_container = "global"
 
             elif ir_type == "program":

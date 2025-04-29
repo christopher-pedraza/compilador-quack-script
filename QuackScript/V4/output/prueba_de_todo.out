@@ -311,15 +311,15 @@ Container: greet
   Symbols:
 Container: calculateArea
   Parameters:
-  r: float, 3.0, param, 0
+  r: float, None, param, 0
   Symbols:
   temp_area: float, 28.274309999999996, var, None
 Container: checkSign
   Parameters:
-  value: int, 7, param, 0
+  value: int, None, param, 0
   Symbols:
 Container: countDown
   Parameters:
-  start: int, 0, param, 0
+  start: int, None, param, 0
   Symbols:
 
