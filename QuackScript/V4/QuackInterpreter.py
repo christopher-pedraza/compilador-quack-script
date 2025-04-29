@@ -127,10 +127,11 @@ class QuackInterpreter:
                 self.current_container = ir[1]
                 func_name = ir[1]
                 params_list = []
-                for param in ir[2][1]:
-                    param_name = param[0]
-                    param_type = param[1]
-                    params_list.append((param_name, param_type))
+                if ir[2]:
+                    for param in ir[2][1]:
+                        param_name = param[0]
+                        param_type = param[1]
+                        params_list.append((param_name, param_type))
                 body = ir[3]
                 self.symbol_table.add_function(name=func_name, params=params_list, body=body)
                 for var in ir[4]:
