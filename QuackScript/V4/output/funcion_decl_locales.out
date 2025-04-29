@@ -1,0 +1,79 @@
+Parse Tree:
+program_func_no_decl
+  program
+  id	TestLocalVars
+  ;
+  function_params_var_decl
+    void
+    id	add_and_print
+    (
+    params_list
+      id	x
+      :
+      int_type
+      ,
+      id	y
+      :
+      int_type
+    )
+    [
+    var_single_decl_no_assign
+      var
+      id	result
+      :
+      int_type
+      ;
+    body_statements
+      {
+      assign
+        id	result
+        =
+        exp_plus
+          factor_id
+            id	x
+          +
+          factor_id
+            id	y
+        ;
+      print_multiple
+        print
+        (
+        cte_string	"Result:"
+        ,
+        factor_id
+          id	result
+        )
+        ;
+      }
+    ]
+    ;
+  main
+  body_statements
+    {
+    func_call_multiple_params
+      id	add_and_print
+      (
+      factor_cte_num
+        int	10
+      ,
+      factor_cte_num
+        int	20
+      )
+      ;
+    }
+  end
+
+IR:
+('program', 'TestLocalVars', [], [('function_decl', 'add_and_print', ('params', [('x', 'int'), ('y', 'int')]), ('body_statements', [('assign', 'result', ('exp_plus', ('id', 'x'), ('id', 'y'))), ('print', [('cte_string', 'Result:'), ('id', 'result'), Token('SEMICOLON', ';')])]), [('var_decl', ['result'], 'int', None, 'var')])], ('body_statements', [('func_call', 'add_and_print', [('cte_num', 10), ('cte_num', 20)])]))
+
+Symbol Table:
+Container: global
+  Parameters:
+  Symbols:
+Container: add_and_print
+  Parameters:
+  x: int, 10, param, 0
+  y: int, 20, param, 1
+  Symbols:
+  result: int, 30, var, None
+

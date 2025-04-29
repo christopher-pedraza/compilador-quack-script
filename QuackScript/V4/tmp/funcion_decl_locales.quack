@@ -1,0 +1,13 @@
+// Prueba: Función con parámetros y variables internas
+program TestLocalVars;
+void add_and_print(x: int, y: int) [
+    var result: int;
+    {
+        result = x + y;
+        print("Result:", result);
+    }
+];
+main {
+    add_and_print(10, 20);
+}
+end
