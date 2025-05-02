@@ -2,8 +2,10 @@
 program TestExpr;
 var x: int = 5;
 var y: int;
+var z: int = -3;
+
 main {
-    y = (x + 3) * 2 - 4 / 2;
+    y = ((x + 3) * 2 - 4 / 2) * z;
     print(y);
 }
 end

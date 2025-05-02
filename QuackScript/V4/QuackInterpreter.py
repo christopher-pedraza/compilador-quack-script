@@ -15,7 +15,7 @@ class QuackInterpreter:
             elif expr_type == "cte_num":  # Constant number
                 return expr_tree[1]
             elif expr_type == "negative_cte_num":  # Negative constant number
-                return expr_tree[1]
+                return -expr_tree[1]
             elif expr_type == "term_mult":  # Multiplication
                 left = self.evaluate_expression(expr_tree[1])
                 right = self.evaluate_expression(expr_tree[2])

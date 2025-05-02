@@ -54,7 +54,7 @@ class QuackTransformer(Transformer):
         return ("cte_num", cte_num)
 
     def negative_cte_num(self, minus, cte_num):
-        return ("negative_cte_num", -cte_num)
+        return ("negative_cte_num", cte_num)
     
     def parenthesis_expresion(self, lpar, expresion, rpar):
         return expresion

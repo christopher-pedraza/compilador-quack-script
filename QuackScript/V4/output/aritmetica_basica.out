@@ -18,33 +18,50 @@ program_decl_no_func
     :
     int_type
     ;
+  var_single_decl_assign
+    var
+    id	z
+    :
+    int_type
+    =
+    negative_cte_num
+      -
+      int	3
+    ;
   main
   body_statements
     {
     assign
       id	y
       =
-      exp_minus
-        term_mult
-          parenthesis_expresion
-            (
-            exp_plus
-              factor_id
-                id	x
-              +
+      term_mult
+        parenthesis_expresion
+          (
+          exp_minus
+            term_mult
+              parenthesis_expresion
+                (
+                exp_plus
+                  factor_id
+                    id	x
+                  +
+                  factor_cte_num
+                    int	3
+                )
+              *
               factor_cte_num
-                int	3
-            )
-          *
-          factor_cte_num
-            int	2
-        -
-        term_div
-          factor_cte_num
-            int	4
-          /
-          factor_cte_num
-            int	2
+                int	2
+            -
+            term_div
+              factor_cte_num
+                int	4
+              /
+              factor_cte_num
+                int	2
+          )
+        *
+        factor_id
+          id	z
       ;
     print_single
       print
@@ -57,12 +74,13 @@ program_decl_no_func
   end
 
 IR:
-('program', 'TestExpr', [('var_decl', ['x'], 'int', ('cte_num', 5), 'var'), ('var_decl', ['y'], 'int', None, 'var')], [], ('body_statements', [('assign', 'y', ('exp_minus', ('term_mult', ('exp_plus', ('id', 'x'), ('cte_num', 3)), ('cte_num', 2)), ('term_div', ('cte_num', 4), ('cte_num', 2)))), ('print', [('id', 'y')])]))
+('program', 'TestExpr', [('var_decl', ['x'], 'int', ('cte_num', 5), 'var'), ('var_decl', ['y'], 'int', None, 'var'), ('var_decl', ['z'], 'int', ('negative_cte_num', 3), 'var')], [], ('body_statements', [('assign', 'y', ('term_mult', ('exp_minus', ('term_mult', ('exp_plus', ('id', 'x'), ('cte_num', 3)), ('cte_num', 2)), ('term_div', ('cte_num', 4), ('cte_num', 2))), ('id', 'z'))), ('print', [('id', 'y')])]))
 
 Symbol Table:
 Container: global
   Parameters:
   Symbols:
   x: int, 5, var, None
-  y: int, 14.0, var, None
+  y: int, -42.0, var, None
+  z: int, -3, var, None
 
