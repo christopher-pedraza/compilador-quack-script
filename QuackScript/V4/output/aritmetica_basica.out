@@ -81,6 +81,6 @@ Container: global
   Parameters:
   Symbols:
   x: int, 5, var, None
-  y: int, -42.0, var, None
+  y: int, -42, var, None
   z: int, -3, var, None
 

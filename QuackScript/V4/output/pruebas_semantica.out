@@ -1,0 +1,66 @@
+Parse Tree:
+program_decl_no_func
+  program
+  id	TestExpr
+  ;
+  var_single_decl_assign
+    var
+    id	x
+    :
+    float_type
+    =
+    factor_cte_num
+      int	2
+    ;
+  var_single_decl_assign
+    var
+    id	y
+    :
+    int_type
+    =
+    expresion_comparison_op
+      factor_id
+        id	x
+      <=
+      factor_cte_num
+        int	2
+    ;
+  main
+  body_statements
+    {
+    print_single
+      print
+      (
+      factor_id
+        id	y
+      )
+      ;
+    condition_if
+      if
+      (
+      factor_id
+        id	y
+      )
+      body_statements
+        {
+        print_single
+          print
+          (
+          cte_string	"Entre!"
+          )
+          ;
+        }
+      ;
+    }
+  end
+
+IR:
+('program', 'TestExpr', [('var_decl', ['x'], 'float', ('cte_num', 2), 'var'), ('var_decl', ['y'], 'int', ('expresion_comparison_op', ('id', 'x'), Token('LTE', '<='), ('cte_num', 2)), 'var')], [], ('body_statements', [('print', [('id', 'y')]), ('condition_if', ('id', 'y'), ('body_statements', [('print', [('cte_string', 'Entre!')])]))]))
+
+Symbol Table:
+Container: global
+  Parameters:
+  Symbols:
+  x: float, 2.0, var, None
+  y: int, 1, var, None
+
