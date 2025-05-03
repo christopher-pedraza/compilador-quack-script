@@ -94,7 +94,7 @@ program_func_no_decl
   end
 
 IR:
-('program', 'TestParams', [], [('function_decl', 'sum', ('params', [('a', 'int'), ('b', 'int')]), ('body_statements', [('print', [('cte_string', 'Sum:'), ('exp_plus', ('id', 'a'), ('id', 'b')), Token('SEMICOLON', ';')])]), []), ('function_decl', 'subs', ('params', [('a', 'int'), ('b', 'int')]), ('body_statements', [('print', [('cte_string', 'Subs:'), ('exp_minus', ('id', 'a'), ('id', 'b')), Token('SEMICOLON', ';')])]), [])], ('body_statements', [('func_call', 'sum', [('cte_num', 3), ('cte_num', 4)]), ('func_call', 'subs', [('cte_num', 3), ('cte_num', 4)])]))
+('program', 'TestParams', [], [('function_decl', 'sum', ('params', [('a', 'int'), ('b', 'int')]), ('body_statements', [('print', [('cte_string', 'Sum:'), ('exp_plus', ('id', 'a'), ('id', 'b'))])]), []), ('function_decl', 'subs', ('params', [('a', 'int'), ('b', 'int')]), ('body_statements', [('print', [('cte_string', 'Subs:'), ('exp_minus', ('id', 'a'), ('id', 'b'))])]), [])], ('body_statements', [('func_call', 'sum', [('cte_num', 3), ('cte_num', 4)]), ('func_call', 'subs', [('cte_num', 3), ('cte_num', 4)])]))
 
 Symbol Table:
 Container: global

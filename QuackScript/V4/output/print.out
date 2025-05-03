@@ -46,7 +46,7 @@ program_decl_no_func
   end
 
 IR:
-('program', 'TestPrint', [('var_decl', ['num1'], 'int', ('cte_num', 25), 'var'), ('var_decl', ['num2'], 'float', ('exp_plus', ('cte_num', 2.5), ('id', 'num1')), 'var')], [], ('body_statements', [('print', [('cte_string', 'Num1:'), ('id', 'num1'), ('cte_string', ', Num2:'), ('id', 'num2'), Token('SEMICOLON', ';')])]))
+('program', 'TestPrint', [('var_decl', ['num1'], 'int', ('cte_num', 25), 'var'), ('var_decl', ['num2'], 'float', ('exp_plus', ('cte_num', 2.5), ('id', 'num1')), 'var')], [], ('body_statements', [('print', [('cte_string', 'Num1:'), ('id', 'num1'), ('cte_string', ', Num2:'), ('id', 'num2')])]))
 
 Symbol Table:
 Container: global

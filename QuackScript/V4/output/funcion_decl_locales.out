@@ -64,7 +64,7 @@ program_func_no_decl
   end
 
 IR:
-('program', 'TestLocalVars', [], [('function_decl', 'add_and_print', ('params', [('x', 'int'), ('y', 'int')]), ('body_statements', [('assign', 'result', ('exp_plus', ('id', 'x'), ('id', 'y'))), ('print', [('cte_string', 'Result:'), ('id', 'result'), Token('SEMICOLON', ';')])]), [('var_decl', ['result'], 'int', None, 'var')])], ('body_statements', [('func_call', 'add_and_print', [('cte_num', 10), ('cte_num', 20)])]))
+('program', 'TestLocalVars', [], [('function_decl', 'add_and_print', ('params', [('x', 'int'), ('y', 'int')]), ('body_statements', [('assign', 'result', ('exp_plus', ('id', 'x'), ('id', 'y'))), ('print', [('cte_string', 'Result:'), ('id', 'result')])]), [('var_decl', ['result'], 'int', None, 'var')])], ('body_statements', [('func_call', 'add_and_print', [('cte_num', 10), ('cte_num', 20)])]))
 
 Symbol Table:
 Container: global

@@ -68,7 +68,7 @@ program_decl_no_func
   end
 
 IR:
-('program', 'TestExpr', [('var_decl', ['x'], 'float', ('cte_num', 2), 'const'), ('var_decl', ['y'], 'int', ('expresion_logic_cond', ('expresion_comparison_op', ('id', 'x'), Token('LTE', '<='), ('cte_num', 2)), Token('OR', 'or'), ('cte_num', 0)), 'var')], [], ('body_statements', [('print', [('id', 'y')]), ('condition_if', ('id', 'y'), ('body_statements', [('print', [('cte_string', 'Entre!'), ('id', 'x'), Token('SEMICOLON', ';')])]))]))
+('program', 'TestExpr', [('var_decl', ['x'], 'float', ('cte_num', 2), 'const'), ('var_decl', ['y'], 'int', ('expresion_logic_cond', ('expresion_comparison_op', ('id', 'x'), Token('LTE', '<='), ('cte_num', 2)), Token('OR', 'or'), ('cte_num', 0)), 'var')], [], ('body_statements', [('print', [('id', 'y')]), ('condition_if', ('id', 'y'), ('body_statements', [('print', [('cte_string', 'Entre!'), ('id', 'x')])]))]))
 
 Symbol Table:
 Container: global

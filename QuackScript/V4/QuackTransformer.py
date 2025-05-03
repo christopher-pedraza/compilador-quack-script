@@ -165,8 +165,8 @@ class QuackTransformer(Transformer):
     
     def print_multiple(self, print_, lpar, content, *args):
         cont = [content]  # Start with the first content
-        for i in range(0, len(args)-1, 2):
-            cont.append(args[i + 1])
+        for i in range(1, len(args)-2, 2):
+            cont.append(args[i])
         return ("print", cont)
 
     """
