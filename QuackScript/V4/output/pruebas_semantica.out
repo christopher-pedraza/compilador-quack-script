@@ -3,8 +3,8 @@ program_decl_no_func
   program
   id	TestExpr
   ;
-  var_single_decl_assign
-    var
+  const_decl
+    const
     id	x
     :
     float_type
@@ -18,12 +18,22 @@ program_decl_no_func
     :
     int_type
     =
-    expresion_comparison_op
-      factor_id
-        id	x
-      <=
-      factor_cte_num
-        int	2
+    expresion_logic_cond
+      parenthesis_expresion
+        (
+        expresion_comparison_op
+          factor_id
+            id	x
+          <=
+          factor_cte_num
+            int	2
+        )
+      or
+      parenthesis_expresion
+        (
+        factor_cte_num
+          int	0
+        )
     ;
   main
   body_statements
@@ -43,10 +53,13 @@ program_decl_no_func
       )
       body_statements
         {
-        print_single
+        print_multiple
           print
           (
           cte_string	"Entre!"
+          ,
+          factor_id
+            id	x
           )
           ;
         }
@@ -55,12 +68,12 @@ program_decl_no_func
   end
 
 IR:
-('program', 'TestExpr', [('var_decl', ['x'], 'float', ('cte_num', 2), 'var'), ('var_decl', ['y'], 'int', ('expresion_comparison_op', ('id', 'x'), Token('LTE', '<='), ('cte_num', 2)), 'var')], [], ('body_statements', [('print', [('id', 'y')]), ('condition_if', ('id', 'y'), ('body_statements', [('print', [('cte_string', 'Entre!')])]))]))
+('program', 'TestExpr', [('var_decl', ['x'], 'float', ('cte_num', 2), 'const'), ('var_decl', ['y'], 'int', ('expresion_logic_cond', ('expresion_comparison_op', ('id', 'x'), Token('LTE', '<='), ('cte_num', 2)), Token('OR', 'or'), ('cte_num', 0)), 'var')], [], ('body_statements', [('print', [('id', 'y')]), ('condition_if', ('id', 'y'), ('body_statements', [('print', [('cte_string', 'Entre!'), ('id', 'x'), Token('SEMICOLON', ';')])]))]))
 
 Symbol Table:
 Container: global
   Parameters:
   Symbols:
-  x: float, 2.0, var, None
+  x: float, 2.0, const, None
   y: int, 1, var, None
 

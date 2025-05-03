@@ -1,12 +1,12 @@
 // Prueba: Expresiones aritméticas básicas
 program TestExpr;
-var x: float = 2;
-var y: int = x <= 2;
+const x: float = 2;
+var y: int = (x <= 2) or (0);
 
 main {
     print(y);
     if(y) {
-        print("Entre!");
+        print("Entre!", x);
     };
 }
 end
