@@ -125,6 +125,10 @@ class SymbolTable:
         """Get a variable from the specified container."""
         return self.__get_symbol(name, containerName).value
     
+    def get_variable_type(self, name: str, containerName: str) -> str:
+        """Get the type of a variable from the specified container."""
+        return self.__get_symbol(name, containerName).var_type
+    
     def update_variable(self, name: str, value, containerName: str) -> None:
         """Update the value of a variable in the specified container."""
         self.__update_symbol(name, value, containerName)
