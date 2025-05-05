@@ -1,3 +1,11 @@
+from Exceptions import SymbolRedeclarationError, \
+                       ParameterRedeclarationError, \
+                       ParameterMismatchError, \
+                       InvalidParameterIndexError, \
+                       NameNotFoundError, \
+                       CannotModifyConstantError, \
+                       ContainerRedeclarationError
+
 class Symbol:
     def __init__(self, name, var_type, value=None, category="var", param_index=None):
         self.name = name
@@ -16,43 +24,43 @@ class Container:
     def add_symbol(self, symbol: Symbol) -> None:
         """Add a symbol to the container."""
         if symbol.name in self.symbols:
-            raise ValueError(f"Symbol {symbol.name} already exists in {self.name}.")
+            raise SymbolRedeclarationError(f"Symbol '{symbol.name}' already exists in '{self.name}'.")
         self.symbols[symbol.name] = symbol
 
     def add_param(self, symbol: Symbol) -> None:
         """Add a parameter to the container."""
         if symbol.name in self.params:
-            raise ValueError(f"Parameter {symbol.name} already exists in {self.name}.")
+            raise ParameterRedeclarationError(f"Parameter '{symbol.name}' already exists in '{self.name}'.")
         self.params[symbol.name] = symbol
 
     def set_params_values(self, values: list) -> None:
         """Set the values of parameters in the container."""
         if len(values) != len(self.params):
-            raise ValueError(f"Number of values does not match number of parameters in {self.name}.")
-        
-        # update params in order of their param_index
+            raise ParameterMismatchError(f"Number of values does not match number of parameters in '{self.name}'.")
+
+        # Update params in order of their param_index
         for param in sorted(self.params.values(), key=lambda p: p.param_index):
             if param.param_index is not None:
                 param.value = values[param.param_index]
             else:
-                raise ValueError(f"Parameter {param.name} does not have a valid index.")
+                raise InvalidParameterIndexError(f"Parameter '{param.name}' does not have a valid index.")
 
     def get_symbol(self, name: str) -> Symbol:
         """Get a symbol from the container."""
         if name in self.params:
-            return self.params.get(name, None)
+            return self.params.get(name)
         elif name in self.symbols:
-            return self.symbols.get(name, None)
+            return self.symbols.get(name)
         else:
-            raise ValueError(f"Symbol {name} not found in {self.name}.")
-    
+            raise NameNotFoundError(f"Symbol '{name}' not found in '{self.name}'.")
+
     def update_symbol(self, name: str, value) -> None:
         """Update the value of a symbol in the container."""
         if name not in self.symbols and name not in self.params:
-            raise ValueError(f"Symbol {name} not found in {self.name}.")
+            raise NameNotFoundError(f"Symbol '{name}' not found in '{self.name}'.")
         symbol = self.get_symbol(name)
         if symbol.category == "const":
-            raise ValueError(f"Cannot modify constant {name}.")
+            raise CannotModifyConstantError(f"Cannot modify constant '{name}'.")
         symbol.value = value
 
     def is_symbol_declared(self, name: str) -> bool:
@@ -72,13 +80,13 @@ class SymbolTable:
     def get_container(self, name: str) -> Container:
         """Get a container by name."""
         if name not in self.containers:
-            raise ValueError(f"Container {name} not found.")
+            raise NameNotFoundError(f"Container {name} not found.")
         return self.containers.get(name)
 
     def add_container(self, container: Container) -> None:
         """Add a new container to the symbol table."""
         if container.name in self.containers:
-            raise ValueError(f"Container {container.name} already exists.")
+            raise ContainerRedeclarationError(f"Container '{container.name}' already exists.")
         self.containers[container.name] = container
 
     def __add_symbol(self, symbol: Symbol, containerName: str) -> None:
@@ -96,8 +104,8 @@ class SymbolTable:
             if container.is_symbol_declared(name):
                 return container.get_symbol(name)
             else:
-                raise ValueError(f"Symbol {name} not found in {containerName} or global container.")
-
+                raise NameNotFoundError(f"Symbol '{name}' not found in '{containerName}' or global container.")
+            
     def __update_symbol(self, name: str, value, containerName: str) -> None:
         """Update the value of a symbol in the specified container."""
         container = self.get_container(containerName)
@@ -108,7 +116,7 @@ class SymbolTable:
             if container.is_symbol_declared(name):
                 container.update_symbol(name, value)
             else:
-                raise ValueError(f"Symbol {name} not found in {containerName} or global container.")
+                raise NameNotFoundError(f"Symbol '{name}' not found in '{containerName}' or global container.")
             
     def add_variable(self, name: str, var_type: str, value=None, category="var", containerName: str = "global", param_index: int = None) -> None:
         """Add a variable to the specified container."""

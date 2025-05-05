@@ -1,4 +1,9 @@
 from SemanticCube import SemanticCube
+from Exceptions import UnsupportedOperationError, \
+                       DivisionByZeroError, \
+                       UnsupportedExpressionError, \
+                       TypeMismatchError, \
+                       UnknownIRTypeError
 
 class QuackInterpreter:
     def __init__(self, symbol_table):
@@ -37,12 +42,14 @@ class QuackInterpreter:
                 t_right = type(right).__name__
                 result_type = self.semantic_cube.get_type(t_left, t_right, "*")
 
-                if (result_type == "int"):
+                if result_type == "int":
                     return int(left * right)
-                elif (result_type == "float"):
+                elif result_type == "float":
                     return float(left * right)
                 else:
-                    raise TypeError(f"Unsupported operand types for multiplication: {t_left} * {t_right}")
+                    raise UnsupportedOperationError(
+                        f"Unsupported operand types for multiplication: {t_left} * {t_right}"
+                    )
 
             #############################################################################################################
             elif expr_type == "term_div":  # Division
@@ -54,18 +61,17 @@ class QuackInterpreter:
                 result_type = self.semantic_cube.get_type(t_left, t_right, "/")
 
                 if result_type is None:
-                    raise TypeError(f"Unsupported operand types for division: {t_left} / {t_right}")
+                    raise UnsupportedOperationError(f"Unsupported operand types for division: {t_left} / {t_right}")
 
                 if right == 0:
-                    raise ZeroDivisionError("Division by zero is not allowed.")
+                    raise DivisionByZeroError("Division by zero is not allowed.")
                 
                 if result_type == "int":
                     return int(left / right)
                 elif result_type == "float":
                     return float(left / right)
                 else:
-                    # If somehow an unexpected type comes up
-                    raise TypeError(f"Unexpected result type from division: {result_type}")
+                    raise UnsupportedOperationError(f"Unsupported operand types for division: {t_left} / {t_right}")
                 
             #############################################################################################################
             elif expr_type == "exp_plus":  # Addition
@@ -81,7 +87,7 @@ class QuackInterpreter:
                 elif (result_type == "float"):
                     return float(left + right)
                 else:
-                    raise TypeError(f"Invalid types for addition: {t_left} + {t_right}")
+                    raise UnsupportedOperationError(f"Unsupported operand types for addition: {t_left} + {t_right}")
             
             #############################################################################################################
             elif expr_type == "exp_minus":  # Subtraction
@@ -97,7 +103,7 @@ class QuackInterpreter:
                 elif (result_type == "float"):
                     return float(left - right)
                 else:
-                    raise TypeError(f"Invalid types for subtraction: {t_left} - {t_right}")
+                    raise UnsupportedOperationError(f"Unsupported operand types for subtraction: {t_left} - {t_right}")
             
             #############################################################################################################
             elif expr_type == "expresion_comparison_op":  # Comparison
@@ -110,22 +116,24 @@ class QuackInterpreter:
                 result_type = self.semantic_cube.get_type(t_left, t_right, op)
 
                 if (result_type != "int"):
-                    raise TypeError(f"Invalid types for comparison: {t_left} {op} {t_right}")
+                    raise UnsupportedOperationError(f"Unsupported operand types for comparison: {t_left} {op} {t_right}")
 
                 if op == "==":
-                    return 1 if left == right else 0
+                    result = left == right
                 elif op == "!=":
-                    return 1 if left != right else 0
+                    result = left != right
                 elif op == "<":
-                    return 1 if left < right else 0
+                    result = left < right
                 elif op == "<=":
-                    return 1 if left <= right else 0
+                    result = left <= right
                 elif op == ">":
-                    return 1 if left > right else 0
+                    result = left > right
                 elif op == ">=":
-                    return 1 if left >= right else 0
+                    result = left >= right
                 else:
-                    raise ValueError(f"Unknown comparison operator: {op}")
+                    raise UnsupportedOperationError(f"Unknown comparison operator: {op}")
+
+                return 1 if result else 0
                 
             #############################################################################################################
             elif expr_type == "expresion_logic_cond":  # Logical operation
@@ -138,16 +146,19 @@ class QuackInterpreter:
                 result_type = self.semantic_cube.get_type(t_left, t_right, op)
 
                 if (result_type != "int"):
-                    raise TypeError(f"Invalid types for logical operation: {t_left} {op} {t_right}")
+                    raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} {op} {t_right}")
 
                 if op == "and":
-                    return 1 if left and right else 0
+                    result = bool(left) and bool(right)
                 elif op == "or":
-                    return 1 if left or right else 0
+                    result = bool(left) or bool(right)
                 else:
-                    raise ValueError(f"Unknown logical operator: {op}")
+                    raise UnsupportedOperationError(f"Unknown logical operator: {op}")
+
+                return 1 if result else 0
+                
         else:
-            raise ValueError(f"Unsupported expression type: {expr_tree}")
+            raise UnsupportedExpressionError(f"Unsupported expression type: {expr_tree}")
 
     def execute(self, ir):
         if isinstance(ir, tuple):
@@ -158,28 +169,43 @@ class QuackInterpreter:
                 var_name = ir[1]
                 value = self.evaluate_expression(ir[2])
 
+                value_type = type(value).__name__
                 var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
-                if self.semantic_cube.is_decl_valid(var_type, type(value).__name__):
-                    value = self.semantic_cube.convert_type(var_type, type(value).__name__, value)
+
+                if self.semantic_cube.is_decl_valid(var_type, value_type):
+                    value = self.semantic_cube.convert_type(var_type, value_type, value)
                 else:
-                    raise TypeError(f"Invalid assignment: {var_type} = {type(value).__name__}")
+                    raise TypeMismatchError(
+                        f"Cannot assign type '{value_type}' to variable '{var_name}' of type '{var_type}'"
+                    )
 
                 self.symbol_table.update_variable(name=var_name, value=value, containerName=self.current_container)
 
             #############################################################################################################
             elif ir_type == "var_decl":
                 var_type = ir[2]
+                initializer = ir[3] if ir[3] else None
+
+                value = self.evaluate_expression(initializer) if initializer else None
+                value_type = type(value).__name__ if value is not None else None
+
+                if value is not None:
+                    if not self.semantic_cube.is_decl_valid(var_type, value_type):
+                        raise TypeMismatchError(
+                            f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'"
+                        )
+                    converted_value = self.semantic_cube.convert_type(var_type, value_type, value)
+                else:
+                    converted_value = None
+
                 for var in ir[1]:
-                    value = self.evaluate_expression(ir[3]) if ir[3] else None
-
-                    if value:
-                        value_type = type(value).__name__
-                        if self.semantic_cube.is_decl_valid(var_type, value_type):
-                            value = self.semantic_cube.convert_type(var_type, value_type, value)
-                        else:
-                            raise TypeError(f"Invalid declaration: {var_type} = {ir[2]}")
-
-                    self.symbol_table.add_variable(name=var, value=value, var_type=var_type, containerName=self.current_container, category=ir[4])
+                    self.symbol_table.add_variable(
+                        name=var,
+                        value=converted_value,
+                        var_type=var_type,
+                        containerName=self.current_container,
+                        category=ir[4]
+                    )
             
             #############################################################################################################
             elif ir_type == "body_statements":
@@ -274,6 +300,6 @@ class QuackInterpreter:
 
             #############################################################################################################
             else:
-                raise ValueError(f"Unknown IR type: {ir_type}")
+                raise UnknownIRTypeError(f"Unknown IR type: {ir_type}")
         else:
-            raise ValueError(f"Unsupported IR: {ir}")
+            raise UnknownIRTypeError(f"Unsupported IR: {ir}")
