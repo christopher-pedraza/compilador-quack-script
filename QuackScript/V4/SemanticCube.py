@@ -6,7 +6,7 @@ class SemanticCube:
                     "+": "int",
                     "-": "int",
                     "*": "int",
-                    "/": "float",
+                    "/": "int",
                     "<": "int",
                     "<=": "int",
                     ">": "int",

@@ -32,40 +32,53 @@ class QuackInterpreter:
             elif expr_type == "term_mult":  # Multiplication
                 left = self.evaluate_expression(expr_tree[1])
                 right = self.evaluate_expression(expr_tree[2])
-                t_left = "int" if isinstance(left, int) else "float"
-                t_right = "int" if isinstance(right, int) else "float"
 
-                if (self.semantic_cube.get_type(t_left, t_right, "*") == "int"):
+                t_left = type(left).__name__
+                t_right = type(right).__name__
+                result_type = self.semantic_cube.get_type(t_left, t_right, "*")
+
+                if (result_type == "int"):
                     return int(left * right)
-                elif (self.semantic_cube.get_type(t_left, t_right, "*") == "float"):
+                elif (result_type == "float"):
                     return float(left * right)
                 else:
-                    raise TypeError(f"Invalid types for multiplication: {t_left} * {t_right}")
+                    raise TypeError(f"Unsupported operand types for multiplication: {t_left} * {t_right}")
 
             #############################################################################################################
             elif expr_type == "term_div":  # Division
                 left = self.evaluate_expression(expr_tree[1])
                 right = self.evaluate_expression(expr_tree[2])
-                t_left = "int" if isinstance(left, int) else "float"
-                t_right = "int" if isinstance(right, int) else "float"
+
+                t_left = type(left).__name__
+                t_right = type(right).__name__
+                result_type = self.semantic_cube.get_type(t_left, t_right, "/")
+
+                if result_type is None:
+                    raise TypeError(f"Unsupported operand types for division: {t_left} / {t_right}")
+
                 if right == 0:
                     raise ZeroDivisionError("Division by zero is not allowed.")
                 
-                if (self.semantic_cube.get_type(t_left, t_right, "/") == "float"):
+                if result_type == "int":
+                    return int(left / right)
+                elif result_type == "float":
                     return float(left / right)
                 else:
-                    raise TypeError(f"Invalid types for division: {t_left} / {t_right}")
+                    # If somehow an unexpected type comes up
+                    raise TypeError(f"Unexpected result type from division: {result_type}")
                 
             #############################################################################################################
             elif expr_type == "exp_plus":  # Addition
                 left = self.evaluate_expression(expr_tree[1])
                 right = self.evaluate_expression(expr_tree[2])
-                t_left = "int" if isinstance(left, int) else "float"
-                t_right = "int" if isinstance(right, int) else "float"
 
-                if (self.semantic_cube.get_type(t_left, t_right, "+") == "int"):
+                t_left = type(left).__name__
+                t_right = type(right).__name__
+                result_type = self.semantic_cube.get_type(t_left, t_right, "+")
+
+                if (result_type == "int"):
                     return int(left + right)
-                elif (self.semantic_cube.get_type(t_left, t_right, "+") == "float"):
+                elif (result_type == "float"):
                     return float(left + right)
                 else:
                     raise TypeError(f"Invalid types for addition: {t_left} + {t_right}")
@@ -74,12 +87,14 @@ class QuackInterpreter:
             elif expr_type == "exp_minus":  # Subtraction
                 left = self.evaluate_expression(expr_tree[1])
                 right = self.evaluate_expression(expr_tree[2])
-                t_left = "int" if isinstance(left, int) else "float"
-                t_right = "int" if isinstance(right, int) else "float"
 
-                if (self.semantic_cube.get_type(t_left, t_right, "-") == "int"):
+                t_left = type(left).__name__
+                t_right = type(right).__name__
+                result_type = self.semantic_cube.get_type(t_left, t_right, "-")
+
+                if (result_type == "int"):
                     return int(left - right)
-                elif (self.semantic_cube.get_type(t_left, t_right, "-") == "float"):
+                elif (result_type == "float"):
                     return float(left - right)
                 else:
                     raise TypeError(f"Invalid types for subtraction: {t_left} - {t_right}")
@@ -90,9 +105,11 @@ class QuackInterpreter:
                 op = expr_tree[2]
                 right = self.evaluate_expression(expr_tree[3])
 
-                t_left = "int" if isinstance(left, int) else "float"
-                t_right = "int" if isinstance(right, int) else "float"
-                if (self.semantic_cube.get_type(t_left, t_right, op) != "int"):
+                t_left = type(left).__name__
+                t_right = type(right).__name__
+                result_type = self.semantic_cube.get_type(t_left, t_right, op)
+
+                if (result_type != "int"):
                     raise TypeError(f"Invalid types for comparison: {t_left} {op} {t_right}")
 
                 if op == "==":
@@ -116,9 +133,11 @@ class QuackInterpreter:
                 op = expr_tree[2]
                 right = self.evaluate_expression(expr_tree[3])
 
-                t_left = "int" if isinstance(left, int) else "float"
-                t_right = "int" if isinstance(right, int) else "float"
-                if (self.semantic_cube.get_type(t_left, t_right, op) != "int"):
+                t_left = type(left).__name__
+                t_right = type(right).__name__
+                result_type = self.semantic_cube.get_type(t_left, t_right, op)
+
+                if (result_type != "int"):
                     raise TypeError(f"Invalid types for logical operation: {t_left} {op} {t_right}")
 
                 if op == "and":
