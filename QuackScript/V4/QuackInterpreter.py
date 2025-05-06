@@ -225,7 +225,7 @@ class QuackInterpreter:
            
             #############################################################################################################
             elif ir_type == "print":
-                n = 1 if len(ir[1])==1 else len(ir[1])-1
+                n = 1 if len(ir[1])==1 else len(ir[1])
                 for i in range(n):
                     item = ir[1][i]
                     if isinstance(item, tuple) and item[0] == "id":
