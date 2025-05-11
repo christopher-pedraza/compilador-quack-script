@@ -23,12 +23,23 @@ factor: id -> factor_id
     | exp PLUS term -> exp_plus
     | exp MINUS term -> exp_minus
 
-?expresion: exp
-          | exp comparison_op exp -> expresion_comparison_op
-          | exp logic_cond exp -> expresion_logic_cond
+// ?expresion: exp
+//           | exp comparison_op exp -> expresion_comparison_op
+//           | exp logic_cond exp -> expresion_logic_cond
+
+?comparison: exp
+           | exp comparison_op exp -> binary_comparison
+
+?logical_and: comparison
+            | logical_and AND comparison -> binary_logical_and
+
+?logical_or: logical_and
+           | logical_or OR logical_and -> binary_logical_or
+
+?expresion: logical_or
 
 ?comparison_op: GT | LT | NE | EE | GTE | LTE
-?logic_cond: AND | OR
+// ?logic_cond: AND | OR
 
 ?var_type: "float" -> float_type
          | "int" -> int_type

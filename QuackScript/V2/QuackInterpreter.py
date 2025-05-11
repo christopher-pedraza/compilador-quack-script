@@ -105,13 +105,6 @@ class QuackInterpreter:
                     return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for addition: {t_left} + {t_right}")
-
-                # if (result_type == "int"):
-                #     return int(left + right)
-                # elif (result_type == "float"):
-                #     return float(left + right)
-                # else:
-                #     raise UnsupportedOperationError(f"Unsupported operand types for addition: {t_left} + {t_right}")
             
             #############################################################################################################
             elif expr_type == "exp_minus":  # Subtraction
@@ -128,23 +121,9 @@ class QuackInterpreter:
                     return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for subtraction: {t_left} - {t_right}")
-                
-                # left = self.evaluate_expression(expr_tree[1])
-                # right = self.evaluate_expression(expr_tree[2])
-
-                # t_left = type(left).__name__
-                # t_right = type(right).__name__
-                # result_type = self.semantic_cube.get_type(t_left, t_right, "-")
-
-                # if (result_type == "int"):
-                #     return int(left - right)
-                # elif (result_type == "float"):
-                #     return float(left - right)
-                # else:
-                #     raise UnsupportedOperationError(f"Unsupported operand types for subtraction: {t_left} - {t_right}")
             
             #############################################################################################################
-            elif expr_type == "expresion_comparison_op":  # Comparison
+            elif expr_type == "binary_comparison":  # Comparison
                 left = self.evaluate_expression(expr_tree[1])
                 op = expr_tree[2]
                 right = self.evaluate_expression(expr_tree[3])
@@ -174,24 +153,40 @@ class QuackInterpreter:
                 return 1 if result else 0
                 
             #############################################################################################################
-            elif expr_type == "expresion_logic_cond":  # Logical operation
+            elif expr_type == "binary_logical_and":  # Logical operation
                 left = self.evaluate_expression(expr_tree[1])
-                op = expr_tree[2]
-                right = self.evaluate_expression(expr_tree[3])
+                right = self.evaluate_expression(expr_tree[2])
 
                 t_left = type(left).__name__
                 t_right = type(right).__name__
-                result_type = self.semantic_cube.get_type(t_left, t_right, op)
+                result_type = self.semantic_cube.get_type(t_left, t_right, "and")
 
                 if (result_type != "int"):
-                    raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} {op} {t_right}")
+                    raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} and {t_right}")
 
-                if op == "and":
+                if result_type:
                     result = bool(left) and bool(right)
-                elif op == "or":
+                else:
+                    raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} and {t_right}")
+
+                return 1 if result else 0
+            
+            #############################################################################################################
+            elif expr_type == "binary_logical_or":  # Logical operation
+                left = self.evaluate_expression(expr_tree[1])
+                right = self.evaluate_expression(expr_tree[2])
+
+                t_left = type(left).__name__
+                t_right = type(right).__name__
+                result_type = self.semantic_cube.get_type(t_left, t_right, "or")
+
+                if (result_type != "int"):
+                    raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} or {t_right}")
+
+                if result_type:
                     result = bool(left) or bool(right)
                 else:
-                    raise UnsupportedOperationError(f"Unknown logical operator: {op}")
+                    raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} or {t_right}")
 
                 return 1 if result else 0
                 

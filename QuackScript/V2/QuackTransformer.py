@@ -81,17 +81,37 @@ class QuackTransformer(Transformer):
     def exp_minus(self, exp, minus, term):
         return ("exp_minus", exp, term)
 
+    # """
+    # ?expresion: exp
+    #           | exp comparison_op exp -> expresion_comparison_op
+    #           | exp logic_cond exp -> expresion_logic_cond
+    # """
+    # def expresion_comparison_op(self, exp1, comparison_op, exp2):
+    #     return ("expresion_comparison_op", exp1, comparison_op, exp2)
+        
+    # def expresion_logic_cond(self, exp1, logic_cond, exp2):
+    #     return ("expresion_logic_cond", exp1, logic_cond, exp2)
+
+    """
+    ?comparison: exp
+               | exp comparison_op exp -> binary_comparison
+    """
+    def binary_comparison(self, exp1, comparison_op, exp2):
+        return ("binary_comparison", exp1, comparison_op, exp2)
     
     """
-    ?expresion: exp
-              | exp comparison_op exp -> expresion_comparison_op
-              | exp logic_cond exp -> expresion_logic_cond
+    ?logical_and: comparison
+                | logical_and AND comparison -> binary_logical_and
     """
-    def expresion_comparison_op(self, exp1, comparison_op, exp2):
-        return ("expresion_comparison_op", exp1, comparison_op, exp2)
-        
-    def expresion_logic_cond(self, exp1, logic_cond, exp2):
-        return ("expresion_logic_cond", exp1, logic_cond, exp2)
+    def binary_logical_and(self, logical_and, and_, comparison):
+        return ("binary_logical_and", logical_and, comparison)
+
+    """
+    ?logical_or: logical_and
+               | logical_or OR logical_and -> binary_logical_or
+    """
+    def binary_logical_or(self, logical_or, or_, logical_and):
+        return ("binary_logical_or", logical_or, logical_and)
     
     """
     ?var_type: "float" -> float_type
