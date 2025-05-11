@@ -6,11 +6,12 @@ from Exceptions import UnsupportedOperationError, \
                        UnknownIRTypeError
 
 class QuackInterpreter:
-    def __init__(self, symbol_table):
+    def __init__(self, symbol_table, quack_quadruple):
         self.symbol_table = symbol_table
         self.global_container_name = self.symbol_table.global_container_name
         self.current_container = self.global_container_name
         self.semantic_cube = SemanticCube()
+        self.quack_quadruple = quack_quadruple
 
     def evaluate_expression(self, expr_tree):
         if isinstance(expr_tree, tuple):
@@ -76,19 +77,57 @@ class QuackInterpreter:
                 
             #############################################################################################################
             elif expr_type == "exp_plus":  # Addition
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
+                print("\n\n\n\n\n\n")
+                print("expr_tree:", expr_tree)
+                print("LEFT:", expr_tree[1])
+                print("RIGHT:", expr_tree[2])
+                # Check if the expression is a quadruple
+                if isinstance(expr_tree[1], tuple) and expr_tree[1][0] == "quadruple":
+                    left = expr_tree[1][1]
+                    t_left = expr_tree[1][2]
+                else:
+                    left = self.evaluate_expression(expr_tree[1]) 
+                    t_left = type(left).__name__
+                    
+                if isinstance(expr_tree[2], tuple) and expr_tree[2][0] == "quadruple":
+                    right = expr_tree[2][1]
+                    t_right = expr_tree[2][2]
+                else:
+                    right = self.evaluate_expression(expr_tree[2])
+                    t_right = type(right).__name__
+                
+                print("****", expr_tree)
+                print("LEFT:", left)
+                print("RIGHT:", right)
 
-                t_left = type(left).__name__
-                t_right = type(right).__name__
+                if isinstance(left, tuple) and left[0] == "quadruple":
+                    print("Left is a quadruple")
+                    t_left = left[2]
+                    left = left[1]
+                    
+                if isinstance(right, tuple) and right[0] == "quadruple":
+                    t_right = right[2]
+                    right = right[1]
+
+                print("Adding")
+                print(left, t_left)
+                print(right, t_right)
+                
                 result_type = self.semantic_cube.get_type(t_left, t_right, "+")
 
-                if (result_type == "int"):
-                    return int(left + right)
-                elif (result_type == "float"):
-                    return float(left + right)
+                if result_type:
+                    result = self.quack_quadruple.add_quadruple("+", left, right)
+                    print("RESULT:", ("quadruple", result, result_type))
+                    return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for addition: {t_left} + {t_right}")
+
+                # if (result_type == "int"):
+                #     return int(left + right)
+                # elif (result_type == "float"):
+                #     return float(left + right)
+                # else:
+                #     raise UnsupportedOperationError(f"Unsupported operand types for addition: {t_left} + {t_right}")
             
             #############################################################################################################
             elif expr_type == "exp_minus":  # Subtraction
@@ -226,9 +265,16 @@ class QuackInterpreter:
            
             #############################################################################################################
             elif ir_type == "print":
-                n = 1 if len(ir[1])==1 else len(ir[1])
+                print_statement = None
+
+                if isinstance(ir[1], tuple) and ir[1][0] == "quadruple":
+                    print_statement = ir[1][1]
+                else:
+                    print_statement = ir[1]
+
+                n = 1 if len(print_statement)==1 else len(print_statement)
                 for i in range(n):
-                    item = ir[1][i]
+                    item = print_statement[i]
                     if isinstance(item, tuple) and item[0] == "id":
                         var_name = item[1]
                         value = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)

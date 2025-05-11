@@ -272,10 +272,10 @@ class QuackTransformer(Transformer):
         return ("func_call", id, params)
         
     """
-    program: PROGRAM id SEMICOLON MAIN body END -> program_no_decl
-           | PROGRAM id SEMICOLON (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
-           | PROGRAM id SEMICOLON function+ MAIN body END -> program_func_no_decl
-           | PROGRAM id SEMICOLON (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
+    program: program_pt1 program_pt2 MAIN body END -> program_no_decl
+           | program_pt1 program_pt2 (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
+           | program_pt1 program_pt2 function+ MAIN body END -> program_func_no_decl
+           | program_pt1 program_pt2 (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
     """
     def program_no_decl(self, program_pt1, program_pt2, main, body, end):
         id = program_pt2
@@ -316,11 +316,9 @@ class QuackTransformer(Transformer):
     ?program_pt2: id SEMICOLON
     """
     def program_pt1(self, program):
-        print("Creando directorio de funciones")
         self.symbol_table = SymbolTable()
         return program
     
     def program_pt2(self, id, semicolon):
-        print("Agregando id al directorio de funciones")
         self.symbol_table.create_global_container(id)
         return id

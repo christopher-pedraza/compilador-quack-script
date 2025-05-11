@@ -5,7 +5,7 @@ import os
 from lark import Lark, logger, UnexpectedInput
 from QuackTransformer import QuackTransformer
 from QuackInterpreter import QuackInterpreter
-from SymbolTable import SymbolTable
+from QuackQuadruple import QuackQuadruple
 
 logger.setLevel(logging.DEBUG)
 
@@ -38,8 +38,11 @@ def parse_program(program):
         symbol_table = quack_transformer.symbol_table
 
         # Execute the IR
-        quack_interpreter = QuackInterpreter(symbol_table)
+        quack_quadruple = QuackQuadruple()
+        quack_interpreter = QuackInterpreter(symbol_table, quack_quadruple)
         quack_interpreter.execute(ir)
+
+        print(quack_quadruple)
 
         # Display the symbol table after execution
         # print("\nSymbol Table after execution:")
