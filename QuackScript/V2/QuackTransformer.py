@@ -61,61 +61,25 @@ class QuackTransformer(Transformer):
     
     """
     ?term: factor
-         | factor (MULT factor)+ -> term_mult
-         | factor (DIV factor)+ -> term_div
+        | term MULT factor -> term_mult
+        | term DIV factor -> term_div
     """
-    # def term_mult(self, factor1, mult, factor2):
-    #     return ("term_mult", factor1, factor2)
-    def term_mult(self, factor1, *args):
-        factors = [factor1]
-        for i in range(1, len(args), 2):
-            factors.append(args[i])
-        # Create a nested structure for multiplication
-        result = factors[0]
-        for factor in factors[1:]:
-            result = ("term_mult", result, factor)
-        return result
+    def term_mult(self, term, mult, factor):
+        return ("term_mult", term, factor)
     
-    # def term_div(self, factor1, div, factor2):
-    #     return ("term_div", factor1, factor2)
-    def term_div(self, factor1, *args):
-        factors = [factor1]
-        for i in range(1, len(args), 2):
-            factors.append(args[i])
-        # Create a nested structure for division
-        result = factors[0]
-        for factor in factors[1:]:
-            result = ("term_div", result, factor)
-        return result
+    def term_div(self, term, div, factor):
+        return ("term_div", term, factor)
 
     """
     ?exp: term
-        | term (PLUS term)+ -> exp_plus
-        | term (MINUS term)+ -> exp_minus
+        | exp PLUS term -> exp_plus
+        | exp MINUS term -> exp_minus
     """
-    # def exp_plus(self, term1, plus, term2):
-    #     return ("exp_plus", term1, term2)
-    def exp_plus(self, term1, *args):
-        terms = [term1]
-        for i in range(1, len(args), 2):
-            terms.append(args[i])
-        # Create a nested structure for addition
-        result = terms[0]
-        for term in terms[1:]:
-            result = ("exp_plus", result, term)
-        return result
+    def exp_plus(self, exp, plus, term):
+        return ("exp_plus", exp, term)
     
-    # def exp_minus(self, term1, minus, term2):
-    #     return ("exp_minus", term1, term2)
-    def exp_minus(self, term1, *args):
-        terms = [term1]
-        for i in range(1, len(args), 2):
-            terms.append(args[i])
-        # Create a nested structure for subtraction
-        result = terms[0]
-        for term in terms[1:]:
-            result = ("exp_minus", result, term)
-        return result
+    def exp_minus(self, exp, minus, term):
+        return ("exp_minus", exp, term)
 
     
     """
