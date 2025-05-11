@@ -14,17 +14,24 @@ class QuackInterpreter:
         self.quack_quadruple = quack_quadruple
 
     def _resolve_operand(self, node):
+        print(f"Resolving operand: {node}")
         if isinstance(node, tuple) and node[0] == "quadruple":
             value = node[1]
             value_type = node[2]
         else:
             value = self.evaluate_expression(node)
+            print(f"Value: {value}")
             value_type = type(value).__name__
 
         # Second pass: unwrap if result is a quadruple
         if isinstance(value, tuple) and value[0] == "quadruple":
             value_type = value[2]
             value = value[1]
+        elif isinstance(value, tuple) and value[0] == "id":
+            value_type = value[2]
+            value = value[1]
+        print(f"**Value: {value}")
+        print(f"**Value type: {value_type}")
 
         return value, value_type
 
@@ -34,8 +41,13 @@ class QuackInterpreter:
 
             #############################################################################################################
             if expr_type == "id":  # Variable reference
+                print(f"Resolving variable: {expr_tree}")
                 var_name = expr_tree[1]
-                return self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
+                value = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
+                var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
+                result = ("id", value, var_type)
+                print("\tVariable resolved:", result)
+                return result
             
             #############################################################################################################
             elif expr_type == "negative_id":  # Negative variable reference
@@ -118,33 +130,6 @@ class QuackInterpreter:
             
             #############################################################################################################
             elif expr_type == "binary_comparison":  # Comparison
-                # left = self.evaluate_expression(expr_tree[1])
-                # op = expr_tree[2]
-                # right = self.evaluate_expression(expr_tree[3])
-
-                # t_left = type(left).__name__
-                # t_right = type(right).__name__
-                # result_type = self.semantic_cube.get_type(t_left, t_right, op)
-
-                # if (result_type != "int"):
-                #     raise UnsupportedOperationError(f"Unsupported operand types for comparison: {t_left} {op} {t_right}")
-
-                # if op == "==":
-                #     result = left == right
-                # elif op == "!=":
-                #     result = left != right
-                # elif op == "<":
-                #     result = left < right
-                # elif op == "<=":
-                #     result = left <= right
-                # elif op == ">":
-                #     result = left > right
-                # elif op == ">=":
-                #     result = left >= right
-                # else:
-                #     raise UnsupportedOperationError(f"Unknown comparison operator: {op}")
-
-                # return 1 if result else 0
                 left_node = expr_tree[1]
                 op = expr_tree[2]
                 right_node = expr_tree[3]
@@ -162,22 +147,6 @@ class QuackInterpreter:
                 
             #############################################################################################################
             elif expr_type == "binary_logical_and":  # Logical operation
-                # left = self.evaluate_expression(expr_tree[1])
-                # right = self.evaluate_expression(expr_tree[2])
-
-                # t_left = type(left).__name__
-                # t_right = type(right).__name__
-                # result_type = self.semantic_cube.get_type(t_left, t_right, "and")
-
-                # if (result_type != "int"):
-                #     raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} and {t_right}")
-
-                # if result_type:
-                #     result = bool(left) and bool(right)
-                # else:
-                #     raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} and {t_right}")
-
-                # return 1 if result else 0
                 left_node = expr_tree[1]
                 right_node = expr_tree[2]
 
@@ -194,22 +163,6 @@ class QuackInterpreter:
             
             #############################################################################################################
             elif expr_type == "binary_logical_or":  # Logical operation
-                # left = self.evaluate_expression(expr_tree[1])
-                # right = self.evaluate_expression(expr_tree[2])
-
-                # t_left = type(left).__name__
-                # t_right = type(right).__name__
-                # result_type = self.semantic_cube.get_type(t_left, t_right, "or")
-
-                # if (result_type != "int"):
-                #     raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} or {t_right}")
-
-                # if result_type:
-                #     result = bool(left) or bool(right)
-                # else:
-                #     raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} or {t_right}")
-
-                # return 1 if result else 0
                 left_node = expr_tree[1]
                 right_node = expr_tree[2]
 
@@ -234,9 +187,11 @@ class QuackInterpreter:
             #############################################################################################################
             if ir_type == "assign":
                 var_name = ir[1]
-                value = self.evaluate_expression(ir[2])
 
-                value_type = type(value).__name__
+                resolved_expression = self._resolve_operand(ir[2])
+                value = resolved_expression[0]
+                value_type = resolved_expression[1]
+
                 var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
 
                 if self.semantic_cube.is_decl_valid(var_type, value_type):
@@ -245,6 +200,8 @@ class QuackInterpreter:
                     raise TypeMismatchError(
                         f"Cannot assign type '{value_type}' to variable '{var_name}' of type '{var_type}'"
                     )
+                
+                self.quack_quadruple.add_quadruple("=", value, None, var_name)
 
                 self.symbol_table.update_variable(name=var_name, value=value, containerName=self.current_container)
 
@@ -253,22 +210,22 @@ class QuackInterpreter:
                 var_type = ir[2]
                 initializer = ir[3] if ir[3] else None
 
-                value = self.evaluate_expression(initializer) if initializer else None
-                value_type = type(value).__name__ if value is not None else None
+                evaluated_expression = self.evaluate_expression(initializer) if initializer else None
+                value = evaluated_expression[1] if evaluated_expression else None
+                value_type = evaluated_expression[2] if evaluated_expression else None
 
-                if value is not None:
+                if evaluated_expression is not None:
                     if not self.semantic_cube.is_decl_valid(var_type, value_type):
                         raise TypeMismatchError(
                             f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'"
                         )
-                    converted_value = self.semantic_cube.convert_type(var_type, value_type, value)
-                else:
-                    converted_value = None
 
                 for var in ir[1]:
+                    self.quack_quadruple.add_quadruple("=", value, None, var)
+
                     self.symbol_table.add_variable(
                         name=var,
-                        value=converted_value,
+                        value=value,
                         var_type=var_type,
                         containerName=self.current_container,
                         category=ir[4]
