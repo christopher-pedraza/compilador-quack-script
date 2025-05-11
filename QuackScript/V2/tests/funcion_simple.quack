@@ -1,0 +1,11 @@
+// Prueba: Función básica sin parámetros
+program TestFunction;
+void greet() [
+    {
+        print("Hello, world!");
+    }
+];
+main {
+    greet();
+}
+end
