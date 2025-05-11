@@ -52,21 +52,6 @@ class QuackInterpreter:
             
             #############################################################################################################
             elif expr_type == "term_mult":  # Multiplication
-                # left = self.evaluate_expression(expr_tree[1])
-                # right = self.evaluate_expression(expr_tree[2])
-
-                # t_left = type(left).__name__
-                # t_right = type(right).__name__
-                # result_type = self.semantic_cube.get_type(t_left, t_right, "*")
-
-                # if result_type == "int":
-                #     return int(left * right)
-                # elif result_type == "float":
-                #     return float(left * right)
-                # else:
-                #     raise UnsupportedOperationError(
-                #         f"Unsupported operand types for multiplication: {t_left} * {t_right}"
-                #     )
                 left_node = expr_tree[1]
                 right_node = expr_tree[2]
 
@@ -83,26 +68,6 @@ class QuackInterpreter:
 
             #############################################################################################################
             elif expr_type == "term_div":  # Division
-                # left = self.evaluate_expression(expr_tree[1])
-                # right = self.evaluate_expression(expr_tree[2])
-
-                # t_left = type(left).__name__
-                # t_right = type(right).__name__
-                # result_type = self.semantic_cube.get_type(t_left, t_right, "/")
-
-                # if result_type is None:
-                #     raise UnsupportedOperationError(f"Unsupported operand types for division: {t_left} / {t_right}")
-
-                # if right == 0:
-                #     raise DivisionByZeroError("Division by zero is not allowed.")
-                
-                # if result_type == "int":
-                #     return int(left / right)
-                # elif result_type == "float":
-                #     return float(left / right)
-                # else:
-                #     raise UnsupportedOperationError(f"Unsupported operand
-                #     types for division: {t_left} / {t_right}")
                 left_node = expr_tree[1]
                 right_node = expr_tree[2]
 
@@ -153,71 +118,111 @@ class QuackInterpreter:
             
             #############################################################################################################
             elif expr_type == "binary_comparison":  # Comparison
-                left = self.evaluate_expression(expr_tree[1])
-                op = expr_tree[2]
-                right = self.evaluate_expression(expr_tree[3])
+                # left = self.evaluate_expression(expr_tree[1])
+                # op = expr_tree[2]
+                # right = self.evaluate_expression(expr_tree[3])
 
-                t_left = type(left).__name__
-                t_right = type(right).__name__
+                # t_left = type(left).__name__
+                # t_right = type(right).__name__
+                # result_type = self.semantic_cube.get_type(t_left, t_right, op)
+
+                # if (result_type != "int"):
+                #     raise UnsupportedOperationError(f"Unsupported operand types for comparison: {t_left} {op} {t_right}")
+
+                # if op == "==":
+                #     result = left == right
+                # elif op == "!=":
+                #     result = left != right
+                # elif op == "<":
+                #     result = left < right
+                # elif op == "<=":
+                #     result = left <= right
+                # elif op == ">":
+                #     result = left > right
+                # elif op == ">=":
+                #     result = left >= right
+                # else:
+                #     raise UnsupportedOperationError(f"Unknown comparison operator: {op}")
+
+                # return 1 if result else 0
+                left_node = expr_tree[1]
+                op = expr_tree[2]
+                right_node = expr_tree[3]
+
+                left, t_left = self._resolve_operand(left_node)
+                right, t_right = self._resolve_operand(right_node)
+
                 result_type = self.semantic_cube.get_type(t_left, t_right, op)
 
-                if (result_type != "int"):
-                    raise UnsupportedOperationError(f"Unsupported operand types for comparison: {t_left} {op} {t_right}")
-
-                if op == "==":
-                    result = left == right
-                elif op == "!=":
-                    result = left != right
-                elif op == "<":
-                    result = left < right
-                elif op == "<=":
-                    result = left <= right
-                elif op == ">":
-                    result = left > right
-                elif op == ">=":
-                    result = left >= right
+                if result_type:
+                    result = self.quack_quadruple.add_quadruple(op, left, right)
+                    return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unknown comparison operator: {op}")
-
-                return 1 if result else 0
                 
             #############################################################################################################
             elif expr_type == "binary_logical_and":  # Logical operation
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
+                # left = self.evaluate_expression(expr_tree[1])
+                # right = self.evaluate_expression(expr_tree[2])
 
-                t_left = type(left).__name__
-                t_right = type(right).__name__
+                # t_left = type(left).__name__
+                # t_right = type(right).__name__
+                # result_type = self.semantic_cube.get_type(t_left, t_right, "and")
+
+                # if (result_type != "int"):
+                #     raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} and {t_right}")
+
+                # if result_type:
+                #     result = bool(left) and bool(right)
+                # else:
+                #     raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} and {t_right}")
+
+                # return 1 if result else 0
+                left_node = expr_tree[1]
+                right_node = expr_tree[2]
+
+                left, t_left = self._resolve_operand(left_node)
+                right, t_right = self._resolve_operand(right_node)
+
                 result_type = self.semantic_cube.get_type(t_left, t_right, "and")
 
-                if (result_type != "int"):
-                    raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} and {t_right}")
-
                 if result_type:
-                    result = bool(left) and bool(right)
+                    result = self.quack_quadruple.add_quadruple("and", left, right)
+                    return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} and {t_right}")
-
-                return 1 if result else 0
             
             #############################################################################################################
             elif expr_type == "binary_logical_or":  # Logical operation
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
+                # left = self.evaluate_expression(expr_tree[1])
+                # right = self.evaluate_expression(expr_tree[2])
 
-                t_left = type(left).__name__
-                t_right = type(right).__name__
+                # t_left = type(left).__name__
+                # t_right = type(right).__name__
+                # result_type = self.semantic_cube.get_type(t_left, t_right, "or")
+
+                # if (result_type != "int"):
+                #     raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} or {t_right}")
+
+                # if result_type:
+                #     result = bool(left) or bool(right)
+                # else:
+                #     raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} or {t_right}")
+
+                # return 1 if result else 0
+                left_node = expr_tree[1]
+                right_node = expr_tree[2]
+
+                left, t_left = self._resolve_operand(left_node)
+                right, t_right = self._resolve_operand(right_node)
+
                 result_type = self.semantic_cube.get_type(t_left, t_right, "or")
 
-                if (result_type != "int"):
-                    raise UnsupportedOperationError(f"Invalid types for logical operation: {t_left} or {t_right}")
-
                 if result_type:
-                    result = bool(left) or bool(right)
+                    result = self.quack_quadruple.add_quadruple("or", left, right)
+                    return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} or {t_right}")
-
-                return 1 if result else 0
                 
         else:
             raise UnsupportedExpressionError(f"Unsupported expression type: {expr_tree}")

@@ -114,6 +114,12 @@ class QuackTransformer(Transformer):
         return ("binary_logical_or", logical_or, logical_and)
     
     """
+    comparison_op: GT | LT | NE | EE | GTE | LTE
+    """
+    def comparison_op(self, value):
+        return str(value)
+    
+    """
     ?var_type: "float" -> float_type
              | "int" -> int_type
     """

@@ -38,7 +38,7 @@ factor: id -> factor_id
 
 ?expresion: logical_or
 
-?comparison_op: GT | LT | NE | EE | GTE | LTE
+comparison_op: GT | LT | NE | EE | GTE | LTE
 // ?logic_cond: AND | OR
 
 ?var_type: "float" -> float_type
