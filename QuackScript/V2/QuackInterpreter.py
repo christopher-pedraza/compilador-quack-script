@@ -13,6 +13,21 @@ class QuackInterpreter:
         self.semantic_cube = SemanticCube()
         self.quack_quadruple = quack_quadruple
 
+    def _resolve_operand(self, node):
+        if isinstance(node, tuple) and node[0] == "quadruple":
+            value = node[1]
+            value_type = node[2]
+        else:
+            value = self.evaluate_expression(node)
+            value_type = type(value).__name__
+
+        # Second pass: unwrap if result is a quadruple
+        if isinstance(value, tuple) and value[0] == "quadruple":
+            value_type = value[2]
+            value = value[1]
+
+        return value, value_type
+
     def evaluate_expression(self, expr_tree):
         if isinstance(expr_tree, tuple):
             expr_type = expr_tree[0]
@@ -77,47 +92,16 @@ class QuackInterpreter:
                 
             #############################################################################################################
             elif expr_type == "exp_plus":  # Addition
-                print("\n\n\n\n\n\n")
-                print("expr_tree:", expr_tree)
-                print("LEFT:", expr_tree[1])
-                print("RIGHT:", expr_tree[2])
-                # Check if the expression is a quadruple
-                if isinstance(expr_tree[1], tuple) and expr_tree[1][0] == "quadruple":
-                    left = expr_tree[1][1]
-                    t_left = expr_tree[1][2]
-                else:
-                    left = self.evaluate_expression(expr_tree[1]) 
-                    t_left = type(left).__name__
-                    
-                if isinstance(expr_tree[2], tuple) and expr_tree[2][0] == "quadruple":
-                    right = expr_tree[2][1]
-                    t_right = expr_tree[2][2]
-                else:
-                    right = self.evaluate_expression(expr_tree[2])
-                    t_right = type(right).__name__
-                
-                print("****", expr_tree)
-                print("LEFT:", left)
-                print("RIGHT:", right)
+                left_node = expr_tree[1]
+                right_node = expr_tree[2]
 
-                if isinstance(left, tuple) and left[0] == "quadruple":
-                    print("Left is a quadruple")
-                    t_left = left[2]
-                    left = left[1]
-                    
-                if isinstance(right, tuple) and right[0] == "quadruple":
-                    t_right = right[2]
-                    right = right[1]
+                left, t_left = self._resolve_operand(left_node)
+                right, t_right = self._resolve_operand(right_node)
 
-                print("Adding")
-                print(left, t_left)
-                print(right, t_right)
-                
                 result_type = self.semantic_cube.get_type(t_left, t_right, "+")
 
                 if result_type:
                     result = self.quack_quadruple.add_quadruple("+", left, right)
-                    print("RESULT:", ("quadruple", result, result_type))
                     return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for addition: {t_left} + {t_right}")
@@ -131,19 +115,33 @@ class QuackInterpreter:
             
             #############################################################################################################
             elif expr_type == "exp_minus":  # Subtraction
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
+                left_node = expr_tree[1]
+                right_node = expr_tree[2]
 
-                t_left = type(left).__name__
-                t_right = type(right).__name__
+                left, t_left = self._resolve_operand(left_node)
+                right, t_right = self._resolve_operand(right_node)
+
                 result_type = self.semantic_cube.get_type(t_left, t_right, "-")
 
-                if (result_type == "int"):
-                    return int(left - right)
-                elif (result_type == "float"):
-                    return float(left - right)
+                if result_type:
+                    result = self.quack_quadruple.add_quadruple("-", left, right)
+                    return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for subtraction: {t_left} - {t_right}")
+                
+                # left = self.evaluate_expression(expr_tree[1])
+                # right = self.evaluate_expression(expr_tree[2])
+
+                # t_left = type(left).__name__
+                # t_right = type(right).__name__
+                # result_type = self.semantic_cube.get_type(t_left, t_right, "-")
+
+                # if (result_type == "int"):
+                #     return int(left - right)
+                # elif (result_type == "float"):
+                #     return float(left - right)
+                # else:
+                #     raise UnsupportedOperationError(f"Unsupported operand types for subtraction: {t_left} - {t_right}")
             
             #############################################################################################################
             elif expr_type == "expresion_comparison_op":  # Comparison

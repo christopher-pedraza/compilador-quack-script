@@ -6,6 +6,7 @@ class QuackQuadruple:
         self.returns_stack = []
         self.quadruples = deque()
         self.current_memory_space = 0
+        self.current_index = 0
 
     def get_current_memory_space(self):
         """Get the current memory space."""
@@ -17,9 +18,8 @@ class QuackQuadruple:
         """Add a quadruple to the list."""
         if result is None:
             result = f"t{self.get_current_memory_space()}"
-        if op == "GOTO":
-            self.jumps_stack.append(result)
         self.quadruples.append((op, arg1, arg2, result))
+        self.current_index += 1
         return result
 
     def get_quadruples(self):
