@@ -4,6 +4,6 @@ program TestExpr;
 var x: int;
 
 main {
-    print((1 or 0) and 0);
+    print(2 * 3 + 1 / 6);
 }
 end

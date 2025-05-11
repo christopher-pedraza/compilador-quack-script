@@ -52,41 +52,70 @@ class QuackInterpreter:
             
             #############################################################################################################
             elif expr_type == "term_mult":  # Multiplication
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
+                # left = self.evaluate_expression(expr_tree[1])
+                # right = self.evaluate_expression(expr_tree[2])
 
-                t_left = type(left).__name__
-                t_right = type(right).__name__
+                # t_left = type(left).__name__
+                # t_right = type(right).__name__
+                # result_type = self.semantic_cube.get_type(t_left, t_right, "*")
+
+                # if result_type == "int":
+                #     return int(left * right)
+                # elif result_type == "float":
+                #     return float(left * right)
+                # else:
+                #     raise UnsupportedOperationError(
+                #         f"Unsupported operand types for multiplication: {t_left} * {t_right}"
+                #     )
+                left_node = expr_tree[1]
+                right_node = expr_tree[2]
+
+                left, t_left = self._resolve_operand(left_node)
+                right, t_right = self._resolve_operand(right_node)
+
                 result_type = self.semantic_cube.get_type(t_left, t_right, "*")
 
-                if result_type == "int":
-                    return int(left * right)
-                elif result_type == "float":
-                    return float(left * right)
+                if result_type:
+                    result = self.quack_quadruple.add_quadruple("*", left, right)
+                    return ("quadruple", result, result_type)
                 else:
-                    raise UnsupportedOperationError(
-                        f"Unsupported operand types for multiplication: {t_left} * {t_right}"
-                    )
+                    raise UnsupportedOperationError(f"Unsupported operand types for multiplication: {t_left} * {t_right}")
 
             #############################################################################################################
             elif expr_type == "term_div":  # Division
-                left = self.evaluate_expression(expr_tree[1])
-                right = self.evaluate_expression(expr_tree[2])
+                # left = self.evaluate_expression(expr_tree[1])
+                # right = self.evaluate_expression(expr_tree[2])
 
-                t_left = type(left).__name__
-                t_right = type(right).__name__
+                # t_left = type(left).__name__
+                # t_right = type(right).__name__
+                # result_type = self.semantic_cube.get_type(t_left, t_right, "/")
+
+                # if result_type is None:
+                #     raise UnsupportedOperationError(f"Unsupported operand types for division: {t_left} / {t_right}")
+
+                # if right == 0:
+                #     raise DivisionByZeroError("Division by zero is not allowed.")
+                
+                # if result_type == "int":
+                #     return int(left / right)
+                # elif result_type == "float":
+                #     return float(left / right)
+                # else:
+                #     raise UnsupportedOperationError(f"Unsupported operand
+                #     types for division: {t_left} / {t_right}")
+                left_node = expr_tree[1]
+                right_node = expr_tree[2]
+
+                left, t_left = self._resolve_operand(left_node)
+                right, t_right = self._resolve_operand(right_node)
+
                 result_type = self.semantic_cube.get_type(t_left, t_right, "/")
 
-                if result_type is None:
-                    raise UnsupportedOperationError(f"Unsupported operand types for division: {t_left} / {t_right}")
-
-                if right == 0:
-                    raise DivisionByZeroError("Division by zero is not allowed.")
-                
-                if result_type == "int":
-                    return int(left / right)
-                elif result_type == "float":
-                    return float(left / right)
+                if result_type:
+                    if right == 0:
+                        raise DivisionByZeroError("Division by zero is not allowed.")
+                    result = self.quack_quadruple.add_quadruple("/", left, right)
+                    return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for division: {t_left} / {t_right}")
                 
