@@ -16,12 +16,12 @@ factor: id -> factor_id
       | LPAREN expresion RPAREN -> parenthesis_expresion
 
 ?term: factor
-     | factor (MULT factor)+ -> term_mult
-     | factor (DIV factor)+ -> term_div
+     | term MULT factor -> term_mult
+     | term DIV factor -> term_div
 
 ?exp: term
-    | term (PLUS term)+ -> exp_plus
-    | term (MINUS term)+ -> exp_minus
+    | exp PLUS term -> exp_plus
+    | exp MINUS term -> exp_minus
 
 ?expresion: exp
           | exp comparison_op exp -> expresion_comparison_op
