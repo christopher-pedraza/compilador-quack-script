@@ -29,15 +29,13 @@ def parse_program(program):
 
         # Parse the input program
         tree = quack(program)
-        # print(tree.pretty())
-
-        # Initialize the symbol table
-        symbol_table = SymbolTable()
 
         # Transform the parse tree using QuackTransformer
-        quack_transformer = QuackTransformer(symbol_table)
+        quack_transformer = QuackTransformer()
         ir = quack_transformer.transform(tree)
-        # print(ir)
+
+        # Get the symbol table from the transformer
+        symbol_table = quack_transformer.symbol_table
 
         # Execute the IR
         quack_interpreter = QuackInterpreter(symbol_table)

@@ -1,11 +1,11 @@
 from lark import Lark, Transformer, v_args, Tree, Token
-
+from SymbolTable import SymbolTable
 
 
 @v_args(inline=True)
 class QuackTransformer(Transformer):
-    def __init__(self, symbol_table):
-        pass
+    def __init__(self):
+        self.symbol_table = None
 
     """
     id: CNAME
@@ -277,24 +277,30 @@ class QuackTransformer(Transformer):
            | PROGRAM id SEMICOLON function+ MAIN body END -> program_func_no_decl
            | PROGRAM id SEMICOLON (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
     """
-    def program_no_decl(self, program, id, semicolon, main, body, end):
+    def program_no_decl(self, program_pt1, program_pt2, main, body, end):
+        id = program_pt2
         return ("program", id, [], [], body)
      
-    def program_decl_no_func(self, program, id, semicolon, *args):
+    def program_decl_no_func(self, program_pt1, program_pt2, *args):
+        id = program_pt2
         body = args[-2]
         decls = []
         for i in range(0, len(args)-3):
             decls.append(args[i])
+
+        print(("program", id, decls, [], body))
         return ("program", id, decls, [], body)
     
-    def program_func_no_decl(self, program, id, semicolon, *args):
+    def program_func_no_decl(self, program_pt1, program_pt2, *args):
+        id = program_pt2
         body = args[-2]
         funcs = []
         for i in range(0, len(args)-3):
             funcs.append(args[i])
         return ("program", id, [], funcs, body)
     
-    def program_decl_func(self, program, id, semicolon, *args):
+    def program_decl_func(self, program_pt1, program_pt2, *args):
+        id = program_pt2
         body = args[-2]
         decls = []
         funcs = []
@@ -304,3 +310,17 @@ class QuackTransformer(Transformer):
             else:
                 funcs.append(args[i])
         return ("program", id, decls, funcs, body)
+    
+    """
+    ?program_pt1: PROGRAM
+    ?program_pt2: id SEMICOLON
+    """
+    def program_pt1(self, program):
+        print("Creando directorio de funciones")
+        self.symbol_table = SymbolTable()
+        return program
+    
+    def program_pt2(self, id, semicolon):
+        print("Agregando id al directorio de funciones")
+        self.symbol_table.create_global_container(id)
+        return id

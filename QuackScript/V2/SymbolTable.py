@@ -75,7 +75,7 @@ class Container:
 class SymbolTable:
     def __init__(self):
         self.containers = {}
-        self.add_container(Container("global", None))
+        self.global_container_name = "global"
 
     def get_container(self, name: str) -> Container:
         """Get a container by name."""
@@ -100,7 +100,7 @@ class SymbolTable:
         if container.is_symbol_declared(name):
             return container.get_symbol(name)
         else:
-            container = self.containers["global"]
+            container = self.containers[self.global_container_name]
             if container.is_symbol_declared(name):
                 return container.get_symbol(name)
             else:
@@ -112,14 +112,16 @@ class SymbolTable:
         if container.is_symbol_declared(name):
             container.update_symbol(name, value)
         else:
-            container = self.containers["global"]
+            container = self.containers[self.global_container_name]
             if container.is_symbol_declared(name):
                 container.update_symbol(name, value)
             else:
                 raise NameNotFoundError(f"Symbol '{name}' not found in '{containerName}' or global container.")
             
-    def add_variable(self, name: str, var_type: str, value=None, category="var", containerName: str = "global", param_index: int = None) -> None:
+    def add_variable(self, name: str, var_type: str, value=None, category="var", containerName: str = None, param_index: int = None) -> None:
         """Add a variable to the specified container."""
+        if containerName is None:
+            containerName = self.global_container_name
         variable = Symbol(name=name, var_type=var_type, value=value, category=category, param_index=param_index)
         self.__add_symbol(variable, containerName)
 
@@ -182,3 +184,12 @@ class SymbolTable:
             for symbol_name, symbol in container.symbols.items():
                 result += f"  {symbol_name}: {symbol.var_type}, {symbol.value}, {symbol.category}, {symbol.param_index}\n"
         return result
+    
+    def create_global_container(self, id):
+        """Create a global container with the given id."""
+        self.add_container(Container(id, None))
+        self.global_container_name = id
+    
+    def __str__(self):
+        """String representation of the symbol table."""
+        return self.get_str_representation()

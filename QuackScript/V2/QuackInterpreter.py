@@ -8,7 +8,8 @@ from Exceptions import UnsupportedOperationError, \
 class QuackInterpreter:
     def __init__(self, symbol_table):
         self.symbol_table = symbol_table
-        self.current_container = "global"
+        self.global_container_name = self.symbol_table.global_container_name
+        self.current_container = self.global_container_name
         self.semantic_cube = SemanticCube()
 
     def evaluate_expression(self, expr_tree):
@@ -271,7 +272,7 @@ class QuackInterpreter:
                 self.symbol_table.add_function(name=func_name, params=params_list, body=body)
                 for var in ir[4]:
                     self.execute(var)
-                self.current_container = "global"
+                self.current_container = self.global_container_name
             
             #############################################################################################################
             elif ir_type == "func_call":
@@ -286,7 +287,7 @@ class QuackInterpreter:
                 func_body = self.symbol_table.get_container(func_name).body
                 self.execute(func_body)
                 self.symbol_table.clean_params_values(containerName=func_name)
-                self.current_container = "global"
+                self.current_container = self.global_container_name
 
             #############################################################################################################
             elif ir_type == "program":
