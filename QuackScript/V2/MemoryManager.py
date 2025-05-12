@@ -49,21 +49,28 @@ class MemoryManager:
                     return None
         raise ValueError(f"Memory index {memory_index} is out of bounds.")
 
-    def save_to_first_available(self, value, var_type):
-        """Save a value in the first available position of the correct memory space."""
-        for space, types in self.memory_spaces_reference.items():
-            if var_type in types:
-                start, end = types[var_type]
-                if var_type not in self.memory[space]:
-                    self.memory[space][var_type] = []
-                # Find the first available position
-                for offset in range(end - start + 1):
-                    if offset >= len(self.memory[space][var_type]):
-                        self.memory[space][var_type].append(None)
-                    if self.memory[space][var_type][offset] is None:
-                        self.memory[space][var_type][offset] = value
-                        return start + offset
-        raise ValueError(f"No available space for type {var_type}.")
+    def save_to_first_available(self, value, var_type, space):
+        """Save a value in the first available position of the specified memory space."""
+        if space not in self.memory_spaces_reference:
+            raise ValueError(f"Invalid memory space: {space}")
+
+        types = self.memory_spaces_reference[space]
+        if var_type not in types:
+            raise ValueError(f"Invalid type {var_type} for memory space {space}")
+
+        start, end = types[var_type]
+        if var_type not in self.memory[space]:
+            self.memory[space][var_type] = []
+
+        # Find the first available position
+        for offset in range(end - start + 1):
+            if offset >= len(self.memory[space][var_type]):
+                self.memory[space][var_type].append(None)
+            if self.memory[space][var_type][offset] is None:
+                self.memory[space][var_type][offset] = value
+                return start + offset
+
+        raise ValueError(f"No available space for type {var_type} in memory space {space}.")
 
 if __name__ == "__main__":
     memory_manager = MemoryManager()
@@ -71,12 +78,12 @@ if __name__ == "__main__":
     # memory_manager.save(16000, 3.14)  # Save a constant float
     # print(memory_manager.retrieve(1500))  # Retrieve the global int
     # print(memory_manager.retrieve(16000))  # Retrieve the constant float
-    memory_manager.save_to_first_available(42, "int")  # Save an int
-    memory_manager.save_to_first_available(3.14, "float")  # Save a float
-    memory_manager.save_to_first_available("Hello", "string")  # Save a string
-    memory_manager.save_to_first_available(100, "int")  # Save another int
+    memory_manager.save_to_first_available(42, "int", "global")  # Save an int in global space
+    memory_manager.save_to_first_available(3.14, "float", "global")  # Save a float in global space
+    memory_manager.save_to_first_available("Hello", "string", "constant")  # Save a string in constant space
+    memory_manager.save_to_first_available(100, "int", "local")  # Save another int in global space
     print(memory_manager.retrieve(1000))  # Retrieve the first int
     print(memory_manager.retrieve(3000))  # Retrieve the float
     print(memory_manager.retrieve(18000))  # Retrieve the string
-    print(memory_manager.retrieve(1001))  # Retrieve the second int
+    print(memory_manager.retrieve(5000))  # Retrieve the second int
     print(memory_manager.memory)  # Print the memory state
