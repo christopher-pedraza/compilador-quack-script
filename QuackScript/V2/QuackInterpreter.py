@@ -234,13 +234,17 @@ class QuackInterpreter:
             
             #############################################################################################################
             elif ir_type == "cycle":
-                condition = ir[1]
+                self.quack_quadruple.add_return()
+                condition = self._resolve_operand(ir[1])
                 body = ir[2]
-                print("current index:", self.quack_quadruple.get_current_index())
-                # while self.evaluate_expression(condition):
-                #     self.execute(body)
+
+                self.quack_quadruple.push_jump()
+                self.quack_quadruple.add_jump(type="False", condition=condition[0], target=None)
+                
                 self.execute(body)
-                print("current index:", self.quack_quadruple.get_current_index())
+                
+                self.quack_quadruple.add_jump(target=self.quack_quadruple.pop_return())
+                self.quack_quadruple.update_jump(index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index())
            
             #############################################################################################################
             elif ir_type == "print":

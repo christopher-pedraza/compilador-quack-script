@@ -25,10 +25,48 @@ class QuackQuadruple:
         self.quadruples.append((op, arg1, arg2, result))
         self.current_index += 1
         return result
+    
+    def add_return(self, return_value = None):
+        """Add a return to the list."""
+        if return_value is None:
+            return_value = self.current_index
+
+        self.returns_stack.append(return_value)
+    
+    def add_jump(self, type: str = None, condition: str = None, target: str = None):
+        """Add a jump to the list."""
+        self.quadruples.append(("goto", type, condition, target))
+        self.current_index += 1
 
     def get_quadruples(self):
         """Get the list of quadruples."""
         return list(self.quadruples)
+    
+    def push_jump(self, jump: int = None):
+        """Push a jump onto the stack."""
+        if jump is None:
+            jump = self.current_index
+        self.jumps_stack.append(jump)
+    
+    def pop_jump(self):
+        """Pop the last jump from the stack."""
+        if self.jumps_stack:
+            return self.jumps_stack.pop()
+        return None
+    
+    def pop_return(self):
+        """Pop the last return from the stack."""
+        if self.returns_stack:
+            return self.returns_stack.pop()
+        return None
+    
+    def update_jump(self, index: int, target: int):
+        """Update the jump at the given index."""
+        if 0 <= index < len(self.quadruples):
+            op, arg1, arg2, _ = self.quadruples[index]
+            self.quadruples[index] = (op, arg1, arg2, target)
+        else:
+            raise IndexError("Jump index out of range")
     
     def __str__(self):
         """Get a string representation of the quadruples."""

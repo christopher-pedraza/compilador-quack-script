@@ -1,9 +1,11 @@
 // Prueba
 program Test;
 
-var x, y, z: int = 2 / 3.0;
+var x: int = 0;
 
 main {
-    z = x + y;
+    while(x < 3) do {
+        x = x + 3;
+    };
 }
 end
