@@ -204,7 +204,8 @@ class QuackInterpreter:
                 var_type = ir[2]
                 initializer = ir[3] if ir[3] else None
 
-                value, value_type = self._resolve_operand(initializer) if initializer else None
+                resolved_operand = self._resolve_operand(initializer) if initializer else None
+                value, value_type = resolved_operand if resolved_operand else (None, None)
 
                 if value is not None:
                     if not self.semantic_cube.is_decl_valid(var_type, value_type):
@@ -248,27 +249,6 @@ class QuackInterpreter:
            
             #############################################################################################################
             elif ir_type == "print":
-                # print_statement = None
-
-                # if isinstance(ir[1], tuple) and ir[1][0] == "quadruple":
-                #     print_statement = ir[1][1]
-                # else:
-                #     print_statement = ir[1]
-
-                # n = 1 if len(print_statement)==1 else len(print_statement)
-                # for i in range(n):
-                #     item = print_statement[i]
-                #     if isinstance(item, tuple) and item[0] == "id":
-                #         var_name = item[1]
-                #         value = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
-                #         print(value, end=" ")
-                #     elif isinstance(item, tuple) and item[0] == "cte_string":
-                #         value = item[1]
-                #         print(value, end=" ")
-                #     else:
-                #         value = self.evaluate_expression(item)
-                #         print(value, end=" ")
-                # print()
                 print_statement = None
 
                 if isinstance(ir[1], tuple) and ir[1][0] == "quadruple":
