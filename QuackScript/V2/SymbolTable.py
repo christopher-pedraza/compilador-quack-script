@@ -25,7 +25,7 @@ class Container:
 
     def add_symbol(self, symbol: Symbol) -> None:
         """Add a symbol to the container."""
-        if symbol.name in self.symbols:
+        if symbol.name in self.symbols or symbol.name in self.params:
             raise SymbolRedeclarationError(f"Symbol '{symbol.name}' already exists in '{self.name}'.")
         if symbol.name in self.reserved_words:
             raise ReservedWordError(f"Symbol '{symbol.name}' is a reserved word and cannot be used as an identifier.")
