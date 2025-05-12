@@ -81,17 +81,6 @@ class QuackTransformer(Transformer):
     def exp_minus(self, exp, minus, term):
         return ("exp_minus", exp, term)
 
-    # """
-    # ?expresion: exp
-    #           | exp comparison_op exp -> expresion_comparison_op
-    #           | exp logic_cond exp -> expresion_logic_cond
-    # """
-    # def expresion_comparison_op(self, exp1, comparison_op, exp2):
-    #     return ("expresion_comparison_op", exp1, comparison_op, exp2)
-        
-    # def expresion_logic_cond(self, exp1, logic_cond, exp2):
-    #     return ("expresion_logic_cond", exp1, logic_cond, exp2)
-
     """
     ?comparison: exp
                | exp comparison_op exp -> binary_comparison
@@ -277,8 +266,6 @@ class QuackTransformer(Transformer):
         decls = []
         for i in range(0, len(args)-3):
             decls.append(args[i])
-
-        print(("program", id, decls, [], body))
         return ("program", id, decls, [], body)
     
     def program_func_no_decl(self, program_pt1, program_pt2, *args):

@@ -23,10 +23,6 @@ factor: id -> factor_id
     | exp PLUS term -> exp_plus
     | exp MINUS term -> exp_minus
 
-// ?expresion: exp
-//           | exp comparison_op exp -> expresion_comparison_op
-//           | exp logic_cond exp -> expresion_logic_cond
-
 ?comparison: exp
            | exp comparison_op exp -> binary_comparison
 
@@ -39,7 +35,6 @@ factor: id -> factor_id
 ?expresion: logical_or
 
 comparison_op: GT | LT | NE | EE | GTE | LTE
-// ?logic_cond: AND | OR
 
 ?var_type: "float" -> float_type
          | "int" -> int_type
@@ -67,7 +62,6 @@ var_decl: VAR id COLON var_type SEMICOLON -> var_single_decl_no_assign
 ?params: id COLON var_type -> param
        | id COLON var_type (COMMA id COLON var_type)+ -> params_list
 
-// TODO: modificar diagramas para que permita multiples variables
 function: VOID id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
         | VOID id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
         | VOID id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
