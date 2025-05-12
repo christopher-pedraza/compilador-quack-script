@@ -26,7 +26,7 @@ class QuackInterpreter:
             value_type = value[2]
             value = value[1]
         elif isinstance(value, tuple) and value[0] == "id":
-            value_type = value[2]
+            value_type = value[3]
             value = value[1]
 
         return value, value_type
@@ -40,7 +40,7 @@ class QuackInterpreter:
                 var_name = expr_tree[1]
                 value = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
                 var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
-                result = ("id", value, var_type)
+                result = ("id", var_name, value, var_type)
                 return result
             
             #############################################################################################################

@@ -1,9 +1,9 @@
 // Prueba
 program Test;
 
-var x: int = 2;
+var x, y, z: int = 2 / 3.0;
 
 main {
-    
+    z = x + y;
 }
 end
