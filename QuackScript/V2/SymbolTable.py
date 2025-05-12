@@ -4,7 +4,8 @@ from Exceptions import SymbolRedeclarationError, \
                        InvalidParameterIndexError, \
                        NameNotFoundError, \
                        CannotModifyConstantError, \
-                       ContainerRedeclarationError
+                       ContainerRedeclarationError, \
+                       ReservedWordError
 
 class Symbol:
     def __init__(self, name, var_type, value=None, category="var", param_index=None):
@@ -20,11 +21,14 @@ class Container:
         self.symbols = {}
         self.params = {}
         self.body = body
+        self.reserved_words = ["if", "else", "while", "do", "int", "float", "program", "main", "void", "end", "const", "var", "print", "and", "or"]
 
     def add_symbol(self, symbol: Symbol) -> None:
         """Add a symbol to the container."""
         if symbol.name in self.symbols:
             raise SymbolRedeclarationError(f"Symbol '{symbol.name}' already exists in '{self.name}'.")
+        if symbol.name in self.reserved_words:
+            raise ReservedWordError(f"Symbol '{symbol.name}' is a reserved word and cannot be used as an identifier.")
         self.symbols[symbol.name] = symbol
 
     def add_param(self, symbol: Symbol) -> None:

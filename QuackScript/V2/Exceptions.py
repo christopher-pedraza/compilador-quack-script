@@ -50,3 +50,8 @@ class ParameterMismatchError(InterpreterError):
 class InvalidParameterIndexError(ParameterMismatchError):
     """Raised when a parameter does not have a valid index."""
     pass
+
+# Variable declaration errors
+class ReservedWordError(InterpreterError):
+    """Raised when a variable or identifier is named using a reserved word."""
+    pass
