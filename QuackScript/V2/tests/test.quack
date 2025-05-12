@@ -1,10 +1,9 @@
 // Prueba
 program Test;
 
-var x, y: int = 2 + 3;
-var z: int;
+var x: int = 2;
 
 main {
-    z = x + y;
+    
 }
 end

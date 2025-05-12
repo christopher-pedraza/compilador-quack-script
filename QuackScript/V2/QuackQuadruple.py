@@ -8,6 +8,10 @@ class QuackQuadruple:
         self.current_memory_space = 0
         self.current_index = 0
 
+    def get_current_index(self):
+        """Get the current index."""
+        return self.current_index
+
     def get_current_memory_space(self):
         """Get the current memory space."""
         current = self.current_memory_space

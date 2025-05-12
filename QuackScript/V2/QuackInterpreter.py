@@ -14,13 +14,11 @@ class QuackInterpreter:
         self.quack_quadruple = quack_quadruple
 
     def _resolve_operand(self, node):
-        print(f"Resolving operand: {node}")
         if isinstance(node, tuple) and node[0] == "quadruple":
             value = node[1]
             value_type = node[2]
         else:
             value = self.evaluate_expression(node)
-            print(f"Value: {value}")
             value_type = type(value).__name__
 
         # Second pass: unwrap if result is a quadruple
@@ -30,8 +28,6 @@ class QuackInterpreter:
         elif isinstance(value, tuple) and value[0] == "id":
             value_type = value[2]
             value = value[1]
-        print(f"**Value: {value}")
-        print(f"**Value type: {value_type}")
 
         return value, value_type
 
@@ -41,12 +37,10 @@ class QuackInterpreter:
 
             #############################################################################################################
             if expr_type == "id":  # Variable reference
-                print(f"Resolving variable: {expr_tree}")
                 var_name = expr_tree[1]
                 value = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
                 var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
                 result = ("id", value, var_type)
-                print("\tVariable resolved:", result)
                 return result
             
             #############################################################################################################
@@ -210,11 +204,9 @@ class QuackInterpreter:
                 var_type = ir[2]
                 initializer = ir[3] if ir[3] else None
 
-                evaluated_expression = self.evaluate_expression(initializer) if initializer else None
-                value = evaluated_expression[1] if evaluated_expression else None
-                value_type = evaluated_expression[2] if evaluated_expression else None
+                value, value_type = self._resolve_operand(initializer) if initializer else None
 
-                if evaluated_expression is not None:
+                if value is not None:
                     if not self.semantic_cube.is_decl_valid(var_type, value_type):
                         raise TypeMismatchError(
                             f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'"
@@ -244,8 +236,11 @@ class QuackInterpreter:
             elif ir_type == "cycle":
                 condition = ir[1]
                 body = ir[2]
-                while self.evaluate_expression(condition):
-                    self.execute(body)
+                print("current index:", self.quack_quadruple.get_current_index())
+                # while self.evaluate_expression(condition):
+                #     self.execute(body)
+                self.execute(body)
+                print("current index:", self.quack_quadruple.get_current_index())
            
             #############################################################################################################
             elif ir_type == "print":
