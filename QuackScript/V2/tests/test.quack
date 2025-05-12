@@ -1,11 +1,14 @@
 // Prueba
 program Test;
 
-var x: int = 0;
+var x, y: int = 0;
 
 main {
-    while(x < 3) do {
-        x = x + 3;
+    if (x < 4) {
+        y = 5;
+        y = 2 + 3;
+        x = y / x;
     };
+    x = 2;
 }
 end

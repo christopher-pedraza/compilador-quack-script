@@ -236,11 +236,11 @@ class QuackInterpreter:
             elif ir_type == "cycle":
                 self.quack_quadruple.add_return()
                 condition = self._resolve_operand(ir[1])
-                body = ir[2]
-
+            
                 self.quack_quadruple.push_jump()
                 self.quack_quadruple.add_jump(type="False", condition=condition[0], target=None)
                 
+                body = ir[2]
                 self.execute(body)
                 
                 self.quack_quadruple.add_jump(target=self.quack_quadruple.pop_return())
@@ -272,10 +272,15 @@ class QuackInterpreter:
          
             #############################################################################################################
             elif ir_type == "condition_if":
-                condition = ir[1]
+                condition = self._resolve_operand(ir[1])
+
+                self.quack_quadruple.push_jump()
+                self.quack_quadruple.add_jump(type="False", condition=condition[0], target=None)
+
                 body = ir[2]
-                if self.evaluate_expression(condition):
-                    self.execute(body)
+                self.execute(body)
+
+                self.quack_quadruple.update_jump(index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index())
          
             #############################################################################################################
             elif ir_type == "condition_if_else":
