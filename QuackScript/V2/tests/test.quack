@@ -5,10 +5,11 @@ var x, y: int = 0;
 
 main {
     if (x < 4) {
-        y = 5;
+        print(y);
     } else {
         y = 2 + 3;
         x = y / x;
+        print(x, y, 25/3+2>5);
     };
     x = 2;
 }
