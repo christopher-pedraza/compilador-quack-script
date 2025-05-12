@@ -44,8 +44,8 @@ class QuackTransformer(Transformer):
     def positive_factor_id(self, id):
         return ("id", id)
     
-    def negative_factor_id(self, id):
-        return ("negative_id", id)
+    def negative_factor_id(self, minus, id):
+        return ("exp_minus", ("cte_num", 0), ("id", id))
     
     def factor_cte_num(self, cte_num):
         return ("cte_num", cte_num)

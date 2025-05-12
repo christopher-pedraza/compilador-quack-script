@@ -44,11 +44,6 @@ class QuackInterpreter:
                 return result
             
             #############################################################################################################
-            elif expr_type == "negative_id":  # Negative variable reference
-                var_name = expr_tree[1]
-                return -self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
-            
-            #############################################################################################################
             elif expr_type == "cte_num":  # Constant number
                 return expr_tree[1]
             
