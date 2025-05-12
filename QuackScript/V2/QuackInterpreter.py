@@ -284,13 +284,25 @@ class QuackInterpreter:
          
             #############################################################################################################
             elif ir_type == "condition_if_else":
-                condition = ir[1]
+                condition = self._resolve_operand(ir[1])
+
+                self.quack_quadruple.push_jump()
+                self.quack_quadruple.add_jump(type="False", condition=condition[0], target=None)
+
                 body_if = ir[2]
+                self.execute(body_if)
+
+                # Add 1 to the current index to skip the else block
+                self.quack_quadruple.update_jump(index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()+1)
+
+                self.quack_quadruple.push_jump()
+                self.quack_quadruple.add_jump()
+
                 body_else = ir[3]
-                if self.evaluate_expression(condition):
-                    self.execute(body_if)
-                else:
-                    self.execute(body_else)
+                self.execute(body_else)
+
+                self.quack_quadruple.update_jump(index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index())
+                    
           
             #############################################################################################################
             elif ir_type == "function_decl":
