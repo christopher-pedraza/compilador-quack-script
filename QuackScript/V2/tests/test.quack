@@ -1,13 +1,7 @@
 // Prueba: Expresiones aritméticas básicas
 program TestExpr;
-var x: int = 5;
-
-void testFunc () [
-    var x : int = 2;    
-{
-
-}];
 
 main {
+    print(2 + 3 * 5 / 2);  
 }
 end

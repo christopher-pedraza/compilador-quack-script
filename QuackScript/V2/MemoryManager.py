@@ -38,15 +38,15 @@ class MemoryManager:
         raise ValueError(f"Memory index {memory_index} is out of bounds.")
 
     def retrieve(self, memory_index: int):
-        """Retrieve the value from memory using the memory index."""
+        """Retrieve the value and its type from memory using the memory index."""
         for space, types in self.memory_spaces_reference.items():
             for var_type, (start, end) in types.items():
                 if start <= memory_index <= end:
                     if var_type in self.memory[space]:
                         offset = memory_index - start
                         if 0 <= offset < len(self.memory[space][var_type]):
-                            return self.memory[space][var_type][offset]
-                    return None
+                            return self.memory[space][var_type][offset], var_type
+                    return None, None
         raise ValueError(f"Memory index {memory_index} is out of bounds.")
 
     def save_to_first_available(self, value, var_type, space):

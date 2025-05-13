@@ -1,12 +1,13 @@
 from collections import deque 
 
 class QuackQuadruple:
-    def __init__(self):
+    def __init__(self, memory_manager):
         self.jumps_stack = []
         self.returns_stack = []
         self.quadruples = deque()
         self.current_memory_space = 0
         self.current_index = 0
+        self.memory_manager = memory_manager
 
     def get_current_index(self):
         """Get the current index."""
@@ -18,10 +19,10 @@ class QuackQuadruple:
         self.current_memory_space += 1
         return current
 
-    def add_quadruple(self, op: str, arg1: str, arg2: str, result: str = None):
+    def add_quadruple(self, op: str, arg1: str, arg2: str, result: str = None, memory_space: str = None, result_type: str = None):
         """Add a quadruple to the list."""
         if result is None:
-            result = f"t{self.get_current_memory_space()}"
+            result = self.memory_manager.save_to_first_available(value=(op, arg1, arg2), var_type=result_type, space=memory_space)
         self.quadruples.append((op, arg1, arg2, result))
         self.current_index += 1
         return result
@@ -70,4 +71,5 @@ class QuackQuadruple:
     
     def __str__(self):
         """Get a string representation of the quadruples."""
+        print(self.memory_manager.memory)
         return "\n".join([f"{i}: {quadruple}" for i, quadruple in enumerate(self.quadruples)])

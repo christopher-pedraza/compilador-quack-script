@@ -1,17 +1,22 @@
 from SemanticCube import SemanticCube
-from Exceptions import UnsupportedOperationError, \
-                       DivisionByZeroError, \
-                       UnsupportedExpressionError, \
-                       TypeMismatchError, \
-                       UnknownIRTypeError
+
+from Exceptions import (
+    UnsupportedOperationError,
+    DivisionByZeroError,
+    UnsupportedExpressionError,
+    TypeMismatchError,
+    UnknownIRTypeError
+)
 
 class QuackInterpreter:
-    def __init__(self, symbol_table, quack_quadruple):
+    def __init__(self, symbol_table, quack_quadruple, memory_manager):
+        self.memory_manager = memory_manager
         self.symbol_table = symbol_table
         self.global_container_name = self.symbol_table.global_container_name
         self.current_container = self.global_container_name
         self.semantic_cube = SemanticCube()
         self.quack_quadruple = quack_quadruple
+        self.current_memory_space = "global"
 
     def _resolve_operand(self, node):
         if isinstance(node, tuple) and node[0] == "quadruple":
@@ -45,7 +50,9 @@ class QuackInterpreter:
             
             #############################################################################################################
             elif expr_type == "cte_num":  # Constant number
-                return expr_tree[1]
+                cte_type = type(expr_tree[1]).__name__
+                result = self.memory_manager.save_to_first_available(expr_tree[1], cte_type, "constant")
+                return result
             
             #############################################################################################################
             elif expr_type == "negative_cte_num":  # Negative constant number
@@ -62,7 +69,7 @@ class QuackInterpreter:
                 result_type = self.semantic_cube.get_type(t_left, t_right, "*")
 
                 if result_type:
-                    result = self.quack_quadruple.add_quadruple("*", left, right)
+                    result = self.quack_quadruple.add_quadruple(op="*", arg1=left, arg2=right, memory_space=self.current_memory_space, result_type=result_type)
                     return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for multiplication: {t_left} * {t_right}")
@@ -80,7 +87,7 @@ class QuackInterpreter:
                 if result_type:
                     if right == 0:
                         raise DivisionByZeroError("Division by zero is not allowed.")
-                    result = self.quack_quadruple.add_quadruple("/", left, right)
+                    result = self.quack_quadruple.add_quadruple(op="/", arg1=left, arg2=right, memory_space=self.current_memory_space, result_type=result_type)
                     return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for division: {t_left} / {t_right}")
@@ -96,7 +103,7 @@ class QuackInterpreter:
                 result_type = self.semantic_cube.get_type(t_left, t_right, "+")
 
                 if result_type:
-                    result = self.quack_quadruple.add_quadruple("+", left, right)
+                    result = self.quack_quadruple.add_quadruple(op="+", arg1=left, arg2=right, memory_space=self.current_memory_space, result_type=result_type)
                     return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for addition: {t_left} + {t_right}")
@@ -112,7 +119,7 @@ class QuackInterpreter:
                 result_type = self.semantic_cube.get_type(t_left, t_right, "-")
 
                 if result_type:
-                    result = self.quack_quadruple.add_quadruple("-", left, right)
+                    result = self.quack_quadruple.add_quadruple(op="-", arg1=left, arg2=right, memory_space=self.current_memory_space, result_type=result_type)
                     return ("quadruple", result, result_type)
                 else:
                     raise UnsupportedOperationError(f"Unsupported operand types for subtraction: {t_left} - {t_right}")
@@ -175,6 +182,9 @@ class QuackInterpreter:
 
             #############################################################################################################
             if ir_type == "assign":
+                if self.current_container != self.global_container_name:
+                    self.current_memory_space = "temp"
+
                 var_name = ir[1]
 
                 resolved_expression = self._resolve_operand(ir[2])
@@ -193,6 +203,8 @@ class QuackInterpreter:
                 self.quack_quadruple.add_quadruple("=", value, None, var_name)
 
                 self.symbol_table.update_variable(name=var_name, value=value, containerName=self.current_container)
+
+                self.current_memory_space = "global"
 
             #############################################################################################################
             elif ir_type == "var_decl":
@@ -245,6 +257,7 @@ class QuackInterpreter:
             #############################################################################################################
             elif ir_type == "print":
                 print_statement = None
+                self.current_memory_space = "temp"
 
                 if isinstance(ir[1], tuple) and ir[1][0] == "quadruple":
                     print_statement = ir[1][1]
@@ -263,6 +276,8 @@ class QuackInterpreter:
                         value = self._resolve_operand(item)[0]
                         
                     self.quack_quadruple.add_quadruple("print", None, None, value)
+
+                    self.current_memory_space = "global"
          
             #############################################################################################################
             elif ir_type == "condition_if":

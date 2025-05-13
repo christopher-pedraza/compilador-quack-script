@@ -6,6 +6,7 @@ from lark import Lark, logger, UnexpectedInput
 from QuackTransformer import QuackTransformer
 from QuackInterpreter import QuackInterpreter
 from QuackQuadruple import QuackQuadruple
+from MemoryManager import MemoryManager
 
 logger.setLevel(logging.DEBUG)
 
@@ -38,8 +39,10 @@ def parse_program(program):
         symbol_table = quack_transformer.symbol_table
 
         # Execute the IR
-        quack_quadruple = QuackQuadruple()
-        quack_interpreter = QuackInterpreter(symbol_table, quack_quadruple)
+        # Initialize the memory manager
+        memory_manager = MemoryManager()
+        quack_quadruple = QuackQuadruple(memory_manager=memory_manager)
+        quack_interpreter = QuackInterpreter(symbol_table, quack_quadruple, memory_manager)
         quack_interpreter.execute(ir)
 
         print(quack_quadruple)
