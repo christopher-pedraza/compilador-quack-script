@@ -1,6 +1,30 @@
 from collections import deque
 
 
+class OperatorsInterface:
+    def __init__(self):
+        self.operators = {
+            "+": 1,
+            "-": 2,
+            "*": 3,
+            "/": 4,
+            "<": 5,
+            "<=": 6,
+            ">": 7,
+            ">=": 8,
+            "==": 9,
+            "and": 10,
+            "or": 11,
+            "goto": 12,
+            "gotoF": 13,
+            "gotoT": 14,
+        }
+
+    def get_operator(self, op: str):
+        """Get the operator."""
+        return self.operators.get(op, None)
+
+
 class QuackQuadruple:
     def __init__(self):
         self.jumps_stack = []
@@ -8,6 +32,7 @@ class QuackQuadruple:
         self.quadruples = deque()
         self.current_memory_space = 0
         self.current_index = 0
+        self.operators = OperatorsInterface()
 
     def get_current_index(self):
         """Get the current index."""
@@ -23,6 +48,7 @@ class QuackQuadruple:
         self, op: str, arg1: str, arg2: str, result: str = None, memory_space: str = None, result_type: str = None
     ):
         """Add a quadruple to the list."""
+        op = self.operators.get_operator(op)
         self.quadruples.append((op, arg1, arg2, result))
         self.current_index += 1
         return result
@@ -34,9 +60,10 @@ class QuackQuadruple:
 
         self.returns_stack.append(return_value)
 
-    def add_jump(self, type_: str = "goto", condition: str = None, target: str = None):
+    def add_jump(self, type: str = "goto", condition: str = None, target: str = None):
         """Add a jump to the list."""
-        self.quadruples.append((type_, condition, None, target))
+        type = self.operators.get_operator(type)
+        self.quadruples.append((type, condition, None, target))
         self.current_index += 1
 
     def get_quadruples(self):
