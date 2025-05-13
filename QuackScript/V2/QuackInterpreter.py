@@ -32,7 +32,7 @@ from TransformerClasses import (
     ProgramNode,
 )
 
-from MemoryManager import MemorySpace, VarType, MemoryAddress, MemoryManager
+from MemoryManager import MemoryAddress, MemoryManager
 
 
 class QuackInterpreter:
@@ -43,7 +43,7 @@ class QuackInterpreter:
         self.current_container = self.global_container_name
         self.semantic_cube = SemanticCube()
         self.quack_quadruple = quack_quadruple
-        self.current_memory_space = MemorySpace.GLOBAL
+        self.current_memory_space = "global"
 
     def _resolve_operand(self, node):
         # if isinstance(node, tuple) and node[0] == "quadruple":
@@ -61,20 +61,17 @@ class QuackInterpreter:
         #     value_type = value[2]
         #     value = value[1]
         if isinstance(node, MemoryAddress):
-            print("Memory Address:", node)
             value = node.address
             value_type = node.var_type
         else:
             value = self.evaluate_expression(node)
+            print(node)
+            value_type = type(value).__name__
 
         # Second pass: unwrap if result is a quadruple
         if isinstance(value, MemoryAddress):
-            print(value)
             value_type = value.var_type
             value = value.address
-
-        print("Value:", value)
-        print("Type:", value_type)
 
         return value, value_type
 
@@ -87,13 +84,13 @@ class QuackInterpreter:
             return (value, var_type)
 
         elif isinstance(expr_tree, CteNumNode):
-            var_type = VarType.INT if isinstance(expr_tree.value, int) else VarType.FLOAT
+            var_type = type(expr_tree.value).__name__
+
             result = self.memory_manager.save_to_first_available(
                 value=expr_tree.value,
                 var_type=var_type,
-                space=MemorySpace.CONSTANT,
+                space="constant",
             )
-            print("*****", result)
             return result
 
         elif isinstance(expr_tree, CteStringNode):
@@ -119,7 +116,7 @@ class QuackInterpreter:
                 space=self.current_memory_space,
             )
             result = self.quack_quadruple.add_quadruple(
-                op=expr_tree.op, arg1=left_value, arg2=right_value, result=memory_space
+                op=expr_tree.op, arg1=left_value, arg2=right_value, result=memory_space.address
             )
             return result
 
@@ -134,8 +131,15 @@ class QuackInterpreter:
                     f"Unsupported operation '{expr_tree.op}' for types '{left_type}' and '{right_type}'"
                 )
 
-            result = self.quack_quadruple.add_quadruple(expr_tree.op, left_value, right_value, None)
-            return (result, result_type)
+            memory_space = self.memory_manager.save_to_first_available(
+                value=(expr_tree.op, expr_tree.left, expr_tree.right),
+                var_type=result_type,
+                space=self.current_memory_space,
+            )
+            result = self.quack_quadruple.add_quadruple(
+                op=expr_tree.op, arg1=left_value, arg2=right_value, result=memory_space.address
+            )
+            return result
 
         ## TODO: PUEDO DEJAR ESTO?? O SI NO HACE MATCH, DEBERIA ARROJAR UN ERROR
         else:
@@ -160,20 +164,18 @@ class QuackInterpreter:
             var_type = ir.var_type
             value, value_type = self._resolve_operand(ir.init_value)
 
-            print(value, value_type)
-
             if not self.semantic_cube.is_decl_valid(var_type, value_type):
                 raise TypeMismatchError(f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'")
 
-            for var_name in ir.var_names:
+            for var_name in ir.names:
                 self.symbol_table.add_variable(
-                    name=var_name,
+                    name=var_name.name,
                     var_type=var_type,
                     value=value,
                     containerName=self.current_container,
                     category=ir.category,
                 )
-                self.quack_quadruple.add_quadruple("=", value, None, var_name)
+                self.quack_quadruple.add_quadruple("=", value, None, var_name.name)
         ######################################################################################################################
         elif isinstance(ir, BodyNode):
             for statement in ir.statements:
