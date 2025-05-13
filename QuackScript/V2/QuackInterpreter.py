@@ -193,7 +193,7 @@ class QuackInterpreter:
             value, value_type = self._resolve_operand(ir.condition)
 
             self.quack_quadruple.push_jump()
-            self.quack_quadruple.add_jump(type="False", condition=value, target=None)
+            self.quack_quadruple.add_jump(type="gotoF", condition=value, target=None)
 
             self.execute(ir.then_body)
 
