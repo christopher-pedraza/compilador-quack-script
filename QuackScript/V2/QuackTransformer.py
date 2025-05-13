@@ -71,7 +71,7 @@ class QuackTransformer(Transformer):
 
     def factor_id(self, id):
         # return ("id", id)
-        return IdNode(name=id)
+        return id
 
     def positive_factor_id(self, id):
         # return ("id", id)
@@ -175,7 +175,7 @@ class QuackTransformer(Transformer):
 
     def assign(self, id, assign, expresion, semicolon):
         # return ("assign", id, expresion)
-        return AssignNode(var_name=id, expr=expresion)
+        return AssignNode(var_name=id.name, expr=expresion)
 
     """
     body: LBRACE RBRACE -> empty_body

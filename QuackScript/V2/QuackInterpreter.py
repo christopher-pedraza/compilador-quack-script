@@ -138,7 +138,7 @@ class QuackInterpreter:
 
     def execute(self, ir):
         if isinstance(ir, AssignNode):
-            var_name = ir.name
+            var_name = ir.var_name
             value, value_type = self._resolve_operand(ir.expr)
 
             var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
@@ -265,6 +265,8 @@ class QuackInterpreter:
             for func in ir.functions:
                 self.execute(func)
 
+            self.current_memory_space = "temp"
             self.execute(ir.main_body)
+            self.current_memory_space = "global"
         else:
             raise UnknownIRTypeError(f"Unknown IR type: {type(ir)}")
