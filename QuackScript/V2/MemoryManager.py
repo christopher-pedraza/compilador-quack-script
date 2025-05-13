@@ -1,10 +1,12 @@
 from enum import Enum
 
+
 class MemorySpace(Enum):
     GLOBAL = "global"
     LOCAL = "local"
     TEMP = "temp"
     CONSTANT = "constant"
+
 
 class VarType(Enum):
     INT = "int"
@@ -44,7 +46,7 @@ class MemoryManager:
                 VarType.INT: (14000, 15999),
                 VarType.FLOAT: (16000, 17999),
                 VarType.STRING: (18000, 19999),
-            }
+            },
         }
 
         # Build flat list of ranges, ordered by start address
@@ -57,9 +59,7 @@ class MemoryManager:
         self.ranges.sort()
 
         # Memory storage (nested lists by space and type)
-        self.memory = {
-            space: {} for space in MemorySpace
-        }
+        self.memory = {space: {} for space in MemorySpace}
 
         # Temp pointers
         self.reset_temp_pointers()
@@ -135,7 +135,8 @@ class MemoryManager:
         self.memory[space][var_type][offset] = value
 
         return MemoryAddress(memory_index, space, var_type)
-    
+
+
 if __name__ == "__main__":
     mm = MemoryManager()
 
