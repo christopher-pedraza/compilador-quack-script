@@ -18,6 +18,8 @@ class OperatorsInterface:
             "goto": 12,
             "gotoF": 13,
             "gotoT": 14,
+            "=": 15,
+            "print": 16,
         }
 
     def get_operator(self, op: str):

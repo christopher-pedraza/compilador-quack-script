@@ -87,7 +87,13 @@ class QuackInterpreter:
         elif isinstance(expr_tree, CteStringNode):
             return expr_tree.value
 
-        elif isinstance(expr_tree, MultiplicativeOpNode):
+        elif (
+            isinstance(expr_tree, MultiplicativeOpNode)
+            or isinstance(expr_tree, ArithmeticOpNode)
+            or isinstance(expr_tree, ComparisonNode)
+            or isinstance(expr_tree, LogicalAndNode)
+            or isinstance(expr_tree, LogicalOrNode)
+        ):
             left_value, left_type = self._resolve_operand(expr_tree.left)
             right_value, right_type = self._resolve_operand(expr_tree.right)
 
@@ -100,27 +106,6 @@ class QuackInterpreter:
 
             if expr_tree.op == "/" and right_value == 0:
                 raise DivisionByZeroError("Division by zero is not allowed.")
-
-            memory_space = self.memory_manager.save_to_first_available(
-                value=(expr_tree.op, expr_tree.left, expr_tree.right),
-                var_type=result_type,
-                space=self.current_memory_space,
-            )
-            result = self.quack_quadruple.add_quadruple(
-                op=expr_tree.op, arg1=left_value, arg2=right_value, result=memory_space.address
-            )
-            return result
-
-        elif isinstance(expr_tree, ArithmeticOpNode):
-            left_value, left_type = self._resolve_operand(expr_tree.left)
-            right_value, right_type = self._resolve_operand(expr_tree.right)
-
-            result_type = self.semantic_cube.get_type(left_type, right_type, expr_tree.op)
-
-            if result_type is None:
-                raise UnsupportedOperationError(
-                    f"Unsupported operation '{expr_tree.op}' for types '{left_type}' and '{right_type}'"
-                )
 
             memory_space = self.memory_manager.save_to_first_available(
                 value=(expr_tree.op, expr_tree.left, expr_tree.right),

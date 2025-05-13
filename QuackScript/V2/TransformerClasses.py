@@ -52,12 +52,14 @@ class ComparisonNode:
 
 @dataclass
 class LogicalAndNode:
+    op: Literal["and"]
     left: "ExprNode"
     right: "ExprNode"
 
 
 @dataclass
 class LogicalOrNode:
+    op: Literal["or"]
     left: "ExprNode"
     right: "ExprNode"
 

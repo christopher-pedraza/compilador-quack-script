@@ -1,10 +1,9 @@
-// Prueba: Ciclo while
-program TestWhile;
-var i: int = 1;
+// Prueba: Expresiones lógicas y relacionales
+program TestLogic;
+var x: int = 10;
+var flag: int;
 main {
-    while (i <= 5) do {
-        print(i);
-        i = i + 1;
-    };
+    flag = ((x > 5) and (x < 20)) or (x == 0);
+    print(flag);
 }
 end

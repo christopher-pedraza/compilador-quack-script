@@ -140,7 +140,7 @@ class QuackTransformer(Transformer):
 
     def binary_logical_and(self, logical_and, and_, comparison):
         # return ("binary_logical_and", logical_and, comparison)
-        return LogicalAndNode(left=logical_and, right=comparison)
+        return LogicalAndNode(op="and", left=logical_and, right=comparison)
 
     """
     ?logical_or: logical_and
@@ -149,7 +149,7 @@ class QuackTransformer(Transformer):
 
     def binary_logical_or(self, logical_or, or_, logical_and):
         # return ("binary_logical_or", logical_or, logical_and)
-        return LogicalOrNode(left=logical_or, right=logical_and)
+        return LogicalOrNode(op="and", left=logical_or, right=logical_and)
 
     """
     comparison_op: GT | LT | NE | EE | GTE | LTE
