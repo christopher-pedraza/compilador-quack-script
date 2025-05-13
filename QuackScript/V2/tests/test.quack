@@ -1,9 +1,5 @@
-// Prueba: Expresiones lógicas y relacionales
-program TestLogic;
-var x: int = 10;
-var flag: int;
+program Test;
+
 main {
-    flag = ((x > 5) and (x < 20)) or (x == 0);
-    print(flag);
 }
 end

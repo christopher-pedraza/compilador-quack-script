@@ -175,7 +175,7 @@ class QuackInterpreter:
         elif isinstance(ir, PrintNode):
             for value in ir.values:
                 value, value_type = self._resolve_operand(value)
-                self.quack_quadruple.add_quadruple("print", value, None, None)
+                self.quack_quadruple.add_quadruple("print", None, None, value)
         ######################################################################################################################
         elif isinstance(ir, IfNode):
             value, value_type = self._resolve_operand(ir.condition)
