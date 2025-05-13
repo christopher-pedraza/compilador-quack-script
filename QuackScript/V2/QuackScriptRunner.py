@@ -47,10 +47,6 @@ def parse_program(program):
 
         print(quack_quadruple)
 
-        # Display the symbol table after execution
-        # print("\nSymbol Table after execution:")
-        # symbol_table.display()
-
         return (tree.pretty(), ir, symbol_table.get_str_representation())
     except UnexpectedInput as e:
         print(f"Parsing failed: {e}")

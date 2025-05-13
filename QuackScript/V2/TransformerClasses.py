@@ -87,7 +87,7 @@ class VarDeclNode:
     names: List[str]
     var_type: TypeNode
     init_value: Optional["ExprNode"] = None
-    category: str
+    category: Literal["var", "const", "param"] = "var"
 
 @dataclass
 class ParamNode:
@@ -124,8 +124,8 @@ ExprNode = Union[
     IdNode,
     CteStringNode,
     UnaryOpNode,
-    BinaryOpNode,
-    AddOpNode,
+    MultiplicativeOpNode,
+    ArithmeticOpNode,
     ComparisonNode,
     LogicalAndNode,
     LogicalOrNode,

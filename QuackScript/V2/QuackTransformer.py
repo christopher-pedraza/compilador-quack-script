@@ -22,7 +22,6 @@ from TransformerClasses import (
     FunctionDeclNode,
     FuncCallNode,
     ProgramNode,
-    QuackQuadruple,
 )
 
 
@@ -367,5 +366,5 @@ class QuackTransformer(Transformer):
         return program
     
     def program_pt2(self, id, semicolon):
-        self.symbol_table.create_global_container(id)
-        return id
+        self.symbol_table.create_global_container(id.name)
+        return id.name
