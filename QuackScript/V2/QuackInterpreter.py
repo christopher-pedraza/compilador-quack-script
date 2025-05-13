@@ -8,6 +8,30 @@ from Exceptions import (
     UnknownIRTypeError
 )
 
+from TransformerClasses import (
+    IdNode,
+    CteNumNode,
+    CteStringNode,
+    ArithmeticOpNode,
+    UnaryOpNode,
+    MultiplicativeOpNode,
+    ComparisonNode,
+    LogicalAndNode,
+    LogicalOrNode,
+    AssignNode,
+    BodyNode,
+    PrintNode,
+    WhileNode,
+    IfNode,
+    IfElseNode,
+    VarDeclNode,
+    ParamsNode,
+    ParamNode,
+    FunctionDeclNode,
+    FuncCallNode,
+    ProgramNode,
+)
+
 class QuackInterpreter:
     def __init__(self, symbol_table, quack_quadruple, memory_manager):
         self.memory_manager = memory_manager
@@ -37,144 +61,11 @@ class QuackInterpreter:
         return value, value_type
 
     def evaluate_expression(self, expr_tree):
-        if isinstance(expr_tree, tuple):
-            expr_type = expr_tree[0]
-
-            #############################################################################################################
-            if expr_type == "id":  # Variable reference
-                var_name = expr_tree[1]
-                value = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
-                var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
-                result = ("id", var_name, value, var_type)
-                return result
-            
-            #############################################################################################################
-            elif expr_type == "cte_num":  # Constant number
-                cte_type = type(expr_tree[1]).__name__
-                result = self.memory_manager.save_to_first_available(expr_tree[1], cte_type, "constant")
-                return result
-            
-            #############################################################################################################
-            elif expr_type == "negative_cte_num":  # Negative constant number
-                return -expr_tree[1]
-            
-            #############################################################################################################
-            elif expr_type == "term_mult":  # Multiplication
-                left_node = expr_tree[1]
-                right_node = expr_tree[2]
-
-                left, t_left = self._resolve_operand(left_node)
-                right, t_right = self._resolve_operand(right_node)
-
-                result_type = self.semantic_cube.get_type(t_left, t_right, "*")
-
-                if result_type:
-                    result = self.quack_quadruple.add_quadruple(op="*", arg1=left, arg2=right, memory_space=self.current_memory_space, result_type=result_type)
-                    return ("quadruple", result, result_type)
-                else:
-                    raise UnsupportedOperationError(f"Unsupported operand types for multiplication: {t_left} * {t_right}")
-
-            #############################################################################################################
-            elif expr_type == "term_div":  # Division
-                left_node = expr_tree[1]
-                right_node = expr_tree[2]
-
-                left, t_left = self._resolve_operand(left_node)
-                right, t_right = self._resolve_operand(right_node)
-
-                result_type = self.semantic_cube.get_type(t_left, t_right, "/")
-
-                if result_type:
-                    if right == 0:
-                        raise DivisionByZeroError("Division by zero is not allowed.")
-                    result = self.quack_quadruple.add_quadruple(op="/", arg1=left, arg2=right, memory_space=self.current_memory_space, result_type=result_type)
-                    return ("quadruple", result, result_type)
-                else:
-                    raise UnsupportedOperationError(f"Unsupported operand types for division: {t_left} / {t_right}")
-                
-            #############################################################################################################
-            elif expr_type == "exp_plus":  # Addition
-                left_node = expr_tree[1]
-                right_node = expr_tree[2]
-
-                left, t_left = self._resolve_operand(left_node)
-                right, t_right = self._resolve_operand(right_node)
-
-                result_type = self.semantic_cube.get_type(t_left, t_right, "+")
-
-                if result_type:
-                    result = self.quack_quadruple.add_quadruple(op="+", arg1=left, arg2=right, memory_space=self.current_memory_space, result_type=result_type)
-                    return ("quadruple", result, result_type)
-                else:
-                    raise UnsupportedOperationError(f"Unsupported operand types for addition: {t_left} + {t_right}")
-            
-            #############################################################################################################
-            elif expr_type == "exp_minus":  # Subtraction
-                left_node = expr_tree[1]
-                right_node = expr_tree[2]
-
-                left, t_left = self._resolve_operand(left_node)
-                right, t_right = self._resolve_operand(right_node)
-
-                result_type = self.semantic_cube.get_type(t_left, t_right, "-")
-
-                if result_type:
-                    result = self.quack_quadruple.add_quadruple(op="-", arg1=left, arg2=right, memory_space=self.current_memory_space, result_type=result_type)
-                    return ("quadruple", result, result_type)
-                else:
-                    raise UnsupportedOperationError(f"Unsupported operand types for subtraction: {t_left} - {t_right}")
-            
-            #############################################################################################################
-            elif expr_type == "binary_comparison":  # Comparison
-                left_node = expr_tree[1]
-                op = expr_tree[2]
-                right_node = expr_tree[3]
-
-                left, t_left = self._resolve_operand(left_node)
-                right, t_right = self._resolve_operand(right_node)
-
-                result_type = self.semantic_cube.get_type(t_left, t_right, op)
-
-                if result_type:
-                    result = self.quack_quadruple.add_quadruple(op, left, right)
-                    return ("quadruple", result, result_type)
-                else:
-                    raise UnsupportedOperationError(f"Unknown comparison operator: {op}")
-                
-            #############################################################################################################
-            elif expr_type == "binary_logical_and":  # Logical operation
-                left_node = expr_tree[1]
-                right_node = expr_tree[2]
-
-                left, t_left = self._resolve_operand(left_node)
-                right, t_right = self._resolve_operand(right_node)
-
-                result_type = self.semantic_cube.get_type(t_left, t_right, "and")
-
-                if result_type:
-                    result = self.quack_quadruple.add_quadruple("and", left, right)
-                    return ("quadruple", result, result_type)
-                else:
-                    raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} and {t_right}")
-            
-            #############################################################################################################
-            elif expr_type == "binary_logical_or":  # Logical operation
-                left_node = expr_tree[1]
-                right_node = expr_tree[2]
-
-                left, t_left = self._resolve_operand(left_node)
-                right, t_right = self._resolve_operand(right_node)
-
-                result_type = self.semantic_cube.get_type(t_left, t_right, "or")
-
-                if result_type:
-                    result = self.quack_quadruple.add_quadruple("or", left, right)
-                    return ("quadruple", result, result_type)
-                else:
-                    raise UnsupportedOperationError(f"Invalid operand types for logical operation: {t_left} or {t_right}")
-                
-        else:
-            raise UnsupportedExpressionError(f"Unsupported expression type: {expr_tree}")
+        if isinstance(expr_tree, IdNode):
+            var_name = expr_tree.name
+            var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
+            value = self.symbol_table.get_variable_value(name=var_name, containerName=self.current_container)
+            return value, var_type
 
     def execute(self, ir):
         if isinstance(ir, tuple):

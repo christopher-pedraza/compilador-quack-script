@@ -1,4 +1,4 @@
-from collections import deque 
+from collections import deque
 
 class QuackQuadruple:
     def __init__(self, memory_manager):
