@@ -75,11 +75,11 @@ class QuackTransformer(Transformer):
 
     def positive_factor_id(self, id):
         # return ("id", id)
-        return IdNode(name=id)
+        return id
 
     def negative_factor_id(self, minus, id):
         # return ("exp_minus", ("cte_num", 0), ("id", id))
-        return ArithmeticOpNode(op="-", left=CteNumNode(0), right=IdNode(id))
+        return ArithmeticOpNode(op="-", left=CteNumNode(0), right=id)
 
     def factor_cte_num(self, cte_num):
         # return ("cte_num", cte_num)
@@ -91,7 +91,7 @@ class QuackTransformer(Transformer):
 
     def negative_cte_num(self, minus, cte_num):
         # return ("negative_cte_num", cte_num)
-        return UnaryOpNode(op="-", expr=CteNumNode(value=cte_num))
+        return ArithmeticOpNode(op="-", left=CteNumNode(0), right=CteNumNode(cte_num))
 
     def parenthesis_expresion(self, lpar, expresion, rpar):
         return expresion

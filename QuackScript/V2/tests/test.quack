@@ -1,6 +1,9 @@
 // Prueba: Expresiones aritméticas básicas
 program TestExpr;
-var x : int = 2 * 3 + (5 / 3);
+var x: int = 2;
+var z: int = -x;
+
+
 main {
 }
 end

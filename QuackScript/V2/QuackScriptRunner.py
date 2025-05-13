@@ -41,12 +41,13 @@ def parse_program(program):
 
         # Execute the IR
         # Initialize the memory manager
-        # memory_manager = MemoryManager()
+        memory_manager = MemoryManager()
         quack_quadruple = QuackQuadruple()
-        quack_interpreter = QuackInterpreter(symbol_table, quack_quadruple)
+        quack_interpreter = QuackInterpreter(symbol_table, quack_quadruple, memory_manager)
         quack_interpreter.execute(ir)
 
         print(quack_quadruple)
+        print(memory_manager)
 
         return (tree.pretty(), ir, symbol_table.get_str_representation())
     except UnexpectedInput as e:

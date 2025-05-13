@@ -32,12 +32,12 @@ from TransformerClasses import (
     ProgramNode,
 )
 
-from MemoryManager import MemoryAddress, MemoryManager
+from MemoryManager import MemoryAddress
 
 
 class QuackInterpreter:
-    def __init__(self, symbol_table, quack_quadruple):
-        self.memory_manager = MemoryManager()
+    def __init__(self, symbol_table, quack_quadruple, memory_manager):
+        self.memory_manager = memory_manager
         self.symbol_table = symbol_table
         self.global_container_name = self.symbol_table.global_container_name
         self.current_container = self.global_container_name
@@ -46,42 +46,33 @@ class QuackInterpreter:
         self.current_memory_space = "global"
 
     def _resolve_operand(self, node):
-        # if isinstance(node, tuple) and node[0] == "quadruple":
-        #     value = node[1]
-        #     value_type = node[2]
-        # else:
-        #     value = self.evaluate_expression(node)
-        #     value_type = type(value).__name__
-
-        # # Second pass: unwrap if result is a quadruple
-        # if isinstance(value, tuple) and value[0] == "quadruple":
-        #     value_type = value[2]
-        #     value = value[1]
-        # elif isinstance(value, tuple) and value[0] == "id":
-        #     value_type = value[2]
-        #     value = value[1]
         if isinstance(node, MemoryAddress):
             value = node.address
             value_type = node.var_type
+        elif isinstance(node, tuple) and node[0] == "id":
+            value = node[0]
+            value_type = node[1]
         else:
             value = self.evaluate_expression(node)
-            print(node)
             value_type = type(value).__name__
 
         # Second pass: unwrap if result is a quadruple
         if isinstance(value, MemoryAddress):
             value_type = value.var_type
             value = value.address
+        elif isinstance(value, tuple) and value[0] == "id":
+            value_type = value[2]
+            value = value[1]
 
         return value, value_type
 
     def evaluate_expression(self, expr_tree):
         if isinstance(expr_tree, IdNode):
             var_name = expr_tree.name
-            variable = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
-            value = variable.value
+            variable = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
+            value = var_name
             var_type = variable.var_type
-            return (value, var_type)
+            return ("id", value, var_type)
 
         elif isinstance(expr_tree, CteNumNode):
             var_type = type(expr_tree.value).__name__
@@ -162,9 +153,9 @@ class QuackInterpreter:
         ######################################################################################################################
         elif isinstance(ir, VarDeclNode):
             var_type = ir.var_type
-            value, value_type = self._resolve_operand(ir.init_value)
+            value, value_type = self._resolve_operand(ir.init_value) if ir.init_value else (None, None)
 
-            if not self.semantic_cube.is_decl_valid(var_type, value_type):
+            if ir.init_value and not self.semantic_cube.is_decl_valid(var_type, value_type):
                 raise TypeMismatchError(f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'")
 
             for var_name in ir.names:

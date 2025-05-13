@@ -123,6 +123,17 @@ class MemoryManager:
 
         return MemoryAddress(memory_index, space, var_type)
 
+    def __str__(self):
+        """Return a string representation of the memory manager, including memory indices with respect to their ranges."""
+        result = []
+        for space, types in self.memory.items():
+            result.append(f"{space}:")
+            for var_type, values in types.items():
+                start = self.memory_spaces_reference[space][var_type][0]
+                indexed_values = [f"{start + i}: {v}" for i, v in enumerate(values)]
+                result.append(f"  {var_type}: {indexed_values}")
+        return "\n".join(result)
+
 
 if __name__ == "__main__":
     mm = MemoryManager()
