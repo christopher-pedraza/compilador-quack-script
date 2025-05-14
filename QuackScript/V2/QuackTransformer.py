@@ -379,10 +379,6 @@ class QuackTransformer(Transformer):
         return ProgramNode(name=program_pt2, global_decls=decls, functions=funcs, main_body=body)
 
     """
-    program: program_pt1 program_pt2 MAIN body END -> program_no_decl
-        | program_pt1 program_pt2 (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
-        | program_pt1 program_pt2 function+ MAIN body END -> program_func_no_decl
-        | program_pt1 program_pt2 (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
     ?program_pt1: PROGRAM
     ?program_pt2: id SEMICOLON
     """
