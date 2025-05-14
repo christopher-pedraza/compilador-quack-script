@@ -13,7 +13,6 @@ from TransformerClasses import (
     CteNumNode,
     CteStringNode,
     ArithmeticOpNode,
-    UnaryOpNode,
     MultiplicativeOpNode,
     ComparisonNode,
     LogicalAndNode,
@@ -25,8 +24,6 @@ from TransformerClasses import (
     IfNode,
     IfElseNode,
     VarDeclNode,
-    ParamsNode,
-    ParamNode,
     FunctionDeclNode,
     FuncCallNode,
     ProgramNode,
@@ -124,13 +121,13 @@ class QuackInterpreter:
     def execute(self, ir):
         if isinstance(ir, AssignNode):
             var_name = ir.var_name
-            value, value_type = self._resolve_operand(ir.expr)
-
             var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
 
+            value, value_type = self._resolve_operand(ir.expr)
+
             if self.semantic_cube.is_decl_valid(var_type, value_type):
-                self.quack_quadruple.add_quadruple("=", value, None, var_name)
                 self.symbol_table.update_variable(name=var_name, value=value, containerName=self.current_container)
+                self.quack_quadruple.add_quadruple("=", value, None, var_name)
             else:
                 raise TypeMismatchError(
                     f"Cannot assign type '{value_type}' to variable '{var_name}' of type '{var_type}'"
@@ -171,7 +168,6 @@ class QuackInterpreter:
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
         ######################################################################################################################
-        ## TODO: REGRESAR A REVISARLO
         elif isinstance(ir, PrintNode):
             for value in ir.values:
                 value, value_type = self._resolve_operand(value)
