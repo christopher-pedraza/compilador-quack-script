@@ -103,8 +103,24 @@ class MemoryManager:
                 raise ValueError("No available space in temp memory.")
             memory_index = current
             self.temp_pointer[var_type] += 1
+        # Handle constant differently (if the constant is already in memory, reuse it)
+        elif space == "constant":
+            for offset in range(start, end + 1):
+                if (offset - start) < len(self.memory[space][var_type]) and self.memory[space][var_type][
+                    offset - start
+                ] == value:
+                    memory_index = offset
+                    break
+                elif (offset - start) >= len(self.memory[space][var_type]) or self.memory[space][var_type][
+                    offset - start
+                ] is None:
+                    memory_index = offset
+                    self.memory[space][var_type].append(value)
+                    break
+            else:
+                raise ValueError("No available space in constant memory.")
         else:
-            # For global/constant/local, search for first None slot
+            # For global/local, search for first None slot
             arr = self.memory[space][var_type]
             for offset in range(end - start + 1):
                 if offset >= len(arr):
@@ -116,10 +132,11 @@ class MemoryManager:
             else:
                 raise ValueError("No available space in target segment.")
 
-        offset = memory_index - start
-        while len(self.memory[space][var_type]) <= offset:
-            self.memory[space][var_type].append(None)
-        self.memory[space][var_type][offset] = value
+        if space != "constant":
+            offset = memory_index - start
+            while len(self.memory[space][var_type]) <= offset:
+                self.memory[space][var_type].append(None)
+            self.memory[space][var_type][offset] = value
 
         return MemoryAddress(memory_index, space, var_type)
 
@@ -138,23 +155,25 @@ class MemoryManager:
 if __name__ == "__main__":
     mm = MemoryManager()
 
-    i1 = mm.save_to_first_available(42, "int", "global")
-    f1 = mm.save_to_first_available(3.14, "float", "global")
-    s1 = mm.save_to_first_available("Hello", "string", "constant")
-    t1 = mm.save_to_first_available(True, "bool", "temp")
-    t2 = mm.save_to_first_available(7.5, "float", "temp")
-    t3 = mm.save_to_first_available(200, "int", "temp")
+    t1 = mm.save_to_first_available("Hello", "string", "constant")
+    print("\n", t1, "\n", mm)
+    t2 = mm.save_to_first_available("World", "string", "constant")
+    print("\n", t2, "\n", mm)
+    t3 = mm.save_to_first_available("Hello", "string", "constant")
+    print("\n", t3, "\n", mm)
+    t4 = mm.save_to_first_available("World", "string", "constant")
+    print("\n", t4, "\n", mm)
 
-    print("Saved at:", i1, f1, s1, t1, t2, t3)
+    # print("Saved at:", i1, f1, s1, t1, t2, t3)
 
-    print(mm.retrieve(i1.address))  # returns (value, MemoryAddress)
-    print(mm.retrieve(f1.address))
-    print(mm.retrieve(s1.address))
-    print(mm.retrieve(t1.address))
-    print(mm.retrieve(t2.address))
-    print(mm.retrieve(t3.address))
+    # print(mm.retrieve(i1.address))  # returns (value, MemoryAddress)
+    # print(mm.retrieve(f1.address))
+    # print(mm.retrieve(s1.address))
+    # print(mm.retrieve(t1.address))
+    # print(mm.retrieve(t2.address))
+    # print(mm.retrieve(t3.address))
 
-    mm.reset_temp_pointers()
-    t3 = mm.save_to_first_available(100, "int", "temp")
-    print("Reused temp at:", t3)
-    print(mm.retrieve(t3.address))
+    # mm.reset_temp_pointers()
+    # t3 = mm.save_to_first_available(100, "int", "temp")
+    # print("Reused temp at:", t3)
+    # print(mm.retrieve(t3.address))

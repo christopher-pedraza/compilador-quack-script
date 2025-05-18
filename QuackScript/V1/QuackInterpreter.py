@@ -79,6 +79,9 @@ class QuackInterpreter:
                 var_type=var_type,
                 space="constant",
             )
+
+            self.symbol_table.add_constant(address=result.address, value=expr_tree.value, value_type=var_type)
+
             return result
 
         elif isinstance(expr_tree, CteStringNode):

@@ -9,6 +9,9 @@ from Exceptions import (
     ReservedWordError,
 )
 
+from dataclasses import dataclass
+from typing import Union, List, Optional, Literal
+
 
 class Symbol:
     def __init__(self, name, var_type, value=None, category="var", param_index=None):
@@ -97,10 +100,33 @@ class Container:
             param.value = None
 
 
+@dataclass
+class Constant:
+    value: Union[int, float, str, bool]
+    value_type: Literal["int", "float", "str", "bool"]
+
+    def __post_init__(self):
+        if not isinstance(self.value, (int, float, str, bool)):
+            raise TypeError(f"Invalid type for constant value: {type(self.value)}. Must be int, float, str, or bool.")
+
+
+class ConstantsTable:
+    def __init__(self):
+        self.constants = {}
+
+    def add_constant(
+        self, address: int, value: Union[int, float, str, bool], value_type: Literal["int", "float", "str", "bool"]
+    ) -> None:
+        """Add a constant to the table."""
+        if address not in self.constants:
+            self.constants[address] = Constant(value=value, value_type=value_type)
+
+
 class SymbolTable:
     def __init__(self):
         self.containers = {}
         self.global_container_name = "global"
+        self.constants_table = ConstantsTable()
 
     def get_container(self, name: str) -> Container:
         """Get a container by name."""
@@ -192,6 +218,12 @@ class SymbolTable:
         container = self.get_container(containerName)
         container.clean_params_values()
 
+    def add_constant(
+        self, address: int, value: Union[int, float, str, bool], value_type: Literal["int", "float", "str", "bool"]
+    ) -> None:
+        """Add a constant to the constants table."""
+        self.constants_table.add_constant(address=address, value=value, value_type=value_type)
+
     def display(self) -> None:
         """Display the contents of the symbol table."""
         for container_name, container in self.containers.items():
@@ -216,6 +248,11 @@ class SymbolTable:
                 result += (
                     f"  {symbol_name}: {symbol.var_type}, {symbol.value}, {symbol.category}, {symbol.param_index}\n"
                 )
+        # Add constants
+        result += "Constants:\n"
+        for address, constant in self.constants_table.constants.items():
+            result += f"  {address}: {constant.value}\n"
+
         return result
 
     def create_global_container(self, id):
