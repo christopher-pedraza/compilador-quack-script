@@ -1,8 +1,9 @@
 Parse Tree:
 program_decl_no_func
-  program
-  id	TestPrint
-  ;
+  program_pt1	program
+  program_pt2
+    id	TestPrint
+    ;
   var_single_decl_assign
     var
     id	num1
@@ -46,12 +47,12 @@ program_decl_no_func
   end
 
 IR:
-('program', 'TestPrint', [('var_decl', ['num1'], 'int', ('cte_num', 25), 'var'), ('var_decl', ['num2'], 'float', ('exp_plus', ('cte_num', 2.5), ('id', 'num1')), 'var')], [], ('body_statements', [('print', [('cte_string', 'Num1:'), ('id', 'num1'), ('cte_string', ', Num2:'), ('id', 'num2')])]))
+ProgramNode(name='TestPrint', global_decls=[VarDeclNode(names=[IdNode(name='num1')], var_type='int', init_value=CteNumNode(value=25), category='var'), VarDeclNode(names=[IdNode(name='num2')], var_type='float', init_value=ArithmeticOpNode(op='+', left=CteNumNode(value=2.5), right=IdNode(name='num1')), category='var')], functions=[], main_body=BodyNode(statements=[PrintNode(values=[CteStringNode(value='Num1:'), IdNode(name='num1'), CteStringNode(value=', Num2:'), IdNode(name='num2')])]))
 
 Symbol Table:
-Container: global
+Container: TestPrint
   Parameters:
   Symbols:
-  num1: int, 25, var, None
-  num2: float, 27.5, var, None
+  num1: int, 14000, var, None
+  num2: float, 3000, var, None
 

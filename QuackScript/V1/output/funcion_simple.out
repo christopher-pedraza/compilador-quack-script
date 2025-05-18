@@ -1,8 +1,9 @@
 Parse Tree:
 program_func_no_decl
-  program
-  id	TestFunction
-  ;
+  program_pt1	program
+  program_pt2
+    id	TestFunction
+    ;
   function_no_params_no_var_decl
     void
     id	greet
@@ -35,7 +36,7 @@ IR:
 ('program', 'TestFunction', [], [('function_decl', 'greet', [], ('body_statements', [('print', [('cte_string', 'Hello, world!')])]), [])], ('body_statements', [('func_call', 'greet', [])]))
 
 Symbol Table:
-Container: global
+Container: TestFunction
   Parameters:
   Symbols:
 Container: greet

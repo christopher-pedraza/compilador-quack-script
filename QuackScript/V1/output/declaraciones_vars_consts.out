@@ -1,8 +1,9 @@
 Parse Tree:
 program_decl_no_func
-  program
-  id	TestVars
-  ;
+  program_pt1	program
+  program_pt2
+    id	TestVars
+    ;
   const_decl
     const
     id	PI
@@ -34,11 +35,12 @@ program_decl_no_func
       id	area
       =
       term_mult
-        factor_id
-          id	PI
-        *
-        factor_id
-          id	radius
+        term_mult
+          factor_id
+            id	PI
+          *
+          factor_id
+            id	radius
         *
         factor_id
           id	radius
@@ -54,13 +56,13 @@ program_decl_no_func
   end
 
 IR:
-('program', 'TestVars', [('var_decl', ['PI'], 'float', ('cte_num', 3.14159), 'const'), ('var_decl', ['radius'], 'float', ('cte_num', 5.0), 'var'), ('var_decl', ['area'], 'float', None, 'var')], [], ('body_statements', [('assign', 'area', ('term_mult', ('term_mult', ('id', 'PI'), ('id', 'radius')), ('id', 'radius'))), ('print', [('id', 'area')])]))
+ProgramNode(name='TestVars', global_decls=[VarDeclNode(names=[IdNode(name='PI')], var_type='float', init_value=CteNumNode(value=3.14159), category='const'), VarDeclNode(names=[IdNode(name='radius')], var_type='float', init_value=CteNumNode(value=5.0), category='var'), VarDeclNode(names=[IdNode(name='area')], var_type='float', init_value=None, category='var')], functions=[], main_body=BodyNode(statements=[AssignNode(var_name='area', expr=MultiplicativeOpNode(op='*', left=MultiplicativeOpNode(op='*', left=IdNode(name='PI'), right=IdNode(name='radius')), right=IdNode(name='radius'))), PrintNode(values=[IdNode(name='area')])]))
 
 Symbol Table:
-Container: global
+Container: TestVars
   Parameters:
   Symbols:
-  PI: float, 3.14159, const, None
-  radius: float, 5.0, var, None
-  area: float, 78.53975, var, None
+  PI: float, 16000, const, None
+  radius: float, 16001, var, None
+  area: float, 10001, var, None
 

@@ -1,8 +1,9 @@
 Parse Tree:
 program_decl_no_func
-  program
-  id	TestWhile
-  ;
+  program_pt1	program
+  program_pt2
+    id	TestWhile
+    ;
   var_single_decl_assign
     var
     id	i
@@ -18,10 +19,10 @@ program_decl_no_func
     cycle
       while
       (
-      expresion_comparison_op
+      binary_comparison
         factor_id
           id	i
-        <=
+        comparison_op	<=
         factor_cte_num
           int	5
       )
@@ -51,11 +52,11 @@ program_decl_no_func
   end
 
 IR:
-('program', 'TestWhile', [('var_decl', ['i'], 'int', ('cte_num', 1), 'var')], [], ('body_statements', [('cycle', ('expresion_comparison_op', ('id', 'i'), Token('LTE', '<='), ('cte_num', 5)), ('body_statements', [('print', [('id', 'i')]), ('assign', 'i', ('exp_plus', ('id', 'i'), ('cte_num', 1)))]))]))
+ProgramNode(name='TestWhile', global_decls=[VarDeclNode(names=[IdNode(name='i')], var_type='int', init_value=CteNumNode(value=1), category='var')], functions=[], main_body=BodyNode(statements=[WhileNode(condition=ComparisonNode(op='<=', left=IdNode(name='i'), right=CteNumNode(value=5)), body=BodyNode(statements=[PrintNode(values=[IdNode(name='i')]), AssignNode(var_name='i', expr=ArithmeticOpNode(op='+', left=IdNode(name='i'), right=CteNumNode(value=1)))]))]))
 
 Symbol Table:
-Container: global
+Container: TestWhile
   Parameters:
   Symbols:
-  i: int, 6, var, None
+  i: int, 9001, var, None
 

@@ -1,8 +1,9 @@
 Parse Tree:
 program_decl_no_func
-  program
-  id	TestLogic
-  ;
+  program_pt1	program
+  program_pt2
+    id	TestLogic
+    ;
   var_single_decl_assign
     var
     id	x
@@ -24,26 +25,26 @@ program_decl_no_func
     assign
       id	flag
       =
-      expresion_logic_cond
+      binary_logical_or
         parenthesis_expresion
           (
-          expresion_logic_cond
+          binary_logical_and
             parenthesis_expresion
               (
-              expresion_comparison_op
+              binary_comparison
                 factor_id
                   id	x
-                >
+                comparison_op	>
                 factor_cte_num
                   int	5
               )
             and
             parenthesis_expresion
               (
-              expresion_comparison_op
+              binary_comparison
                 factor_id
                   id	x
-                <
+                comparison_op	<
                 factor_cte_num
                   int	20
               )
@@ -51,10 +52,10 @@ program_decl_no_func
         or
         parenthesis_expresion
           (
-          expresion_comparison_op
+          binary_comparison
             factor_id
               id	x
-            ==
+            comparison_op	==
             factor_cte_num
               int	0
           )
@@ -70,12 +71,12 @@ program_decl_no_func
   end
 
 IR:
-('program', 'TestLogic', [('var_decl', ['x'], 'int', ('cte_num', 10), 'var'), ('var_decl', ['flag'], 'int', None, 'var')], [], ('body_statements', [('assign', 'flag', ('expresion_logic_cond', ('expresion_logic_cond', ('expresion_comparison_op', ('id', 'x'), Token('GT', '>'), ('cte_num', 5)), Token('AND', 'and'), ('expresion_comparison_op', ('id', 'x'), Token('LT', '<'), ('cte_num', 20))), Token('OR', 'or'), ('expresion_comparison_op', ('id', 'x'), Token('EE', '=='), ('cte_num', 0)))), ('print', [('id', 'flag')])]))
+ProgramNode(name='TestLogic', global_decls=[VarDeclNode(names=[IdNode(name='x')], var_type='int', init_value=CteNumNode(value=10), category='var'), VarDeclNode(names=[IdNode(name='flag')], var_type='int', init_value=None, category='var')], functions=[], main_body=BodyNode(statements=[AssignNode(var_name='flag', expr=LogicalOrNode(op='and', left=LogicalAndNode(op='and', left=ComparisonNode(op='>', left=IdNode(name='x'), right=CteNumNode(value=5)), right=ComparisonNode(op='<', left=IdNode(name='x'), right=CteNumNode(value=20))), right=ComparisonNode(op='==', left=IdNode(name='x'), right=CteNumNode(value=0)))), PrintNode(values=[IdNode(name='flag')])]))
 
 Symbol Table:
-Container: global
+Container: TestLogic
   Parameters:
   Symbols:
-  x: int, 10, var, None
-  flag: int, 1, var, None
+  x: int, 14000, var, None
+  flag: int, 9004, var, None
 

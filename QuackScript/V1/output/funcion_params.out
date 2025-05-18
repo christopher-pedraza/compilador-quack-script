@@ -1,8 +1,9 @@
 Parse Tree:
 program_func_no_decl
-  program
-  id	TestParams
-  ;
+  program_pt1	program
+  program_pt2
+    id	TestParams
+    ;
   function_no_var_decl
     void
     id	sum
@@ -97,7 +98,7 @@ IR:
 ('program', 'TestParams', [], [('function_decl', 'sum', ('params', [('a', 'int'), ('b', 'int')]), ('body_statements', [('print', [('cte_string', 'Sum:'), ('exp_plus', ('id', 'a'), ('id', 'b'))])]), []), ('function_decl', 'subs', ('params', [('a', 'int'), ('b', 'int')]), ('body_statements', [('print', [('cte_string', 'Subs:'), ('exp_minus', ('id', 'a'), ('id', 'b'))])]), [])], ('body_statements', [('func_call', 'sum', [('cte_num', 3), ('cte_num', 4)]), ('func_call', 'subs', [('cte_num', 3), ('cte_num', 4)])]))
 
 Symbol Table:
-Container: global
+Container: TestParams
   Parameters:
   Symbols:
 Container: sum

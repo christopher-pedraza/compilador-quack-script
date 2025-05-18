@@ -1,8 +1,9 @@
 Parse Tree:
 program_decl_no_func
-  program
-  id	TestExpr
-  ;
+  program_pt1	program
+  program_pt2
+    id	TestExpr
+    ;
   var_single_decl_assign
     var
     id	x
@@ -74,13 +75,13 @@ program_decl_no_func
   end
 
 IR:
-('program', 'TestExpr', [('var_decl', ['x'], 'int', ('cte_num', 5), 'var'), ('var_decl', ['y'], 'int', None, 'var'), ('var_decl', ['z'], 'int', ('negative_cte_num', 3), 'var')], [], ('body_statements', [('assign', 'y', ('term_mult', ('exp_minus', ('term_mult', ('exp_plus', ('id', 'x'), ('cte_num', 3)), ('cte_num', 2)), ('term_div', ('cte_num', 4), ('cte_num', 2))), ('id', 'z'))), ('print', [('id', 'y')])]))
+ProgramNode(name='TestExpr', global_decls=[VarDeclNode(names=[IdNode(name='x')], var_type='int', init_value=CteNumNode(value=5), category='var'), VarDeclNode(names=[IdNode(name='y')], var_type='int', init_value=None, category='var'), VarDeclNode(names=[IdNode(name='z')], var_type='int', init_value=ArithmeticOpNode(op='-', left=CteNumNode(value=0), right=CteNumNode(value=3)), category='var')], functions=[], main_body=BodyNode(statements=[AssignNode(var_name='y', expr=MultiplicativeOpNode(op='*', left=ArithmeticOpNode(op='-', left=MultiplicativeOpNode(op='*', left=ArithmeticOpNode(op='+', left=IdNode(name='x'), right=CteNumNode(value=3)), right=CteNumNode(value=2)), right=MultiplicativeOpNode(op='/', left=CteNumNode(value=4), right=CteNumNode(value=2))), right=IdNode(name='z'))), PrintNode(values=[IdNode(name='y')])]))
 
 Symbol Table:
-Container: global
+Container: TestExpr
   Parameters:
   Symbols:
-  x: int, 5, var, None
-  y: int, -42, var, None
-  z: int, -3, var, None
+  x: int, 14000, var, None
+  y: int, 9004, var, None
+  z: int, 1000, var, None
 

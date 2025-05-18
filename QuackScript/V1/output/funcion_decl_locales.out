@@ -1,8 +1,9 @@
 Parse Tree:
 program_func_no_decl
-  program
-  id	TestLocalVars
-  ;
+  program_pt1	program
+  program_pt2
+    id	TestLocalVars
+    ;
   function_params_var_decl
     void
     id	add_and_print
@@ -67,7 +68,7 @@ IR:
 ('program', 'TestLocalVars', [], [('function_decl', 'add_and_print', ('params', [('x', 'int'), ('y', 'int')]), ('body_statements', [('assign', 'result', ('exp_plus', ('id', 'x'), ('id', 'y'))), ('print', [('cte_string', 'Result:'), ('id', 'result')])]), [('var_decl', ['result'], 'int', None, 'var')])], ('body_statements', [('func_call', 'add_and_print', [('cte_num', 10), ('cte_num', 20)])]))
 
 Symbol Table:
-Container: global
+Container: TestLocalVars
   Parameters:
   Symbols:
 Container: add_and_print
@@ -75,5 +76,5 @@ Container: add_and_print
   x: int, None, param, 0
   y: int, None, param, 1
   Symbols:
-  result: int, 30, var, None
+  result: int, t0, var, None
 

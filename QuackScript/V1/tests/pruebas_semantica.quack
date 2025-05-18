@@ -1,4 +1,4 @@
-// Prueba: Expresiones aritméticas básicas
+// Prueba: Semantica
 program TestExpr;
 const x: float = 2;
 var y: int = (x <= 2) or (0);

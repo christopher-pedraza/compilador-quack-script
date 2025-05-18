@@ -1,8 +1,9 @@
 Parse Tree:
 program_decl_func
-  program
-  id	AllInOne
-  ;
+  program_pt1	program
+  program_pt2
+    id	AllInOne
+    ;
   const_decl
     const
     id	PI
@@ -72,11 +73,12 @@ program_decl_func
         id	temp_area
         =
         term_mult
-          factor_id
-            id	PI
-          *
-          factor_id
-            id	r
+          term_mult
+            factor_id
+              id	PI
+            *
+            factor_id
+              id	r
           *
           factor_id
             id	r
@@ -108,10 +110,10 @@ program_decl_func
       condition_if_else
         if
         (
-        expresion_comparison_op
+        binary_comparison
           factor_id
             id	value
-          >
+          comparison_op	>
           factor_cte_num
             int	0
         )
@@ -156,10 +158,10 @@ program_decl_func
       cycle
         while
         (
-        expresion_comparison_op
+        binary_comparison
           factor_id
             id	start
-          >=
+          comparison_op	>=
           factor_cte_num
             int	1
         )
@@ -200,11 +202,12 @@ program_decl_func
       id	area
       =
       term_mult
-        factor_id
-          id	PI
-        *
-        factor_id
-          id	radius
+        term_mult
+          factor_id
+            id	PI
+          *
+          factor_id
+            id	radius
         *
         factor_id
           id	radius
@@ -234,10 +237,10 @@ program_decl_func
     condition_if
       if
       (
-      expresion_comparison_op
+      binary_comparison
         factor_id
           id	isPositive
-        !=
+        comparison_op	!=
         factor_cte_num
           int	0
       )
@@ -296,15 +299,15 @@ program_decl_func
   end
 
 IR:
-('program', 'AllInOne', [('var_decl', ['PI'], 'float', ('cte_num', 3.14159), 'const'), ('var_decl', ['radius'], 'float', ('cte_num', 2.5), 'var'), ('var_decl', ['area'], 'float', None, 'var'), ('var_decl', ['isPositive'], 'int', None, 'var')], [('function_decl', 'greet', [], ('body_statements', [('print', [('cte_string', 'Bienvenido al programa All-In-One!')])]), []), ('function_decl', 'calculateArea', ('params', [('r', 'float')]), ('body_statements', [('assign', 'temp_area', ('term_mult', ('term_mult', ('id', 'PI'), ('id', 'r')), ('id', 'r'))), ('print', [('cte_string', 'Área calculada:'), ('id', 'temp_area')])]), [('var_decl', ['temp_area'], 'float', None, 'var')]), ('function_decl', 'checkSign', ('params', [('value', 'int')]), ('body_statements', [('condition_if_else', ('expresion_comparison_op', ('id', 'value'), Token('GT', '>'), ('cte_num', 0)), ('body_statements', [('print', [('id', 'value'), ('cte_string', ' es positivo.')])]), ('body_statements', [('print', [('cte_string', 'No es positivo')])]))]), []), ('function_decl', 'countDown', ('params', [('start', 'int')]), ('body_statements', [('cycle', ('expresion_comparison_op', ('id', 'start'), Token('GTE', '>='), ('cte_num', 1)), ('body_statements', [('print', [('id', 'start')]), ('assign', 'start', ('exp_minus', ('id', 'start'), ('cte_num', 1)))]))]), [])], ('body_statements', [('func_call', 'greet', []), ('assign', 'area', ('term_mult', ('term_mult', ('id', 'PI'), ('id', 'radius')), ('id', 'radius'))), ('print', [('cte_string', 'Área del círculo:'), ('id', 'area')]), ('func_call', 'calculateArea', [('cte_num', 3.0)]), ('assign', 'isPositive', ('cte_num', 10)), ('condition_if', ('expresion_comparison_op', ('id', 'isPositive'), Token('NE', '!='), ('cte_num', 0)), ('body_statements', [('print', [('cte_string', 'isPositive no es cero.')])])), ('func_call', 'checkSign', [('negative_cte_num', 5)]), ('func_call', 'checkSign', [('cte_num', 0)]), ('func_call', 'checkSign', [('cte_num', 7)]), ('func_call', 'countDown', [('cte_num', 5)]), ('print', [('cte_string', 'Fin'), ('cte_string', 'del'), ('cte_string', 'programa.'), ('cte_string', 'Gracias por usar All-In-One!')])]))
+('program', 'AllInOne', [('var_decl', ['PI'], 'float', ('cte_num', 3.14159), 'const'), ('var_decl', ['radius'], 'float', ('cte_num', 2.5), 'var'), ('var_decl', ['area'], 'float', None, 'var'), ('var_decl', ['isPositive'], 'int', None, 'var')], [('function_decl', 'greet', [], ('body_statements', [('print', [('cte_string', 'Bienvenido al programa All-In-One!')])]), []), ('function_decl', 'calculateArea', ('params', [('r', 'float')]), ('body_statements', [('assign', 'temp_area', ('term_mult', ('term_mult', ('id', 'PI'), ('id', 'r')), ('id', 'r'))), ('print', [('cte_string', 'Área calculada:'), ('id', 'temp_area')])]), [('var_decl', ['temp_area'], 'float', None, 'var')]), ('function_decl', 'checkSign', ('params', [('value', 'int')]), ('body_statements', [('condition_if_else', ('binary_comparison', ('id', 'value'), '>', ('cte_num', 0)), ('body_statements', [('print', [('id', 'value'), ('cte_string', ' es positivo.')])]), ('body_statements', [('print', [('cte_string', 'No es positivo')])]))]), []), ('function_decl', 'countDown', ('params', [('start', 'int')]), ('body_statements', [('cycle', ('binary_comparison', ('id', 'start'), '>=', ('cte_num', 1)), ('body_statements', [('print', [('id', 'start')]), ('assign', 'start', ('exp_minus', ('id', 'start'), ('cte_num', 1)))]))]), [])], ('body_statements', [('func_call', 'greet', []), ('assign', 'area', ('term_mult', ('term_mult', ('id', 'PI'), ('id', 'radius')), ('id', 'radius'))), ('print', [('cte_string', 'Área del círculo:'), ('id', 'area')]), ('func_call', 'calculateArea', [('cte_num', 3.0)]), ('assign', 'isPositive', ('cte_num', 10)), ('condition_if', ('binary_comparison', ('id', 'isPositive'), '!=', ('cte_num', 0)), ('body_statements', [('print', [('cte_string', 'isPositive no es cero.')])])), ('func_call', 'checkSign', [('negative_cte_num', 5)]), ('func_call', 'checkSign', [('cte_num', 0)]), ('func_call', 'checkSign', [('cte_num', 7)]), ('func_call', 'countDown', [('cte_num', 5)]), ('print', [('cte_string', 'Fin'), ('cte_string', 'del'), ('cte_string', 'programa.'), ('cte_string', 'Gracias por usar All-In-One!')])]))
 
 Symbol Table:
-Container: global
+Container: AllInOne
   Parameters:
   Symbols:
   PI: float, 3.14159, const, None
   radius: float, 2.5, var, None
-  area: float, 19.6349375, var, None
+  area: float, t1, var, None
   isPositive: int, 10, var, None
 Container: greet
   Parameters:
@@ -313,7 +316,7 @@ Container: calculateArea
   Parameters:
   r: float, None, param, 0
   Symbols:
-  temp_area: float, 28.274309999999996, var, None
+  temp_area: float, t3, var, None
 Container: checkSign
   Parameters:
   value: int, None, param, 0
