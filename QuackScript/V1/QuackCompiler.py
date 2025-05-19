@@ -7,6 +7,7 @@ from QuackTransformer import QuackTransformer
 from QuackInterpreter import QuackInterpreter
 from QuackQuadruple import QuackQuadruple
 from MemoryManager import MemoryManager
+import pickle
 
 logger.setLevel(logging.DEBUG)
 
@@ -22,6 +23,20 @@ with open("grammar.lark", "r") as file:
 # Create the Lark parser
 quackParser = Lark(grammar, start="start", parser="lalr", debug=True)
 quack = quackParser.parse
+
+
+def generate_obj_file(quadruples, symbol_table, output_file):
+    """
+    Generates a binary object file from the quadruple and symbol table.
+    """
+    data = {
+        "quadruples": quadruples,
+        "symbol_table": symbol_table.containers,
+        "constants_table": symbol_table.constants_table,
+    }
+    with open(output_file, "wb") as f:
+        pickle.dump(data, f)
+    print(f"Object file generated: {output_file}")
 
 
 def parse_program(program):
@@ -46,12 +61,24 @@ def parse_program(program):
         quack_interpreter = QuackInterpreter(symbol_table, quack_quadruple, memory_manager)
         quack_interpreter.execute(ir)
 
-        print(quack_quadruple)
-        print(memory_manager)
-
-        return (tree.pretty(), ir, symbol_table.get_str_representation())
+        return (tree.pretty(), ir, symbol_table, quack_quadruple, memory_manager)
     except UnexpectedInput as e:
         print(f"Parsing failed: {e}")
+
+
+def compile_program(input_file, output_file):
+    """
+    Compiles a QuackScript program from an input file and generates an object file.
+    """
+    try:
+        with open(input_file, "r", encoding="utf-8") as file:
+            program = file.read()
+        tree, ir, symbol_table, quadruples, memory = parse_program(program)
+        generate_obj_file(quadruples, symbol_table, output_file)
+    except FileNotFoundError:
+        print(f"File {input_file} not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 if __name__ == "__main__":
@@ -69,7 +96,7 @@ if __name__ == "__main__":
                 sys.stdout = log_file
                 with open(os.path.join("./tests", file), "r", encoding="utf-8") as input_file:
                     program = input_file.read()
-                    tree, ir, symbol_table = parse_program(program)
+                    tree, ir, symbol_table, quadruples, memory = parse_program(program)
                     # Guarda el output en un archivo .out
                     with open(
                         os.path.join("./output", file.replace(".quack", ".out")), "w", encoding="utf-8"
@@ -81,16 +108,13 @@ if __name__ == "__main__":
                         output_file.write(str(ir))
                         output_file.write("\n\n")
                         output_file.write("Symbol Table:\n")
-                        output_file.write(symbol_table)
+                        output_file.write(symbol_table.get_str_representation())
                         output_file.write("\n")
+                        output_file.write("Quadruples:\n")
+                        output_file.write(quadruples.get_str_representation())
+                        output_file.write("\n\n")
+                        output_file.write("Memory:\n")
+                        output_file.write(memory.get_str_representation())
+                        output_file.write("\n\n")
 
             sys.stdout = sys.__stdout__
-# Si se pasa un archivo como argumento, lo parsea y ejecuta
-# el programa, mostrando el resultado en la consola
-# if args.input_file:
-#     # clear console
-#     print("\033[H\033[J", end="")
-#     # Parse the input program
-#     with open(args.input_file, 'r') as input_file:
-#         program = input_file.read()
-#         parse_program(program)
