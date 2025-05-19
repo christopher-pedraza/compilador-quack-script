@@ -140,6 +140,10 @@ class MemoryManager:
 
         return MemoryAddress(memory_index, space, var_type)
 
+    def get_str_representation(self):
+        """Return a string representation of the memory manager."""
+        return "\n".join(f"{space}: {types}" for space, types in self.memory.items())
+
     def __str__(self):
         """Return a string representation of the memory manager, including memory indices with respect to their ranges."""
         result = []
@@ -150,6 +154,10 @@ class MemoryManager:
                 indexed_values = [f"{start + i}: {v}" for i, v in enumerate(values)]
                 result.append(f"  {var_type}: {indexed_values}")
         return "\n".join(result)
+
+    def __repr__(self):
+        """Return a string representation of the memory manager."""
+        return self.__str__()
 
 
 if __name__ == "__main__":
