@@ -29,11 +29,7 @@ def generate_obj_file(quadruples, symbol_table, output_file):
     """
     Generates a binary object file from the quadruple and symbol table.
     """
-    data = {
-        "quadruples": quadruples,
-        "symbol_table": symbol_table.containers,
-        "constants_table": symbol_table.constants_table,
-    }
+    data = {"quadruples": quadruples, "symbol_table": symbol_table}
     with open(output_file, "wb") as f:
         pickle.dump(data, f)
     print(f"Object file generated: {output_file}")
