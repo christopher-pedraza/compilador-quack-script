@@ -28,7 +28,7 @@ class MemoryManager:
             "constant": {
                 "int": (12000, 13999),
                 "float": (14000, 15999),
-                "string": (16000, 17999),
+                "str": (16000, 17999),
             },
         }
 
@@ -155,13 +155,13 @@ class MemoryManager:
 if __name__ == "__main__":
     mm = MemoryManager()
 
-    t1 = mm.save_to_first_available("Hello", "string", "constant")
+    t1 = mm.save_to_first_available("Hello", "str", "constant")
     print("\n", t1, "\n", mm)
-    t2 = mm.save_to_first_available("World", "string", "constant")
+    t2 = mm.save_to_first_available("World", "str", "constant")
     print("\n", t2, "\n", mm)
-    t3 = mm.save_to_first_available("Hello", "string", "constant")
+    t3 = mm.save_to_first_available("Hello", "str", "constant")
     print("\n", t3, "\n", mm)
-    t4 = mm.save_to_first_available("World", "string", "constant")
+    t4 = mm.save_to_first_available("World", "str", "constant")
     print("\n", t4, "\n", mm)
 
     # print("Saved at:", i1, f1, s1, t1, t2, t3)

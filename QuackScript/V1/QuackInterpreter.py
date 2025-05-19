@@ -85,7 +85,16 @@ class QuackInterpreter:
             return result
 
         elif isinstance(expr_tree, CteStringNode):
-            return expr_tree.value
+            var_type = type(expr_tree.value).__name__
+            result = self.memory_manager.save_to_first_available(
+                value=expr_tree.value,
+                var_type=var_type,
+                space="constant",
+            )
+            self.symbol_table.add_constant(address=result.address, value=expr_tree.value, value_type=var_type)
+            return result
+
+            # return expr_tree.value
 
         elif (
             isinstance(expr_tree, MultiplicativeOpNode)
