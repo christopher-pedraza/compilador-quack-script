@@ -98,6 +98,19 @@ class QuackQuadruple:
         else:
             raise IndexError("Jump index out of range")
 
+    def get_str_representation(self):
+        """Get a string representation of the quadruples."""
+        return "\n".join(
+            [
+                f"{i}: ({quadruple[0]}, {quadruple[1]}, {quadruple[2]}, {quadruple[3]})"
+                for i, quadruple in enumerate(self.quadruples)
+            ],
+        )
+
     def __str__(self):
         """Get a string representation of the quadruples."""
         return "\n".join([f"{i}: {quadruple}" for i, quadruple in enumerate(self.quadruples)])
+
+    def __repr__(self):
+        """Get a string representation of the quadruples."""
+        return self.__str__()
