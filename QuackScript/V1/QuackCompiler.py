@@ -1,5 +1,4 @@
 import logging
-import argparse
 import sys
 import os
 from lark import Lark, logger, UnexpectedInput
@@ -10,11 +9,6 @@ from MemoryManager import MemoryManager
 import pickle
 
 logger.setLevel(logging.DEBUG)
-
-# Parse command-line arguments
-# parser = argparse.ArgumentParser(description="Run a QuackScript program.")
-# parser.add_argument("input_file", help="Path to the QuackScript input file")
-# args = parser.parse_args()
 
 # Import grammar from file
 with open("grammar.lark", "r") as file:
@@ -37,9 +31,6 @@ def generate_obj_file(quadruples, symbol_table, output_file):
 
 def parse_program(program):
     try:
-        # clear console
-        # print("\033[H\033[J", end="")
-
         # Parse the input program
         tree = quack(program)
 
