@@ -10,7 +10,7 @@ from Exceptions import (
 )
 
 from dataclasses import dataclass
-from typing import Union, List, Optional, Literal
+from typing import Union, Literal
 
 
 class Symbol:

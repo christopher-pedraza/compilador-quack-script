@@ -3,7 +3,6 @@ from SemanticCube import SemanticCube
 from Exceptions import (
     UnsupportedOperationError,
     DivisionByZeroError,
-    UnsupportedExpressionError,
     TypeMismatchError,
     UnknownIRTypeError,
 )
@@ -144,7 +143,7 @@ class QuackInterpreter:
                 raise TypeMismatchError(
                     f"Cannot assign type '{value_type}' to variable '{var_name}' of type '{var_type}'"
                 )
-        ######################################################################################################################
+        ###################################################################################
         elif isinstance(ir, VarDeclNode):
             var_type = ir.var_type
             value, value_type = self._resolve_operand(ir.init_value) if ir.init_value else (None, None)
@@ -161,11 +160,11 @@ class QuackInterpreter:
                     category=ir.category,
                 )
                 self.quack_quadruple.add_quadruple("=", value, None, var_name.name)
-        ######################################################################################################################
+        ###################################################################################
         elif isinstance(ir, BodyNode):
             for statement in ir.statements:
                 self.execute(statement)
-        ######################################################################################################################
+        ###################################################################################
         elif isinstance(ir, WhileNode):
             self.quack_quadruple.add_return()
             condition = self._resolve_operand(ir.condition)
@@ -179,12 +178,12 @@ class QuackInterpreter:
             self.quack_quadruple.update_jump(
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
-        ######################################################################################################################
+        ###################################################################################
         elif isinstance(ir, PrintNode):
             for value in ir.values:
                 value, value_type = self._resolve_operand(value)
                 self.quack_quadruple.add_quadruple("print", None, None, value)
-        ######################################################################################################################
+        ###################################################################################
         elif isinstance(ir, IfNode):
             value, value_type = self._resolve_operand(ir.condition)
 
@@ -196,7 +195,7 @@ class QuackInterpreter:
             self.quack_quadruple.update_jump(
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
-        ######################################################################################################################
+        ###################################################################################
         elif isinstance(ir, IfElseNode):
             value, value_type = self._resolve_operand(ir.condition)
 
@@ -218,7 +217,7 @@ class QuackInterpreter:
             self.quack_quadruple.update_jump(
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
-        ######################################################################################################################
+        ###################################################################################
         elif isinstance(ir, FunctionDeclNode):
             self.current_container = ir.name
 
@@ -235,7 +234,7 @@ class QuackInterpreter:
                 self.execute(var)
 
             self.current_container = self.global_container_name
-        ######################################################################################################################
+        ###################################################################################
         ## TODO: REVISAR LUEGO COMO SE MANEJA LAS LLAMADAS DE FUNCIONES
         elif isinstance(ir, FuncCallNode):
             self.current_container = ir.name
@@ -250,7 +249,7 @@ class QuackInterpreter:
             self.execute(func_body)
             self.symbol_table.clean_params_values(containerName=ir.name)
             self.current_container = self.global_container_name
-        ######################################################################################################################
+        ###################################################################################
         elif isinstance(ir, ProgramNode):
             for decl in ir.global_decls:
                 self.execute(decl)
