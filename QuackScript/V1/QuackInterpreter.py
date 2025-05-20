@@ -46,7 +46,6 @@ class QuackInterpreter:
             value = node.address
             value_type = node.var_type
         elif isinstance(node, tuple) and node[0] == "id":
-            print("**", node)
             value = node[1]
             value_type = node[2]
         else:
@@ -58,11 +57,9 @@ class QuackInterpreter:
             value_type = value.var_type
             value = value.address
         elif isinstance(value, tuple) and value[0] == "id":
-            print("&&", value)
             value_type = value[2]
             value = value[1]
 
-        print("%%%%", value, value_type)
         return value, value_type
 
     def evaluate_expression(self, expr_tree):
@@ -70,14 +67,12 @@ class QuackInterpreter:
             var_name = expr_tree.name
             variable = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
             value = variable.value
-            print(value)
             var_type = variable.var_type
             return ("id", value, var_type)
 
         elif isinstance(expr_tree, CteNumNode):
             var_type = type(expr_tree.value).__name__
 
-            print(f"Assigning constant value {expr_tree.value} of type {var_type} to memory.")
             result = self.memory_manager.assign_to_first_available(
                 value=expr_tree.value,
                 var_type=var_type,
@@ -91,7 +86,6 @@ class QuackInterpreter:
         elif isinstance(expr_tree, CteStringNode):
             var_type = type(expr_tree.value).__name__
 
-            print(f"Assigning constant value '{expr_tree.value}' of type {var_type} to memory.")
             result = self.memory_manager.assign_to_first_available(
                 value=expr_tree.value,
                 var_type=var_type,
@@ -120,7 +114,6 @@ class QuackInterpreter:
             if expr_tree.op == "/" and right_value == 0:
                 raise DivisionByZeroError("Division by zero is not allowed.")
 
-            print(f"Assigning result of operation '{(expr_tree.op, expr_tree.left, expr_tree.right)}' to memory.")
             memory_space = self.memory_manager.assign_to_first_available(
                 value=(expr_tree.op, expr_tree.left, expr_tree.right),
                 var_type=result_type,
@@ -138,16 +131,16 @@ class QuackInterpreter:
     def execute(self, ir):
         if isinstance(ir, AssignNode):
             var_name = ir.var_name
-            var_type = self.symbol_table.get_variable_type(name=var_name, containerName=self.current_container)
+            variable = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
 
             value, value_type = self._resolve_operand(ir.expr)
 
-            if self.semantic_cube.is_decl_valid(var_type, value_type):
+            if self.semantic_cube.is_decl_valid(variable.var_type, value_type):
                 self.symbol_table.update_variable(name=var_name, value=value, containerName=self.current_container)
-                self.quack_quadruple.add_quadruple("=", value, None, var_name)
+                self.quack_quadruple.add_quadruple("=", value, None, variable.address)
             else:
                 raise TypeMismatchError(
-                    f"Cannot assign type '{value_type}' to variable '{var_name}' of type '{var_type}'"
+                    f"Cannot assign type '{value_type}' to variable '{var_name}' of type '{variable.var_type}'"
                 )
         ###################################################################################
         elif isinstance(ir, VarDeclNode):
@@ -169,6 +162,7 @@ class QuackInterpreter:
                     value=value,
                     containerName=self.current_container,
                     category=ir.category,
+                    address=address.address,
                 )
                 self.quack_quadruple.add_quadruple("=", value, None, address.address)
         ###################################################################################
