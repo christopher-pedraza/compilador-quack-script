@@ -46,6 +46,11 @@ class Container:
             "or",
         ]
 
+    def remove_symbol_table(self):
+        """Remove the symbol table."""
+        self.symbols = {}
+        self.params = {}
+
     def add_symbol(self, symbol: Symbol) -> None:
         """Add a symbol to the container."""
         if symbol.name in self.symbols or symbol.name in self.params:
@@ -127,6 +132,14 @@ class SymbolTable:
         self.containers = {}
         self.global_container_name = "global"
         self.constants_table = ConstantsTable()
+
+    def end_function(self, name: str) -> None:
+        """End a function and remove its container."""
+        if name in self.containers:
+            container = self.containers[name]
+            container.remove_symbol_table()
+        else:
+            raise NameNotFoundError(f"Container '{name}' not found.")
 
     def get_container(self, name: str) -> Container:
         """Get a container by name."""
