@@ -85,60 +85,6 @@ class MemoryManager:
             return arr[offset], mem_addr
         return None, mem_addr
 
-    # def save_to_first_available(self, value, var_type: str, space: str) -> MemoryAddress:
-    #     if space not in self.memory_spaces_reference:
-    #         raise ValueError(f"Invalid memory space: {space}")
-    #     if var_type not in self.memory_spaces_reference[space]:
-    #         raise ValueError(f"Invalid type {var_type} for memory space {space}")
-
-    #     start, end = self.memory_spaces_reference[space][var_type]
-    #     if var_type not in self.memory[space]:
-    #         self.memory[space][var_type] = []
-
-    #     # Handle local/temp differently (use pointer-based allocation)
-    #     if space == "temp":
-    #         current = self.temp_pointer[var_type]
-    #         if current > end:
-    #             raise ValueError("No available space in temp memory.")
-    #         memory_index = current
-    #         self.temp_pointer[var_type] += 1
-    #     # Handle constant differently (if the constant is already in memory, reuse it)
-    #     elif space == "constant":
-    #         for offset in range(start, end + 1):
-    #             if (offset - start) < len(self.memory[space][var_type]) and self.memory[space][var_type][
-    #                 offset - start
-    #             ] == value:
-    #                 memory_index = offset
-    #                 break
-    #             elif (offset - start) >= len(self.memory[space][var_type]) or self.memory[space][var_type][
-    #                 offset - start
-    #             ] is None:
-    #                 memory_index = offset
-    #                 self.memory[space][var_type].append(value)
-    #                 break
-    #         else:
-    #             raise ValueError("No available space in constant memory.")
-    #     else:
-    #         # For global/local, search for first None slot
-    #         arr = self.memory[space][var_type]
-    #         for offset in range(end - start + 1):
-    #             if offset >= len(arr):
-    #                 arr.append(None)
-    #             if arr[offset] is None:
-    #                 arr[offset] = value
-    #                 memory_index = start + offset
-    #                 break
-    #         else:
-    #             raise ValueError("No available space in target segment.")
-
-    #     if space != "constant":
-    #         offset = memory_index - start
-    #         while len(self.memory[space][var_type]) <= offset:
-    #             self.memory[space][var_type].append(None)
-    #         self.memory[space][var_type][offset] = value
-
-    #     return MemoryAddress(memory_index, space, var_type)
-
     def assign_to_first_available(self, value, var_type: str, space: str) -> MemoryAddress:
         """
         Assign a memory address to the first available slot for a given value,

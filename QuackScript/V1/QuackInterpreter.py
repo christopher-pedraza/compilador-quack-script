@@ -46,8 +46,9 @@ class QuackInterpreter:
             value = node.address
             value_type = node.var_type
         elif isinstance(node, tuple) and node[0] == "id":
-            value = node[0]
-            value_type = node[1]
+            print("**", node)
+            value = node[1]
+            value_type = node[2]
         else:
             value = self.evaluate_expression(node)
             value_type = type(value).__name__
@@ -57,16 +58,19 @@ class QuackInterpreter:
             value_type = value.var_type
             value = value.address
         elif isinstance(value, tuple) and value[0] == "id":
+            print("&&", value)
             value_type = value[2]
             value = value[1]
 
+        print("%%%%", value, value_type)
         return value, value_type
 
     def evaluate_expression(self, expr_tree):
         if isinstance(expr_tree, IdNode):
             var_name = expr_tree.name
             variable = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
-            value = var_name
+            value = variable.value
+            print(value)
             var_type = variable.var_type
             return ("id", value, var_type)
 
@@ -96,8 +100,6 @@ class QuackInterpreter:
             self.symbol_table.add_constant(address=result.address, value=expr_tree.value, value_type=var_type)
             return result
 
-            # return expr_tree.value
-
         elif (
             isinstance(expr_tree, MultiplicativeOpNode)
             or isinstance(expr_tree, ArithmeticOpNode)
@@ -122,7 +124,7 @@ class QuackInterpreter:
             memory_space = self.memory_manager.assign_to_first_available(
                 value=(expr_tree.op, expr_tree.left, expr_tree.right),
                 var_type=result_type,
-                space=self.current_memory_space,
+                space="temp",
             )
             result = self.quack_quadruple.add_quadruple(
                 op=expr_tree.op, arg1=left_value, arg2=right_value, result=memory_space.address
@@ -156,6 +158,11 @@ class QuackInterpreter:
                 raise TypeMismatchError(f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'")
 
             for var_name in ir.names:
+                address = self.memory_manager.assign_to_first_available(
+                    value=var_name.name,
+                    var_type=var_type,
+                    space=self.current_memory_space,
+                )
                 self.symbol_table.add_variable(
                     name=var_name.name,
                     var_type=var_type,
@@ -163,7 +170,7 @@ class QuackInterpreter:
                     containerName=self.current_container,
                     category=ir.category,
                 )
-                self.quack_quadruple.add_quadruple("=", value, None, var_name.name)
+                self.quack_quadruple.add_quadruple("=", value, None, address.address)
         ###################################################################################
         elif isinstance(ir, BodyNode):
             for statement in ir.statements:

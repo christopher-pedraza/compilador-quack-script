@@ -14,12 +14,13 @@ from typing import Union, Literal
 
 
 class Symbol:
-    def __init__(self, name, var_type, value=None, category="var", param_index=None):
+    def __init__(self, name, var_type, value=None, category="var", param_index=None, address=None):
         self.name = name
         self.var_type = var_type
         self.value = value
         self.category = category
         self.param_index = param_index
+        self.address = address
 
 
 class Container:
@@ -133,13 +134,13 @@ class SymbolTable:
         self.global_container_name = "global"
         self.constants_table = ConstantsTable()
 
-    def end_function(self, name: str) -> None:
-        """End a function and remove its container."""
-        if name in self.containers:
-            container = self.containers[name]
-            container.remove_symbol_table()
-        else:
-            raise NameNotFoundError(f"Container '{name}' not found.")
+    # def end_function(self, name: str) -> None:
+    #     """End a function and remove its container."""
+    #     if name in self.containers:
+    #         container = self.containers[name]
+    #         container.remove_symbol_table()
+    #     else:
+    #         raise NameNotFoundError(f"Container '{name}' not found.")
 
     def get_container(self, name: str) -> Container:
         """Get a container by name."""
@@ -183,12 +184,21 @@ class SymbolTable:
                 raise NameNotFoundError(f"Symbol '{name}' not found in '{containerName}' or global container.")
 
     def add_variable(
-        self, name: str, var_type: str, value=None, category="var", containerName: str = None, param_index: int = None
+        self,
+        name: str,
+        var_type: str,
+        value=None,
+        category="var",
+        containerName: str = None,
+        param_index: int = None,
+        address: int = None,
     ) -> None:
         """Add a variable to the specified container."""
         if containerName is None:
             containerName = self.global_container_name
-        variable = Symbol(name=name, var_type=var_type, value=value, category=category, param_index=param_index)
+        variable = Symbol(
+            name=name, var_type=var_type, value=value, category=category, param_index=param_index, address=address
+        )
         self.__add_symbol(variable, containerName)
 
     def add_parameter(self, name: str, var_type: str, containerName: str, param_index: int = None) -> None:

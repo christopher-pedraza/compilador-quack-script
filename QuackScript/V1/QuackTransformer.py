@@ -35,7 +35,6 @@ class QuackTransformer(Transformer):
     """
 
     def id(self, value):
-        # return str(value)
         return IdNode(name=str(value))
 
     """
@@ -44,11 +43,9 @@ class QuackTransformer(Transformer):
     """
 
     def int(self, value):
-        # return int(value)
         return int(value)
 
     def float(self, value):
-        # return float(value)
         return float(value)
 
     """
@@ -56,7 +53,6 @@ class QuackTransformer(Transformer):
     """
 
     def cte_string(self, value):
-        # return ("cte_string", str(value)[1:-1])
         return CteStringNode(value=str(value)[1:-1])
 
     """
@@ -70,27 +66,21 @@ class QuackTransformer(Transformer):
     """
 
     def factor_id(self, id):
-        # return ("id", id)
         return id
 
     def positive_factor_id(self, id):
-        # return ("id", id)
         return id
 
     def negative_factor_id(self, minus, id):
-        # return ("exp_minus", ("cte_num", 0), ("id", id))
         return ArithmeticOpNode(op="-", left=CteNumNode(0), right=id)
 
     def factor_cte_num(self, cte_num):
-        # return ("cte_num", cte_num)
         return CteNumNode(value=cte_num)
 
     def positive_cte_num(self, plus, cte_num):
-        # return ("cte_num", cte_num)
         return CteNumNode(value=cte_num)
 
     def negative_cte_num(self, minus, cte_num):
-        # return ("negative_cte_num", cte_num)
         return ArithmeticOpNode(op="-", left=CteNumNode(0), right=CteNumNode(cte_num))
 
     def parenthesis_expresion(self, lpar, expresion, rpar):
@@ -103,11 +93,9 @@ class QuackTransformer(Transformer):
     """
 
     def term_mult(self, term, mult, factor):
-        # return ("term_mult", term, factor)
         return MultiplicativeOpNode(op="*", left=term, right=factor)
 
     def term_div(self, term, div, factor):
-        # return ("term_div", term, factor)
         return MultiplicativeOpNode(op="/", left=term, right=factor)
 
     """
@@ -117,11 +105,9 @@ class QuackTransformer(Transformer):
     """
 
     def exp_plus(self, exp, plus, term):
-        # return ("exp_plus", exp, term)
         return ArithmeticOpNode(op="+", left=exp, right=term)
 
     def exp_minus(self, exp, minus, term):
-        # return ("exp_minus", exp, term)
         return ArithmeticOpNode(op="-", left=exp, right=term)
 
     """
@@ -130,7 +116,6 @@ class QuackTransformer(Transformer):
     """
 
     def binary_comparison(self, exp1, comparison_op, exp2):
-        # return ("binary_comparison", exp1, comparison_op, exp2)
         return ComparisonNode(op=comparison_op, left=exp1, right=exp2)
 
     """
@@ -139,7 +124,6 @@ class QuackTransformer(Transformer):
     """
 
     def binary_logical_and(self, logical_and, and_, comparison):
-        # return ("binary_logical_and", logical_and, comparison)
         return LogicalAndNode(op="and", left=logical_and, right=comparison)
 
     """
@@ -148,8 +132,7 @@ class QuackTransformer(Transformer):
     """
 
     def binary_logical_or(self, logical_or, or_, logical_and):
-        # return ("binary_logical_or", logical_or, logical_and)
-        return LogicalOrNode(op="and", left=logical_or, right=logical_and)
+        return LogicalOrNode(op="or", left=logical_or, right=logical_and)
 
     """
     comparison_op: GT | LT | NE | EE | GTE | LTE
@@ -174,7 +157,6 @@ class QuackTransformer(Transformer):
     """
 
     def assign(self, id, assign, expresion, semicolon):
-        # return ("assign", id, expresion)
         return AssignNode(var_name=id.name, expr=expresion)
 
     """
@@ -183,12 +165,9 @@ class QuackTransformer(Transformer):
     """
 
     def empty_body(self, lbrace, rbrace):
-        # return ("empty_body",)
         return BodyNode(statements=[])
 
     def body_statements(self, lbrace, *statements):
-        # Exclude the last RBRACE and return the statements as a list
-        # return ("body_statements", list(statements[:-1]))
         return BodyNode(statements=list(statements[:-1]))
 
     """
@@ -197,14 +176,12 @@ class QuackTransformer(Transformer):
     """
 
     def print_single(self, print_, lpar, content, rpar, semicolon):
-        # return ("print", [content])
         return PrintNode(values=[content])
 
     def print_multiple(self, print_, lpar, content, *args):
         cont = [content]  # Start with the first content
         for i in range(1, len(args) - 2, 2):
             cont.append(args[i])
-        # return ("print", cont)
         return PrintNode(values=cont)
 
     """
@@ -212,7 +189,6 @@ class QuackTransformer(Transformer):
     """
 
     def cycle(self, while_, lpar, expresion, rpar, do, body, semicolon):
-        # return ("cycle", expresion, body)
         return WhileNode(condition=expresion, body=body)
 
     """
@@ -221,11 +197,9 @@ class QuackTransformer(Transformer):
     """
 
     def condition_if(self, if_, lpar, expresion, rpar, body, semicolon):
-        # return ("condition_if", expresion, body)
         return IfNode(condition=expresion, then_body=body)
 
     def condition_if_else(self, if_, lpar, expresion, rpar, body1, else_, body2, semicolon):
-        # return ("condition_if_else", expresion, body1, body2)
         return IfElseNode(condition=expresion, then_body=body1, else_body=body2)
 
     """
@@ -233,7 +207,6 @@ class QuackTransformer(Transformer):
     """
 
     def const_decl(self, const, id, colon, var_type, assign, expresion, semicolon):
-        # return ("var_decl", [id], var_type, expresion, "const")
         return VarDeclNode(names=[id], var_type=var_type, init_value=expresion, category="const")
 
     """
@@ -244,25 +217,21 @@ class QuackTransformer(Transformer):
     """
 
     def var_single_decl_no_assign(self, var, id, colon, var_type, semicolon):
-        # return ("var_decl", [id], var_type, None, "var")
         return VarDeclNode(names=[id], var_type=var_type, category="var")
 
     def var_single_decl_assign(self, var, id, colon, var_type, assign, expresion, semicolon):
-        # return ("var_decl", [id], var_type, expresion, "var")
         return VarDeclNode(names=[id], var_type=var_type, init_value=expresion, category="var")
 
     def var_multi_decl_no_assign(self, var, id, *args):
         ids = [id]
         for i in range(0, len(args) - 1, 2):
             ids.append(args[i - 1])
-        # return ("var_decl", ids, args[-1], None, "var")
         return VarDeclNode(names=ids, var_type=args[-1], category="var")
 
     def var_multi_decl_assign(self, var, id, *args):
         ids = [id]
         for i in range(1, len(args) - 5, 2):
             ids.append(args[i])
-        # return ("var_decl", ids, args[-4], args[-2], "var")
         return VarDeclNode(names=ids, var_type=args[-4], init_value=args[-2], category="var")
 
     """
@@ -271,16 +240,12 @@ class QuackTransformer(Transformer):
     """
 
     def param(self, id, colon, type_):
-        # return ("params", [(id, type)])
         return ParamsNode(params=[ParamNode(name=id, param_type=type_)])
 
     def params_list(self, id, colon, type_, comma, *args):
-        # params = ("params", [(id, type)])
         params = [ParamNode(name=id, param_type=type_)]
         for i in range(0, len(args) - 1, 4):
-            # params[1].append((args[i], args[i + 2]))
             params.append(ParamNode(name=args[i], param_type=args[i + 2]))
-        # return params
         return ParamsNode(params=params)
 
     """
@@ -291,27 +256,18 @@ class QuackTransformer(Transformer):
     """
 
     def function_no_params_no_var_decl(self, void, id, lpar, rpar, lbracket, body, rbracket, semicolon):
-        # return ("function_decl", id, [], body, [])
         return FunctionDeclNode(name=id, params=ParamsNode(params=[]), body=body, var_decls=[])
 
     def function_no_var_decl(self, void, id, lpar, params, rpar, lbracket, body, rbracket, semicolon):
-        # return ("function_decl", id, params, body, [])
         return FunctionDeclNode(name=id, params=params, body=body, var_decls=[])
 
     def function_params_var_decl(self, void, id, lpar, params, rpar, lbracket, *args):
         body = args[-3]
-        # for i in range(0, len(args)-3):
-        #     var_decl.append(args[i])
-        # return ("function_decl", id, params, body, var_decl)
         var_decls = list(args[:-3])
         return FunctionDeclNode(name=id, params=params, body=body, var_decls=var_decls)
 
     def function_no_params(self, void, id, lpar, rpar, lbracket, *args):
         body = args[-3]
-        var_decl = []
-        # for i in range(0, len(args)-3):
-        #     var_decl.append(args[i])
-        # return ("function_decl", id, [], body, var_decl)
         var_decls = list(args[:-3])
         return FunctionDeclNode(name=id, params=ParamsNode(params=[]), body=body, var_decls=var_decls)
 
@@ -322,18 +278,15 @@ class QuackTransformer(Transformer):
     """
 
     def func_call_no_params(self, id, lpar, rpar, semicolon):
-        # return ("func_call", id, [])
         return FuncCallNode(name=id, args=[])
 
     def func_call_single_param(self, id, lpar, expresion, rpar, semicolon):
-        # return ("func_call", id, [expresion])
         return FuncCallNode(name=id, args=[expresion])
 
     def func_call_multiple_params(self, id, lpar, expresion, *args):
         params = [expresion]
         for i in range(1, len(args) - 1, 2):
             params.append(args[i])
-        # return ("func_call", id, params)
         return FuncCallNode(name=id, args=params)
 
     """
@@ -344,7 +297,6 @@ class QuackTransformer(Transformer):
     """
 
     def program_no_decl(self, program_pt1, program_pt2, main, body, end):
-        # return ("program", id, [], [], body)
         return ProgramNode(name=program_pt2, global_decls=[], functions=[], main_body=body)
 
     def program_decl_no_func(self, program_pt1, program_pt2, *args):
@@ -352,7 +304,6 @@ class QuackTransformer(Transformer):
         decls = []
         for i in range(0, len(args) - 3):
             decls.append(args[i])
-        # return ("program", id, decls, [], body)
         return ProgramNode(name=program_pt2, global_decls=decls, functions=[], main_body=body)
 
     def program_func_no_decl(self, program_pt1, program_pt2, *args):
@@ -360,7 +311,6 @@ class QuackTransformer(Transformer):
         funcs = []
         for i in range(0, len(args) - 3):
             funcs.append(args[i])
-        # return ("program", id, [], funcs, body)
         return ProgramNode(name=program_pt2, global_decls=[], functions=funcs, main_body=body)
 
     def program_decl_func(self, program_pt1, program_pt2, *args):
@@ -369,13 +319,11 @@ class QuackTransformer(Transformer):
         decls = []
         funcs = []
         for i in range(0, len(args) - 3):
-            # if args[i][0] == "var_decl":
             item = args[i]
             if isinstance(item, VarDeclNode):
                 decls.append(item)
             elif isinstance(item, FunctionDeclNode):
                 funcs.append(item)
-        # return ("program", id, decls, funcs, body)
         return ProgramNode(name=program_pt2, global_decls=decls, functions=funcs, main_body=body)
 
     """

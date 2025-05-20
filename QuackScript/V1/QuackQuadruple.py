@@ -24,6 +24,7 @@ class OperatorsInterface:
 
     def get_operator(self, op: str):
         """Get the operator."""
+        return op
         return self.operators.get(op, None)
 
 
