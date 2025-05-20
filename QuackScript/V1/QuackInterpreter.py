@@ -73,7 +73,8 @@ class QuackInterpreter:
         elif isinstance(expr_tree, CteNumNode):
             var_type = type(expr_tree.value).__name__
 
-            result = self.memory_manager.save_to_first_available(
+            print(f"Assigning constant value {expr_tree.value} of type {var_type} to memory.")
+            result = self.memory_manager.assign_to_first_available(
                 value=expr_tree.value,
                 var_type=var_type,
                 space="constant",
@@ -85,7 +86,9 @@ class QuackInterpreter:
 
         elif isinstance(expr_tree, CteStringNode):
             var_type = type(expr_tree.value).__name__
-            result = self.memory_manager.save_to_first_available(
+
+            print(f"Assigning constant value '{expr_tree.value}' of type {var_type} to memory.")
+            result = self.memory_manager.assign_to_first_available(
                 value=expr_tree.value,
                 var_type=var_type,
                 space="constant",
@@ -115,7 +118,8 @@ class QuackInterpreter:
             if expr_tree.op == "/" and right_value == 0:
                 raise DivisionByZeroError("Division by zero is not allowed.")
 
-            memory_space = self.memory_manager.save_to_first_available(
+            print(f"Assigning result of operation '{(expr_tree.op, expr_tree.left, expr_tree.right)}' to memory.")
+            memory_space = self.memory_manager.assign_to_first_available(
                 value=(expr_tree.op, expr_tree.left, expr_tree.right),
                 var_type=result_type,
                 space=self.current_memory_space,

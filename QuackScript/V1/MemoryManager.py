@@ -44,14 +44,13 @@ class MemoryManager:
         # Memory storage (nested dictionaries by space and type)
         self.memory = {"global": {}, "local": {}, "temp": {}, "constant": {}}
 
-        # Temp pointers
-        self.reset_temp_pointers()
+        # Dynamically initialize pointers for all spaces and types
+        self.pointers = {
+            space: {var_type: type_range[0] for var_type, type_range in types.items()}
+            for space, types in self.memory_spaces_reference.items()
+        }
 
-    def reset_temp_pointers(self):
-        """Reset temp memory pointers to initial values."""
-        self.temp_pointer = {}
-        for vtype, (start, _) in self.memory_spaces_reference["temp"].items():
-            self.temp_pointer[vtype] = start
+        self.temp_constants = []
 
     def get_address_info(self, memory_index: int) -> MemoryAddress:
         """Return MemoryAddress object using a fast linear scan optimized for sequential allocation."""
@@ -59,6 +58,9 @@ class MemoryManager:
             if start <= memory_index <= end:
                 return MemoryAddress(memory_index, space, var_type)
         raise ValueError(f"Memory index {memory_index} is out of bounds.")
+
+    def _get_range_start(self, space: str, var_type: str):
+        return self.memory_spaces_reference[space][var_type][0]
 
     def save(self, memory_index: int, value):
         mem_addr = self.get_address_info(memory_index)
@@ -83,62 +85,87 @@ class MemoryManager:
             return arr[offset], mem_addr
         return None, mem_addr
 
-    def _get_range_start(self, space: str, var_type: str):
-        return self.memory_spaces_reference[space][var_type][0]
+    # def save_to_first_available(self, value, var_type: str, space: str) -> MemoryAddress:
+    #     if space not in self.memory_spaces_reference:
+    #         raise ValueError(f"Invalid memory space: {space}")
+    #     if var_type not in self.memory_spaces_reference[space]:
+    #         raise ValueError(f"Invalid type {var_type} for memory space {space}")
 
-    def save_to_first_available(self, value, var_type: str, space: str) -> MemoryAddress:
+    #     start, end = self.memory_spaces_reference[space][var_type]
+    #     if var_type not in self.memory[space]:
+    #         self.memory[space][var_type] = []
+
+    #     # Handle local/temp differently (use pointer-based allocation)
+    #     if space == "temp":
+    #         current = self.temp_pointer[var_type]
+    #         if current > end:
+    #             raise ValueError("No available space in temp memory.")
+    #         memory_index = current
+    #         self.temp_pointer[var_type] += 1
+    #     # Handle constant differently (if the constant is already in memory, reuse it)
+    #     elif space == "constant":
+    #         for offset in range(start, end + 1):
+    #             if (offset - start) < len(self.memory[space][var_type]) and self.memory[space][var_type][
+    #                 offset - start
+    #             ] == value:
+    #                 memory_index = offset
+    #                 break
+    #             elif (offset - start) >= len(self.memory[space][var_type]) or self.memory[space][var_type][
+    #                 offset - start
+    #             ] is None:
+    #                 memory_index = offset
+    #                 self.memory[space][var_type].append(value)
+    #                 break
+    #         else:
+    #             raise ValueError("No available space in constant memory.")
+    #     else:
+    #         # For global/local, search for first None slot
+    #         arr = self.memory[space][var_type]
+    #         for offset in range(end - start + 1):
+    #             if offset >= len(arr):
+    #                 arr.append(None)
+    #             if arr[offset] is None:
+    #                 arr[offset] = value
+    #                 memory_index = start + offset
+    #                 break
+    #         else:
+    #             raise ValueError("No available space in target segment.")
+
+    #     if space != "constant":
+    #         offset = memory_index - start
+    #         while len(self.memory[space][var_type]) <= offset:
+    #             self.memory[space][var_type].append(None)
+    #         self.memory[space][var_type][offset] = value
+
+    #     return MemoryAddress(memory_index, space, var_type)
+
+    def assign_to_first_available(self, value, var_type: str, space: str) -> MemoryAddress:
+        """
+        Assign a memory address to the first available slot for a given value,
+        type, and space without saving the value directly.
+        This method is useful for assigning values that will be saved later.
+        """
         if space not in self.memory_spaces_reference:
             raise ValueError(f"Invalid memory space: {space}")
         if var_type not in self.memory_spaces_reference[space]:
             raise ValueError(f"Invalid type {var_type} for memory space {space}")
 
         start, end = self.memory_spaces_reference[space][var_type]
-        if var_type not in self.memory[space]:
-            self.memory[space][var_type] = []
-
-        # Handle local/temp differently (use pointer-based allocation)
-        if space == "temp":
-            current = self.temp_pointer[var_type]
-            if current > end:
-                raise ValueError("No available space in temp memory.")
-            memory_index = current
-            self.temp_pointer[var_type] += 1
-        # Handle constant differently (if the constant is already in memory, reuse it)
-        elif space == "constant":
-            for offset in range(start, end + 1):
-                if (offset - start) < len(self.memory[space][var_type]) and self.memory[space][var_type][
-                    offset - start
-                ] == value:
-                    memory_index = offset
-                    break
-                elif (offset - start) >= len(self.memory[space][var_type]) or self.memory[space][var_type][
-                    offset - start
-                ] is None:
-                    memory_index = offset
-                    self.memory[space][var_type].append(value)
-                    break
-            else:
-                raise ValueError("No available space in constant memory.")
-        else:
-            # For global/local, search for first None slot
-            arr = self.memory[space][var_type]
-            for offset in range(end - start + 1):
-                if offset >= len(arr):
-                    arr.append(None)
-                if arr[offset] is None:
-                    arr[offset] = value
-                    memory_index = start + offset
-                    break
-            else:
-                raise ValueError("No available space in target segment.")
 
         if space != "constant":
-            offset = memory_index - start
-            while len(self.memory[space][var_type]) <= offset:
-                self.memory[space][var_type].append(None)
-            self.memory[space][var_type][offset] = value
-
-        return MemoryAddress(memory_index, space, var_type)
+            offset = self.pointers[space][var_type]
+            self.pointers[space][var_type] += 1
+            return MemoryAddress(offset, space, var_type)
+        else:
+            for const in self.temp_constants:
+                if const[0] == value:
+                    return MemoryAddress(const[1], space, var_type)
+            if self.pointers[space][var_type] > end:
+                raise ValueError("No available space in constant memory.")
+            self.temp_constants.append((value, self.pointers[space][var_type]))
+            offset = self.pointers[space][var_type]
+            self.pointers[space][var_type] += 1
+            return MemoryAddress(offset, space, var_type)
 
     def get_str_representation(self):
         """Return a string representation of the memory manager."""
@@ -163,14 +190,14 @@ class MemoryManager:
 if __name__ == "__main__":
     mm = MemoryManager()
 
-    t1 = mm.save_to_first_available("Hello", "str", "constant")
-    print("\n", t1, "\n", mm)
-    t2 = mm.save_to_first_available("World", "str", "constant")
-    print("\n", t2, "\n", mm)
-    t3 = mm.save_to_first_available("Hello", "str", "constant")
-    print("\n", t3, "\n", mm)
-    t4 = mm.save_to_first_available("World", "str", "constant")
-    print("\n", t4, "\n", mm)
+    t1 = mm.assign_to_first_available("Hello", "str", "constant")
+    print("\n", t1, "\n", mm.temp_constants)
+    t2 = mm.assign_to_first_available("World", "str", "constant")
+    print("\n", t2, "\n", mm.temp_constants)
+    t3 = mm.assign_to_first_available("Hello", "str", "constant")
+    print("\n", t3, "\n", mm.temp_constants)
+    t4 = mm.assign_to_first_available("World", "str", "constant")
+    print("\n", t4, "\n", mm.temp_constants)
 
     # print("Saved at:", i1, f1, s1, t1, t2, t3)
 
