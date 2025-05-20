@@ -191,6 +191,7 @@ if __name__ == "__main__":
     mm = MemoryManager()
 
     t1 = mm.assign_to_first_available("Hello", "str", "constant")
+    mm.save(t1.address, "Hello")
     print("\n", t1, "\n", mm.temp_constants)
     t2 = mm.assign_to_first_available("World", "str", "constant")
     print("\n", t2, "\n", mm.temp_constants)
@@ -199,16 +200,4 @@ if __name__ == "__main__":
     t4 = mm.assign_to_first_available("World", "str", "constant")
     print("\n", t4, "\n", mm.temp_constants)
 
-    # print("Saved at:", i1, f1, s1, t1, t2, t3)
-
-    # print(mm.retrieve(i1.address))  # returns (value, MemoryAddress)
-    # print(mm.retrieve(f1.address))
-    # print(mm.retrieve(s1.address))
-    # print(mm.retrieve(t1.address))
-    # print(mm.retrieve(t2.address))
-    # print(mm.retrieve(t3.address))
-
-    # mm.reset_temp_pointers()
-    # t3 = mm.save_to_first_available(100, "int", "temp")
-    # print("Reused temp at:", t3)
-    # print(mm.retrieve(t3.address))
+    print(mm.retrieve(t1.address))  # Should return ("Hello", MemoryAddress)
