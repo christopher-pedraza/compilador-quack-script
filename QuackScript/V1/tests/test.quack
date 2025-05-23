@@ -1,12 +1,8 @@
 // Prueba: Semantica
 program TestExpr;
-const x: float = 2;
-var y: int = (x <= 2) or (0);
+var x: int = 2;
 
 main {
-    print(y);
-    if(y) {
-        print("Entre!", x);
-    };
+    x = 3;
 }
 end

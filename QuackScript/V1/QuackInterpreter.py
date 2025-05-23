@@ -224,36 +224,10 @@ class QuackInterpreter:
             )
         ###################################################################################
         elif isinstance(ir, FunctionDeclNode):
-            self.current_container = ir.name
-
-            params_list = []
-            if ir.params:
-                for param in ir.params.params:
-                    params_list.append((param.name, param.param_type))
-
-            self.symbol_table.add_function(name=ir.name, params=params_list, body=ir.body)
-
-            for var in ir.var_decls:
-                # TODO: Checar si esto esta bien o si se tiene que sacar un
-                # valor de var
-                self.execute(var)
-
-            self.current_container = self.global_container_name
-        ###################################################################################
-        ## TODO: REVISAR LUEGO COMO SE MANEJA LAS LLAMADAS DE FUNCIONES
+            pass
         elif isinstance(ir, FuncCallNode):
-            self.current_container = ir.name
+            pass
 
-            values = []
-            for arg in ir.args:
-                value, value_type = self._resolve_operand(arg)
-                values.append(value)
-
-            self.symbol_table.update_params_values(values=values, containerName=ir.name)
-            func_body = self.symbol_table.get_container(ir.name).body
-            self.execute(func_body)
-            self.symbol_table.clean_params_values(containerName=ir.name)
-            self.current_container = self.global_container_name
         ###################################################################################
         elif isinstance(ir, ProgramNode):
             for decl in ir.global_decls:

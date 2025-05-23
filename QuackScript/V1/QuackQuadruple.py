@@ -20,6 +20,12 @@ class OperatorsInterface:
             "gotoT": 14,
             "=": 15,
             "print": 16,
+            "era": 17,
+            "param": 18,
+            "gosub": 19,
+            "return": 20,
+            "endFunc": 21,
+            "end": 22,
         }
 
     def get_operator(self, op: str):
