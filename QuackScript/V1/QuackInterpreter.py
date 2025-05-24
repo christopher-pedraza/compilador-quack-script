@@ -161,7 +161,7 @@ class QuackInterpreter:
                     var_type=var_type,
                     value=value,
                     containerName=self.current_container,
-                    category=ir.category,
+                    isConstant=ir.isConstant,
                     address=address.address,
                 )
                 self.quack_quadruple.add_quadruple("=", value, None, address.address)

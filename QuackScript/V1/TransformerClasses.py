@@ -107,7 +107,7 @@ class VarDeclNode:
     names: List[str]
     var_type: TypeNode
     init_value: Optional["ExprNode"] = None
-    category: Literal["var", "const", "param"] = "var"
+    isConst: bool = False
 
 
 @dataclass
