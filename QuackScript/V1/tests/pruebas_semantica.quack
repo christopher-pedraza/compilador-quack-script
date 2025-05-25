@@ -1,6 +1,6 @@
 // Prueba: Semantica
 program TestExpr;
-const x: float = 2;
+const x: float = 2.0;
 var y: int = (x <= 2) or (0);
 
 main {

@@ -92,6 +92,10 @@ class Container:
         """Set the initial position of the container."""
         self.initial_position = position
 
+    def get_param_signature(self) -> list:
+        """Get the parameter signature of the container."""
+        return self.param_signature
+
     def clear(self) -> None:
         """Clear the container's symbols."""
         self.symbols.clear()

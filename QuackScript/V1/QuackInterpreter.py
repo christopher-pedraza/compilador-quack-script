@@ -47,8 +47,21 @@ class QuackInterpreter:
 
         self.quack_quadruple.add_quadruple("era", None, None, func_name)
 
-        for arg in func_args:
+        param_signature = self.symbol_table.get_function(func_name).get_param_signature()
+
+        if len(param_signature) != len(func_args):
+            raise TypeMismatchError(
+                f"Function '{func_name}' expects {len(param_signature)} arguments, but got {len(func_args)}"
+            )
+
+        for i, arg in enumerate(func_args):
             arg_value, arg_type = self.__evaluate_expression(arg)
+
+            if not self.semantic_cube.is_decl_valid(param_signature[i], arg_type):
+                raise TypeMismatchError(
+                    f"Argument {i + 1} of function '{func_name}' expects type '{param_signature[i]}', but got '{arg_type}'"
+                )
+
             self.quack_quadruple.add_quadruple("param", None, None, arg_value)
 
         self.quack_quadruple.add_quadruple("gosub", None, None, func_name)
