@@ -338,6 +338,8 @@ class QuackInterpreter:
 
             self.execute(ir.main_body)
 
+            self.quack_quadruple.add_quadruple("end", None, None, None)
+
             self.symbol_table.get_function(self.global_container_name).clear()
         else:
             raise UnknownIRTypeError(f"Unknown IR type: {type(ir)}")

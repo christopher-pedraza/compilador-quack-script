@@ -35,19 +35,22 @@ class QuackVirtualMachine:
             print("No quadruples to process.")
             return
 
-        current = 0
-        for i in range(len(self.quadruples)):
-            quadruple = self.quadruples[i]
+        current_pos = 0
+        quadruple = (None, None, None, None)
+        print(self.operators)
+        while quadruple[0] != self.operators["end"]:
+            quadruple = self.quadruples[current_pos]
             op, arg1, arg2, result = quadruple
+            print(op, arg1, arg2, result)
 
-            if op == "goto":
-                current = int(result)
-            else:
-                # Handle other operations
-                print(f"Executing operation: {self.operators[op]} with args {arg1}, {arg2}, result {result}")
+            if op == self.operators["end"]:
+                print("End of program.")
+                break
+
+            print(f"Executing operation: {op} with args {arg1}, {arg2}, result {result}")
 
             # Update current index
-            current += 1
+            current_pos += 1
 
     def translate_program(self, file_name):
         """
@@ -60,7 +63,7 @@ class QuackVirtualMachine:
         data = self.read_and_delete_object_files(file_name)
         self.quadruples = data["quadruples"].quadruples
         self.operators = data["quadruples"].operators.operators
-        self.operators = {value: key for key, value in self.operators.items()}
+        # self.operators = {value: key for key, value in self.operators.items()}
 
         self.symbol_table = data["symbol_table"]
 
