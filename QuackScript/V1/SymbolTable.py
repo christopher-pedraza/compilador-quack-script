@@ -101,7 +101,14 @@ class ConstantsTable:
     ) -> None:
         """Add a constant to the table."""
         if address not in self.constants:
-            self.constants[address] = Constant(value=value, value_type=value_type)
+            self.constants[address] = Constant(value=value, var_type=value_type)
+
+    def check_and_get_address(self, value: Union[int, float, str, bool]) -> int:
+        """Check if a constant exists and retrieve its address."""
+        for address, constant in self.constants.items():
+            if constant.value == value:
+                return address
+        return None
 
 
 class SymbolTable:
@@ -171,34 +178,55 @@ class SymbolTable:
         """Add a constant to the constants table."""
         self.constants_table.add_constant(address=address, value=value, value_type=value_type)
 
-    def get_str_representation(self):
-        """String representation of the symbol table."""
-        result = ""
+    def get_str_representation(self) -> str:
+        """Return a table-like string representation of the symbol table."""
+        lines = []
+
         # Global container
         gcontainer = self.containers.get(self.global_container_name)
-        result += f"Global Container: {self.global_container_name}\n"
-        for symbol_name, symbol in gcontainer.symbols.items():
-            result += f"  {symbol_name}: {symbol.var_type} (Address: {symbol.address})\n"
+        lines.append(f"Global Container: {self.global_container_name}")
+        if gcontainer and gcontainer.symbols:
+            lines.append(f"{'Name':<15} {'Type':<10} {'Const':<6} {'Address':<10}")
+            for symbol in gcontainer.symbols.values():
+                lines.append(
+                    f"{symbol.name:<15} {symbol.var_type:<10} {str(symbol.isConstant):<6} {str(symbol.address):<10}"
+                )
+        else:
+            lines.append("  (No symbols)")
+        lines.append("")
 
-        # Rest of the containers
-        for container_name, container in self.containers.items():
-            if container_name == self.global_container_name:
+        # Other containers (functions)
+        for cname, container in self.containers.items():
+            if cname == self.global_container_name:
                 continue
-            result += f"Container: {container_name}\n"
-            result += f"Return Type: {container.return_type}\n"
-            result += "Symbols:\n"
-            for symbol_name, symbol in container.symbols.items():
-                result += f"  {symbol_name}: {symbol.var_type} (Address: {symbol.address})\n"
-            result += "Parameters:\n"
-            for param in container.param_signature:
-                result += f"  {param}\n"
-            result += "\n"
-        result += "Constants:\n"
-        for address, constant in self.constants_table.constants.items():
-            result += f"  Address: {address}, Value: {constant.value}, Type: {constant.var_type}\n"
-        result += "\n"
+            lines.append(f"Container: {cname}")
+            lines.append(f"Return Type: {container.return_type}")
+            # Symbols
+            lines.append(f"{'Name':<15} {'Type':<10} {'Const':<6} {'Address':<10}")
+            for symbol in container.symbols.values():
+                lines.append(
+                    f"{symbol.name:<15} {symbol.var_type:<10} {str(symbol.isConstant):<6} {str(symbol.address):<10}"
+                )
+            # Parameters
+            if container.param_signature:
+                lines.append("Parameters:")
+                for idx, param_type in enumerate(container.param_signature):
+                    lines.append(f"  {idx + 1}. {param_type}")
+            else:
+                lines.append("Parameters: None")
+            lines.append("")
 
-        return result
+        # Constants table
+        lines.append("Constants Table:")
+        if self.constants_table.constants:
+            lines.append(f"{'Address':<10} {'Value':<20} {'Type':<10}")
+            for address, constant in self.constants_table.constants.items():
+                lines.append(f"{str(address):<10} {str(constant.value):<20} {constant.var_type:<10}")
+        else:
+            lines.append("  (No constants)")
+        lines.append("")
+
+        return "\n".join(lines)
 
     def __str__(self):
         """String representation of the symbol table."""

@@ -207,7 +207,7 @@ class QuackTransformer(Transformer):
     """
 
     def const_decl(self, const, id, colon, var_type, assign, expresion, semicolon):
-        return VarDeclNode(names=[id], var_type=var_type, init_value=expresion, isConst=True)
+        return VarDeclNode(names=[id], var_type=var_type, init_value=expresion, isConstant=True)
 
     """
     var_decl: VAR id COLON var_type SEMICOLON -> var_single_decl_no_assign
@@ -217,22 +217,22 @@ class QuackTransformer(Transformer):
     """
 
     def var_single_decl_no_assign(self, var, id, colon, var_type, semicolon):
-        return VarDeclNode(names=[id], var_type=var_type, isConst=False)
+        return VarDeclNode(names=[id], var_type=var_type, isConstant=False)
 
     def var_single_decl_assign(self, var, id, colon, var_type, assign, expresion, semicolon):
-        return VarDeclNode(names=[id], var_type=var_type, init_value=expresion, isConst=False)
+        return VarDeclNode(names=[id], var_type=var_type, init_value=expresion, isConstant=False)
 
     def var_multi_decl_no_assign(self, var, id, *args):
         ids = [id]
         for i in range(0, len(args) - 1, 2):
             ids.append(args[i - 1])
-        return VarDeclNode(names=ids, var_type=args[-1], isConst=False)
+        return VarDeclNode(names=ids, var_type=args[-1], isConstant=False)
 
     def var_multi_decl_assign(self, var, id, *args):
         ids = [id]
         for i in range(1, len(args) - 5, 2):
             ids.append(args[i])
-        return VarDeclNode(names=ids, var_type=args[-4], init_value=args[-2], isConst=False)
+        return VarDeclNode(names=ids, var_type=args[-4], init_value=args[-2], isConstant=False)
 
     """
     ?params: id COLON var_type -> param

@@ -188,6 +188,20 @@ class MemoryManager:
         self.memory_spaces[space_name] = new_memory
         return current_space
 
+    def get_str_representation(self) -> str:
+        """Return a table-like string representation of the memory manager."""
+        lines = []
+        for space, memory in self.memory_spaces.items():
+            lines.append(f"Memory Space: {space}")
+            lines.append(f"{'Type':<10} {'Address Range':<20} {'Allocated':<10} {'Values'}")
+            for var_type, info in memory.memory.items():
+                addr_range = f"{info['address_range'][0]}-{info['address_range'][1]}"
+                allocated = len(info["allocated"])
+                values = info["allocated"]
+                lines.append(f"{var_type:<10} {addr_range:<20} {allocated:<10} {values}")
+            lines.append("")
+        return "\n".join(lines)
+
 
 # class MemoryManager:
 #     def __init__(self):
@@ -313,20 +327,20 @@ class MemoryManager:
 
 if __name__ == "__main__":
     mm = MemoryManager()
-    mm.add_memory_space(
-        "global",
-        {
-            "int": ((1000, 1999), None),
-            "float": ((2000, 2999), None),
-            "tint": ((3000, 3999), None),
-            "tfloat": ((4000, 4999), None),
-            "tbool": ((5000, 6999), None),
-        },
-    )
-    mm.add_memory_space(
-        "constant", {"int": ((4000, 4999), None), "float": ((5000, 5999), None), "str": ((6000, 6999), None)}
-    )
-    mm.add_memory_space("local", {"int": ((7000, 7999), 5), "float": ((8000, 8999), 2), "tint": ((9000, 9999), None)})
+    # mm.add_memory_space(
+    #     "global",
+    #     {
+    #         "int": ((1000, 1999), None),
+    #         "float": ((2000, 2999), None),
+    #         "tint": ((3000, 3999), None),
+    #         "tfloat": ((4000, 4999), None),
+    #         "tbool": ((5000, 6999), None),
+    #     },
+    # )
+    # mm.add_memory_space(
+    #     "constant", {"int": ((4000, 4999), None), "float": ((5000, 5999), None), "str": ((6000, 6999), None)}
+    # )
+    # mm.add_memory_space("local", {"int": ((7000, 7999), 5), "float": ((8000, 8999), 2), "tint": ((9000, 9999), None)})
 
     mm.add_memory("local", "int", 10)
     mm.add_memory("local", "float", 3.14)
