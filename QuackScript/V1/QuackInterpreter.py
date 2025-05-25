@@ -174,6 +174,9 @@ class QuackInterpreter:
             var_name = ir.var_name
             variable = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
 
+            if variable.isConstant:
+                raise TypeMismatchError(f"Cannot reassign constant variable '{var_name}'")
+
             value, value_type = self.__evaluate_expression(ir.expr)
 
             if self.semantic_cube.is_decl_valid(variable.var_type, value_type):
