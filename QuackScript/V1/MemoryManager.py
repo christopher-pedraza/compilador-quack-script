@@ -113,16 +113,16 @@ class MemoryManager:
                 "global": {
                     "int": ((1000, 1999), None),
                     "float": ((2000, 2999), None),
-                    "tint": ((3000, 3999), None),
-                    "tfloat": ((4000, 4999), None),
-                    "tbool": ((5000, 6999), None),
+                    "t_int": ((3000, 3999), None),
+                    "t_float": ((4000, 4999), None),
+                    "t_bool": ((5000, 6999), None),
                 },
                 "local": {
                     "int": ((7000, 7999), None),
                     "float": ((8000, 8999), None),
-                    "tint": ((9000, 9999), None),
-                    "tfloat": ((10000, 10999), None),
-                    "tbool": ((11000, 11999), None),
+                    "t_int": ((9000, 9999), None),
+                    "t_float": ((10000, 10999), None),
+                    "t_bool": ((11000, 11999), None),
                 },
                 "constant": {
                     "int": ((12000, 12999), None),
@@ -202,127 +202,11 @@ class MemoryManager:
             lines.append("")
         return "\n".join(lines)
 
-
-# class MemoryManager:
-#     def __init__(self):
-#         # Memory layout configuration using plain strings
-#         self.memory_spaces_reference = {
-#             "global": {
-#                 "int": (1000, 2999),
-#                 "float": (3000, 4999),
-#                 "bool": (5000, 6999),
-#             },
-#             "local": {
-#                 "int": (5000, 6999),
-#                 "float": (7000, 8999),
-#                 "bool": (9000, 10999),
-#             },
-#             "constant": {
-#                 "int": (11000, 12999),
-#                 "float": (13000, 14999),
-#                 "str": (15000, 16999),
-#             },
-#         }
-
-#         # Build flat list of ranges, ordered by start address
-#         self.ranges = []
-#         for space, types in self.memory_spaces_reference.items():
-#             for var_type, (start, end) in types.items():
-#                 self.ranges.append((start, end, space, var_type))
-
-#         # Sort once by starting address
-#         self.ranges.sort()
-
-#         # Memory storage (nested dictionaries by space and type)
-#         self.memory = {"global": {}, "local": {}, "constant": {}}
-
-#         # Dynamically initialize pointers for all spaces and types
-#         self.pointers = {
-#             space: {var_type: type_range[0] for var_type, type_range in types.items()}
-#             for space, types in self.memory_spaces_reference.items()
-#         }
-
-#         self.temp_constants = []
-
-#     def get_address_info(self, memory_index: int) -> MemoryAddress:
-#         """Return MemoryAddress object using a fast linear scan optimized for sequential allocation."""
-#         for start, end, space, var_type in self.ranges:
-#             if start <= memory_index <= end:
-#                 return MemoryAddress(memory_index, space, var_type)
-#         raise ValueError(f"Memory index {memory_index} is out of bounds.")
-
-#     def _get_range_start(self, space: str, var_type: str):
-#         return self.memory_spaces_reference[space][var_type][0]
-
-#     def save(self, memory_index: int, value):
-#         mem_addr = self.get_address_info(memory_index)
-#         space = mem_addr.space
-#         var_type = mem_addr.var_type
-#         if var_type not in self.memory[space]:
-#             self.memory[space][var_type] = []
-#         offset = memory_index - self._get_range_start(space, var_type)
-#         while len(self.memory[space][var_type]) <= offset:
-#             self.memory[space][var_type].append(None)
-#         self.memory[space][var_type][offset] = value
-
-#     def retrieve(self, memory_index: int):
-#         mem_addr = self.get_address_info(memory_index)
-#         space = mem_addr.space
-#         var_type = mem_addr.var_type
-#         if var_type not in self.memory[space]:
-#             return None, mem_addr
-#         offset = memory_index - self._get_range_start(space, var_type)
-#         arr = self.memory[space][var_type]
-#         if 0 <= offset < len(arr):
-#             return arr[offset], mem_addr
-#         return None, mem_addr
-
-#     def assign_to_first_available(self, value, var_type: str, space: str) -> MemoryAddress:
-#         """
-#         Assign a memory address to the first available slot for a given value,
-#         type, and space without saving the value directly.
-#         This method is useful for assigning values that will be saved later.
-#         """
-#         if space not in self.memory_spaces_reference:
-#             raise ValueError(f"Invalid memory space: {space}")
-#         if var_type not in self.memory_spaces_reference[space]:
-#             raise ValueError(f"Invalid type {var_type} for memory space {space}")
-
-#         start, end = self.memory_spaces_reference[space][var_type]
-
-#         if space != "constant":
-#             offset = self.pointers[space][var_type]
-#             self.pointers[space][var_type] += 1
-#             return MemoryAddress(offset, space, var_type)
-#         else:
-#             for const in self.temp_constants:
-#                 if const[0] == value:
-#                     return MemoryAddress(const[1], space, var_type)
-#             if self.pointers[space][var_type] > end:
-#                 raise ValueError("No available space in constant memory.")
-#             self.temp_constants.append((value, self.pointers[space][var_type]))
-#             offset = self.pointers[space][var_type]
-#             self.pointers[space][var_type] += 1
-#             return MemoryAddress(offset, space, var_type)
-
-#     def get_str_representation(self):
-#         """Return a string representation of the memory manager."""
-#         return "\n".join(f"{space}: {types}" for space, types in self.memory.items())
-
-#     def __str__(self):
-#         """Return a string representation of the memory manager, including memory indices with respect to their ranges."""
-#         result = []
-#         for space, types in self.memory.items():
-#             result.append(f"{space}:")
-#             for var_type, values in types.items():
-#                 start = self.memory_spaces_reference[space][var_type][0]
-#                 indexed_values = [f"{start + i}: {v}" for i, v in enumerate(values)]
-#                 result.append(f"  {var_type}: {indexed_values}")
-#         return "\n".join(result)
-
-#     def __repr__(self):
-#         """Return a string representation of the memory manager."""
-#         return self.__str__()
+    def reset_local_temp_memory(self):
+        """Reset the temporary memory spaces."""
+        for var_type in self.memory_spaces["local"].memory:
+            start = self.memory_spaces["local"].memory[var_type]["address_range"][0]
+            self.next_available["local"][var_type] = start
 
 
 if __name__ == "__main__":
@@ -332,15 +216,15 @@ if __name__ == "__main__":
     #     {
     #         "int": ((1000, 1999), None),
     #         "float": ((2000, 2999), None),
-    #         "tint": ((3000, 3999), None),
-    #         "tfloat": ((4000, 4999), None),
-    #         "tbool": ((5000, 6999), None),
+    #         "t_int": ((3000, 3999), None),
+    #         "t_float": ((4000, 4999), None),
+    #         "t_bool": ((5000, 6999), None),
     #     },
     # )
     # mm.add_memory_space(
     #     "constant", {"int": ((4000, 4999), None), "float": ((5000, 5999), None), "str": ((6000, 6999), None)}
     # )
-    # mm.add_memory_space("local", {"int": ((7000, 7999), 5), "float": ((8000, 8999), 2), "tint": ((9000, 9999), None)})
+    # mm.add_memory_space("local", {"int": ((7000, 7999), 5), "float": ((8000, 8999), 2), "t_int": ((9000, 9999), None)})
 
     mm.add_memory("local", "int", 10)
     mm.add_memory("local", "float", 3.14)
@@ -351,9 +235,9 @@ if __name__ == "__main__":
             mapping={
                 "int": ((7000, 7999), 10),
                 "float": ((8000, 8999), 5),
-                "tint": ((9000, 9999), None),
-                "tfloat": ((10000, 10999), None),
-                "tbool": ((11000, 11999), None),
+                "t_int": ((9000, 9999), None),
+                "t_float": ((10000, 10999), None),
+                "t_bool": ((11000, 11999), None),
             }
         ),
     )

@@ -98,7 +98,7 @@ if __name__ == "__main__":
                         output_file.write(symbol_table.get_str_representation())
                         output_file.write("\n")
                         output_file.write("Quadruples:\n")
-                        output_file.write(quadruples.get_str_representation())
+                        output_file.write(quadruples.get_str_representation(pretty=True))
                         output_file.write("\n\n")
                         output_file.write("Memory:\n")
                         output_file.write(memory.get_str_representation())

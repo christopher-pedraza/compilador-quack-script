@@ -1,11 +1,17 @@
-// Prueba: Expresiones aritméticas básicas
-program TestExpr;
-var x: int = 5;
-var y: int;
-var z: int = -3;
-
+// Prueba: Función con parámetros
+program TestParams;
+void sum(a: int, b: int) [
+    {
+        print("Sum:", a + b);
+    }
+];
+void subs(a: int, b: int) [
+    {
+        print("Subs:", a-b);
+    }
+];
 main {
-    y = ((x + 3) * 2 - 4 / 2) * z;
-    print(y);
+    sum(3, 4);
+    subs(3, 4);
 }
 end

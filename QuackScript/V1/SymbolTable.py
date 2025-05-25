@@ -50,6 +50,7 @@ class Container:
         self.initial_position = None
         self.symbols = {}
         self.param_signature = []
+        self.required_space = {}
         self.reserved_words = [
             "if",
             "else",
@@ -85,11 +86,15 @@ class Container:
 
     def is_symbol_declared(self, name: str) -> bool:
         """Check if a symbol is declared in the container."""
-        return name in self.symbols or name in self.params
+        return name in self.symbols
 
     def set_initial_position(self, position: int) -> None:
         """Set the initial position of the container."""
         self.initial_position = position
+
+    def clear(self) -> None:
+        """Clear the container's symbols."""
+        self.symbols.clear()
 
 
 class ConstantsTable:
@@ -116,6 +121,7 @@ class SymbolTable:
         self.containers = {}
         self.global_container_name = "global"
         self.constants_table = ConstantsTable()
+        self.var_type_references = {"int": 1, "float": 2, "t_int": 3, "t_float": 4, "t_bool": 5}
 
     def get_variable(self, name: str, containerName: str) -> Symbol:
         """Get a variable from the specified container."""
@@ -143,6 +149,7 @@ class SymbolTable:
         variable = Symbol(name=name, var_type=var_type, isConstant=isConstant, address=address)
         container = self.get_container(containerName)
         container.add_symbol(variable)
+        container.required_space[var_type] = container.required_space.get(var_type, 0) + 1
 
     def add_parameter(self, name: str, var_type: str, containerName: str, address: int) -> None:
         """Add a parameter to the specified container."""
@@ -153,7 +160,12 @@ class SymbolTable:
             containerName=containerName,
             address=address,
         )
-        self.get_container(containerName).param_signature.append(var_type)
+        container = self.get_container(containerName)
+        container.param_signature.append(var_type)
+
+    def add_temp(self, var_type: str, containerName: str):
+        container = self.get_container(containerName)
+        container.required_space[var_type] = container.required_space.get(var_type, 0) + 1
 
     def add_function(self, name: str, return_type: str) -> None:
         """Add a function as a container"""
@@ -178,6 +190,13 @@ class SymbolTable:
         """Add a constant to the constants table."""
         self.constants_table.add_constant(address=address, value=value, value_type=value_type)
 
+    def get_return_type(self, containerName: str) -> str:
+        """Get the return type of a container."""
+        container = self.get_container(containerName)
+        if container.return_type is None:
+            raise ValueError(f"Container '{containerName}' has no return type.")
+        return container.return_type
+
     def get_str_representation(self) -> str:
         """Return a table-like string representation of the symbol table."""
         lines = []
@@ -191,6 +210,11 @@ class SymbolTable:
                 lines.append(
                     f"{symbol.name:<15} {symbol.var_type:<10} {str(symbol.isConstant):<6} {str(symbol.address):<10}"
                 )
+            # Show required space for global container
+            if gcontainer.required_space:
+                lines.append("Required Space:")
+                for vtype, amount in gcontainer.required_space.items():
+                    lines.append(f"  {vtype}: {amount}")
         else:
             lines.append("  (No symbols)")
         lines.append("")
@@ -214,6 +238,11 @@ class SymbolTable:
                     lines.append(f"  {idx + 1}. {param_type}")
             else:
                 lines.append("Parameters: None")
+            # Show required space for this container
+            if container.required_space:
+                lines.append("Required Space:")
+                for vtype, amount in container.required_space.items():
+                    lines.append(f"  {vtype}: {amount}")
             lines.append("")
 
         # Constants table

@@ -22,6 +22,7 @@ from TransformerClasses import (
     FunctionDeclNode,
     FuncCallNode,
     ProgramNode,
+    ReturnNode,
 )
 
 
@@ -249,27 +250,47 @@ class QuackTransformer(Transformer):
         return ParamsNode(params=params)
 
     """
-    function: VOID id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
-            | VOID id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
-            | VOID id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
-            | VOID id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
+    ?return_type: "void" -> void
+                | var_type -> return_type
     """
 
-    def function_no_params_no_var_decl(self, void, id, lpar, rpar, lbracket, body, rbracket, semicolon):
-        return FunctionDeclNode(name=id, params=ParamsNode(params=[]), body=body, var_decls=[])
+    def void(self):
+        return "void"
 
-    def function_no_var_decl(self, void, id, lpar, params, rpar, lbracket, body, rbracket, semicolon):
-        return FunctionDeclNode(name=id, params=params, body=body, var_decls=[])
+    def return_type(self, var_type):
+        return var_type
 
-    def function_params_var_decl(self, void, id, lpar, params, rpar, lbracket, *args):
+    """
+    function: return_type id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
+            | return_type id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
+            | return_type id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
+            | return_type id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
+    """
+
+    def function_no_params_no_var_decl(self, return_type, id, lpar, rpar, lbracket, body, rbracket, semicolon):
+        return FunctionDeclNode(name=id, return_type=return_type, params=ParamsNode(params=[]), body=body, var_decls=[])
+
+    def function_no_var_decl(self, return_type, id, lpar, params, rpar, lbracket, body, rbracket, semicolon):
+        return FunctionDeclNode(name=id, return_type=return_type, params=params, body=body, var_decls=[])
+
+    def function_params_var_decl(self, return_type, id, lpar, params, rpar, lbracket, *args):
         body = args[-3]
         var_decls = list(args[:-3])
-        return FunctionDeclNode(name=id, params=params, body=body, var_decls=var_decls)
+        return FunctionDeclNode(name=id, return_type=return_type, params=params, body=body, var_decls=var_decls)
 
-    def function_no_params(self, void, id, lpar, rpar, lbracket, *args):
+    def function_no_params(self, return_type, id, lpar, rpar, lbracket, *args):
         body = args[-3]
         var_decls = list(args[:-3])
-        return FunctionDeclNode(name=id, params=ParamsNode(params=[]), body=body, var_decls=var_decls)
+        return FunctionDeclNode(
+            name=id, return_type=return_type, params=ParamsNode(params=[]), body=body, var_decls=var_decls
+        )
+
+    """
+    return: RETURN expresion SEMICOLON -> return_expresion
+    """
+
+    def return_expresion(self, return_, expresion, semicolon):
+        return ReturnNode(expresion=expresion)
 
     """
     func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
@@ -284,10 +305,10 @@ class QuackTransformer(Transformer):
         return FuncCallNode(name=id, args=[expresion])
 
     def func_call_multiple_params(self, id, lpar, expresion, *args):
-        params = [expresion]
+        arguments = [expresion]
         for i in range(1, len(args) - 1, 2):
-            params.append(args[i])
-        return FuncCallNode(name=id, args=params)
+            arguments.append(args[i])
+        return FuncCallNode(name=id, args=arguments)
 
     """
     program: program_pt1 program_pt2 MAIN body END -> program_no_decl

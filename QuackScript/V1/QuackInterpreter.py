@@ -26,6 +26,8 @@ from TransformerClasses import (
     FunctionDeclNode,
     FuncCallNode,
     ProgramNode,
+    ReturnNode,
+    ParamNode,
 )
 
 # from MemoryManager import MemoryAddress
@@ -87,8 +89,12 @@ class QuackInterpreter:
                 raise DivisionByZeroError("Division by zero is not allowed.")
 
             address = self.memory_manager.get_first_available_address(
-                var_type=f"t{result_type}",
+                var_type=f"t_{result_type}",
                 space=self.current_memory_space,
+            )
+            self.symbol_table.add_temp(
+                var_type=f"t_{result_type}",
+                containerName=self.current_container,
             )
 
             result = self.quack_quadruple.add_quadruple(
@@ -113,11 +119,11 @@ class QuackInterpreter:
                 raise TypeMismatchError(
                     f"Cannot assign type '{value_type}' to variable '{var_name}' of type '{variable.var_type}'"
                 )
+
         ###################################################################################
         elif isinstance(ir, VarDeclNode):
             var_type = ir.var_type
 
-            #########Esto se puede mejorar######
             value, value_type = (None, None)
             if ir.init_value:
                 value, value_type = self.evaluate_expression(ir.init_value)
@@ -125,7 +131,6 @@ class QuackInterpreter:
                     raise TypeMismatchError(
                         f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'"
                     )
-            ####################################
 
             for var_name in ir.names:
                 address = self.memory_manager.get_first_available_address(
@@ -140,10 +145,12 @@ class QuackInterpreter:
                     address=address,
                 )
                 self.quack_quadruple.add_quadruple("=", value, None, address)
+
         ###################################################################################
         elif isinstance(ir, BodyNode):
             for statement in ir.statements:
                 self.execute(statement)
+
         ###################################################################################
         elif isinstance(ir, WhileNode):
             self.quack_quadruple.add_return()
@@ -158,11 +165,13 @@ class QuackInterpreter:
             self.quack_quadruple.update_jump(
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
+
         ###################################################################################
         elif isinstance(ir, PrintNode):
             for value in ir.values:
                 value, value_type = self.evaluate_expression(value)
                 self.quack_quadruple.add_quadruple("print", None, None, value)
+
         ###################################################################################
         elif isinstance(ir, IfNode):
             value, value_type = self.evaluate_expression(ir.condition)
@@ -175,6 +184,7 @@ class QuackInterpreter:
             self.quack_quadruple.update_jump(
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
+
         ###################################################################################
         elif isinstance(ir, IfElseNode):
             value, value_type = self.evaluate_expression(ir.condition)
@@ -197,11 +207,92 @@ class QuackInterpreter:
             self.quack_quadruple.update_jump(
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
+
         ###################################################################################
         elif isinstance(ir, FunctionDeclNode):
-            pass
+            """
+            class FunctionDeclNode:
+                name: str
+                return_type: Union[TypeNode, Literal["void"]]
+                params: ParamsNode
+                body: BodyNode
+                var_decls: List[VarDeclNode]
+            """
+
+            func_name = ir.name.name
+            func_return_type = ir.return_type
+            func_params = ir.params.params
+            func_body = ir.body
+            func_var_decls = ir.var_decls
+
+            self.current_container = func_name
+            self.current_memory_space = "local"
+
+            self.symbol_table.add_function(name=func_name, return_type=func_return_type)
+            print(self.symbol_table.get_str_representation())
+
+            for param in func_params:
+                self.execute(param)
+
+            for var_decl in func_var_decls:
+                self.execute(var_decl)
+
+            self.execute(func_body)
+
+            self.quack_quadruple.add_quadruple("endFunc", None, None, None)
+
+            self.current_container = self.global_container_name
+            self.current_memory_space = "global"
+            self.memory_manager.reset_local_temp_memory()
+
+        ###################################################################################
+        elif isinstance(ir, ParamNode):
+            param_name = ir.name.name
+            param_type = ir.param_type
+
+            address = self.memory_manager.get_first_available_address(
+                var_type=param_type,
+                space=self.current_memory_space,
+            )
+            self.symbol_table.add_parameter(
+                name=param_name,
+                var_type=param_type,
+                containerName=self.current_container,
+                address=address,
+            )
+            self.quack_quadruple.add_quadruple("=", None, None, address)
+
+        ###################################################################################
         elif isinstance(ir, FuncCallNode):
-            pass
+            func_name = ir.name.name
+            func_args = ir.args
+
+            self.quack_quadruple.add_quadruple("era", None, None, func_name)
+
+            for arg in func_args:
+                arg_value, arg_type = self.evaluate_expression(arg)
+                self.quack_quadruple.add_quadruple("param", None, None, arg_value)
+
+            self.quack_quadruple.add_quadruple("gosub", None, None, func_name)
+
+            return_type = self.symbol_table.get_return_type(func_name)
+            if return_type != "void":
+                address = self.memory_manager.get_first_available_address(
+                    var_type=return_type,
+                    space=self.global_container_name,
+                )
+                self.symbol_table.add_variable(
+                    name=func_name,
+                    var_type=return_type,
+                    containerName=self.global_container_name,
+                    address=address,
+                )
+                self.quack_quadruple.add_quadruple("=", None, None, address)
+
+        ###################################################################################
+        elif isinstance(ir, ReturnNode):
+            return_value = self.evaluate_expression(ir.expresion)
+            self.quack_quadruple.add_quadruple("return", None, None, return_value[0])
 
         ###################################################################################
         elif isinstance(ir, ProgramNode):

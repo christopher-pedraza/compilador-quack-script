@@ -14,6 +14,7 @@ factor: id -> factor_id
       | PLUS cte_num -> positive_cte_num
       | MINUS cte_num -> negative_cte_num
       | LPAREN expresion RPAREN -> parenthesis_expresion
+      | func_call -> factor_func_call
 
 ?term: factor
      | term MULT factor -> term_mult
@@ -62,20 +63,26 @@ var_decl: VAR id COLON var_type SEMICOLON -> var_single_decl_no_assign
 ?params: id COLON var_type -> param
        | id COLON var_type (COMMA id COLON var_type)+ -> params_list
 
-function: VOID id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
-        | VOID id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
-        | VOID id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
-        | VOID id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
+?return_type: "void" -> void
+            | var_type -> return_type
+
+function: return_type id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
+        | return_type id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
+        | return_type id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
+        | return_type id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
 
 func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
          | id LPAREN expresion RPAREN SEMICOLON -> func_call_single_param
          | id LPAREN expresion (COMMA expresion)+ RPAREN SEMICOLON -> func_call_multiple_params
+
+return: RETURN expresion SEMICOLON -> return_expresion
 
 ?statement: assign
           | condition
           | cycle
           | func_call
           | print
+          | return
 
 program: program_pt1 program_pt2 MAIN body END -> program_no_decl
        | program_pt1 program_pt2 (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
@@ -103,6 +110,7 @@ ELSE: "else"
 PRINT: "print"
 AND: "and"
 OR: "or"
+RETURN: "return"
 
 // SIMBOLOS
 ASSIGN: "="
