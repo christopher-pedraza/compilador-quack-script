@@ -1,0 +1,10 @@
+// {
+//   "exclude": [
+//     "**/output",
+//     "**/tests",
+//     "**/tmp",
+//     ".git",
+//     ".gitignore",
+//     "grammar.lark"
+//   ]
+// }

@@ -44,6 +44,22 @@ class QuackInterpreter:
         self.quack_quadruple = quack_quadruple
         self.current_memory_space = "global"
 
+    def process_func_call(self, func_call):
+        func_name = func_call.name.name
+        func_args = func_call.args
+
+        self.quack_quadruple.add_quadruple("era", None, None, func_name)
+
+        for arg in func_args:
+            arg_value, arg_type = self.evaluate_expression(arg)
+            self.quack_quadruple.add_quadruple("param", None, None, arg_value)
+
+        self.quack_quadruple.add_quadruple("gosub", None, None, func_name)
+
+        return_type = self.symbol_table.get_return_type(func_name)
+
+        return return_type
+
     def evaluate_expression(self, expr_tree):
         if isinstance(expr_tree, IdNode):
             var_name = expr_tree.name
@@ -54,17 +70,7 @@ class QuackInterpreter:
 
         if isinstance(expr_tree, FuncCallNode):
             func_name = expr_tree.name.name
-            func_args = expr_tree.args
-
-            self.quack_quadruple.add_quadruple("era", None, None, func_name)
-
-            for arg in func_args:
-                arg_value, arg_type = self.evaluate_expression(arg)
-                self.quack_quadruple.add_quadruple("param", None, None, arg_value)
-
-            self.quack_quadruple.add_quadruple("gosub", None, None, func_name)
-
-            return_type = self.symbol_table.get_return_type(func_name)
+            return_type = self.process_func_call(expr_tree)
 
             if return_type != "void":
                 if self.symbol_table.get_function(self.global_container_name).is_symbol_declared(name=func_name):
@@ -82,7 +88,6 @@ class QuackInterpreter:
                         containerName=self.global_container_name,
                         address=func_address,
                     )
-
                 temp_address = self.memory_manager.get_first_available_address(
                     var_type=f"t_{return_type}",
                     space="global",
@@ -92,9 +97,12 @@ class QuackInterpreter:
                     containerName=self.global_container_name,
                 )
                 self.quack_quadruple.add_quadruple("=", func_address, None, temp_address)
+
+                return temp_address, return_type
             else:
-                raise TypeMismatchError(f"Function '{func_name}' does not return a value, cannot assign to variable.")
-            return temp_address, return_type
+                raise TypeMismatchError(
+                    f"Function '{func_name}' does not return a value, cannot be used in an expression."
+                )
 
         elif isinstance(expr_tree, CteNumNode) or isinstance(expr_tree, CteStringNode):
             var_type = type(expr_tree.value).__name__
@@ -299,40 +307,7 @@ class QuackInterpreter:
 
         ###################################################################################
         elif isinstance(ir, FuncCallNode):
-            func_name = ir.name.name
-            func_args = ir.args
-
-            self.quack_quadruple.add_quadruple("era", None, None, func_name)
-
-            for arg in func_args:
-                arg_value, arg_type = self.evaluate_expression(arg)
-                self.quack_quadruple.add_quadruple("param", None, None, arg_value)
-
-            self.quack_quadruple.add_quadruple("gosub", None, None, func_name)
-
-            return_type = self.symbol_table.get_return_type(func_name)
-
-            if return_type != "void":
-                func_address = self.memory_manager.get_first_available_address(
-                    var_type=return_type,
-                    space="global",
-                )
-                self.symbol_table.add_variable(
-                    name=func_name,
-                    var_type=return_type,
-                    containerName=self.global_container_name,
-                    address=func_address,
-                )
-                # temp_address = self.memory_manager.get_first_available_address(
-                #     var_type=f"t_{return_type}",
-                #     space="global",
-                # )
-                # self.symbol_table.add_temp(
-                #     var_type=f"t_{return_type}",
-                #     containerName=self.global_container_name,
-                # )
-                # self.quack_quadruple.add_quadruple("=", func_address, None, temp_address)
-                # return temp_address, return_type
+            self.process_func_call(ir)
 
         ###################################################################################
         elif isinstance(ir, ReturnNode):
