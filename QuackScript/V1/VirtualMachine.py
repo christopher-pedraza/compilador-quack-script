@@ -14,13 +14,16 @@ class QuackVirtualMachine:
         """
         Initializes the Quack Virtual Machine.
         """
-        self.symbol_table = None
+        # self.symbol_table = None
         self.quadruples = None
-        self.memory_manager = MemoryManager()
+        self.memory_manager = None
         self.operators = None
+        self.constant_table = None
+        self.functions = None
+        self.global_container_name = None
 
     def read_and_delete_object_files(self, file_name):
-        print(f"Reading object file: {file_name}")
+        # print(f"Reading object file: {file_name}")
         with open(file_name, "rb") as f:
             data = pickle.load(f)
         os.remove(file_name)
@@ -52,6 +55,40 @@ class QuackVirtualMachine:
             # Update current index
             current_pos += 1
 
+    def reconstruct_memory(self):
+        """ "
+        Reconstructs the memory manager and constant table.
+        """
+        constants_required_space = self.constant_table.required_space
+        global_required_space = self.functions[self.global_container_name].required_space
+
+        self.memory_manager = MemoryManager(
+            {
+                "global": {
+                    "int": ((1000, 1999), global_required_space.get("int", 0)),
+                    "float": ((2000, 2999), global_required_space.get("float", 0)),
+                    "t_int": ((3000, 3999), global_required_space.get("t_int", 0)),
+                    "t_float": ((4000, 4999), global_required_space.get("t_float", 0)),
+                    "t_bool": ((5000, 6999), global_required_space.get("t_bool", 0)),
+                },
+                "constant": {
+                    "int": ((12000, 12999), constants_required_space.get("int", 0)),
+                    "float": ((13000, 13999), constants_required_space.get("float", 0)),
+                    "str": ((14000, 14999), constants_required_space.get("str", 0)),
+                },
+            }
+        )
+
+        # Reconstruct constants
+        constants = self.constant_table.constants
+        if constants:
+            for address, constant in constants.items():
+                self.memory_manager.set_memory(
+                    space_name="constant", var_type=constant.var_type, value=constant.value, index=address
+                )
+
+        print(self.memory_manager)
+
     def translate_program(self, file_name):
         """
         Translates a QuackScript program from an object file
@@ -61,13 +98,16 @@ class QuackVirtualMachine:
             return
 
         data = self.read_and_delete_object_files(file_name)
-        self.quadruples = data["quadruples"].quadruples
-        self.operators = data["quadruples"].operators.operators
-        # self.operators = {value: key for key, value in self.operators.items()}
+        # print(f"Data read from object file: \n{data}")
+        self.quadruples = data["quadruples"]
+        self.operators = data["operators"]
+        self.functions = data["functions"]
+        self.constant_table = data["constants_table"]
+        self.global_container_name = data["global_container_name"]
 
-        self.symbol_table = data["symbol_table"]
+        self.reconstruct_memory()
 
-        self.process_quadruples()
+        # self.process_quadruples()
 
 
 if __name__ == "__main__":

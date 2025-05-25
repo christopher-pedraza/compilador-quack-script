@@ -1,6 +1,6 @@
 // Prueba: Función con parámetros
 program TestParams;
-var res_suma: int;
+var res_suma: int = 0;
 
 int sum(a: int, b: int) [
     var result: int = a + b;

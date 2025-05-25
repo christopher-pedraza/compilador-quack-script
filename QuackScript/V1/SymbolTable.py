@@ -33,16 +33,6 @@ class Parameter:
     var_type: Literal["int", "float", "str", "bool"]
 
 
-@dataclass
-class Constant:
-    value: Union[int, float, str, bool]
-    var_type: Literal["int", "float", "str", "bool"]
-
-    def __post_init__(self):
-        if not isinstance(self.value, (int, float, str, bool)):
-            raise TypeError(f"Invalid type for constant value: {type(self.value)}. Must be int, float, str, or bool.")
-
-
 class Container:
     def __init__(self, name, return_type: Literal["int", "float", None]):
         self.name = name
@@ -101,9 +91,20 @@ class Container:
         self.symbols.clear()
 
 
+@dataclass
+class Constant:
+    value: Union[int, float, str, bool]
+    var_type: Literal["int", "float", "str", "bool"]
+
+    def __post_init__(self):
+        if not isinstance(self.value, (int, float, str, bool)):
+            raise TypeError(f"Invalid type for constant value: {type(self.value)}. Must be int, float, str, or bool.")
+
+
 class ConstantsTable:
     def __init__(self):
         self.constants = {}
+        self.required_space = {"int": 0, "float": 0, "str": 0}
 
     def add_constant(
         self, address: int, value: Union[int, float, str, bool], value_type: Literal["int", "float", "str", "bool"]
@@ -111,6 +112,7 @@ class ConstantsTable:
         """Add a constant to the table."""
         if address not in self.constants:
             self.constants[address] = Constant(value=value, var_type=value_type)
+            self.required_space[value_type] += 1
 
     def check_and_get_address(self, value: Union[int, float, str, bool]) -> int:
         """Check if a constant exists and retrieve its address."""
@@ -125,7 +127,6 @@ class SymbolTable:
         self.containers = {}
         self.global_container_name = "global"
         self.constants_table = ConstantsTable()
-        self.var_type_references = {"int": 1, "float": 2, "t_int": 3, "t_float": 4, "t_bool": 5}
 
     def get_variable(self, name: str, containerName: str) -> Symbol:
         """Get a variable from the specified container."""
