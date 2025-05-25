@@ -300,6 +300,7 @@ class QuackInterpreter:
             self.current_container = self.global_container_name
             self.current_memory_space = "global"
             self.memory_manager.reset_local_temp_memory()
+            self.symbol_table.get_function(func_name).clear()
 
         ###################################################################################
         elif isinstance(ir, ParamNode):
@@ -336,5 +337,7 @@ class QuackInterpreter:
                 self.execute(func)
 
             self.execute(ir.main_body)
+
+            self.symbol_table.get_function(self.global_container_name).clear()
         else:
             raise UnknownIRTypeError(f"Unknown IR type: {type(ir)}")

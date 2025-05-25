@@ -235,6 +235,8 @@ class SymbolTable:
             lines.append(f"Return Type: {container.return_type}")
             # Symbols
             lines.append(f"{'Name':<15} {'Type':<10} {'Const':<6} {'Address':<10}")
+            if not container.symbols:
+                lines.append("  (No symbols)")
             for symbol in container.symbols.values():
                 lines.append(
                     f"{symbol.name:<15} {symbol.var_type:<10} {str(symbol.isConstant):<6} {str(symbol.address):<10}"
