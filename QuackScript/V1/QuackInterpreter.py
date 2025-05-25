@@ -330,11 +330,18 @@ class QuackInterpreter:
 
         ###################################################################################
         elif isinstance(ir, ProgramNode):
+            self.quack_quadruple.push_jump()
+            self.quack_quadruple.add_jump(type="goto")
+
             for decl in ir.global_decls:
                 self.execute(decl)
 
             for func in ir.functions:
                 self.execute(func)
+
+            self.quack_quadruple.update_jump(
+                index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
+            )
 
             self.execute(ir.main_body)
 

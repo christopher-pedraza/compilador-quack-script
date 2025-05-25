@@ -34,26 +34,24 @@ class QuackVirtualMachine:
         Processes the quadruples and executes them.
         This method should be implemented to handle the execution logic.
         """
-        if self.quadruples is None:
-            print("No quadruples to process.")
-            return
-
         current_pos = 0
         quadruple = (None, None, None, None)
-        print(self.operators)
+
         while quadruple[0] != self.operators["end"]:
             quadruple = self.quadruples[current_pos]
             op, arg1, arg2, result = quadruple
-            print(op, arg1, arg2, result)
+            print((op, arg1, arg2, result))
+
+            if op == self.operators["="]:
+                self.memory_manager.set_memory()
 
             if op == self.operators["end"]:
                 print("End of program.")
                 break
 
-            print(f"Executing operation: {op} with args {arg1}, {arg2}, result {result}")
-
             # Update current index
             current_pos += 1
+            break
 
     def reconstruct_memory(self):
         """ "
@@ -87,8 +85,6 @@ class QuackVirtualMachine:
                     space_name="constant", var_type=constant.var_type, value=constant.value, index=address
                 )
 
-        print(self.memory_manager)
-
     def translate_program(self, file_name):
         """
         Translates a QuackScript program from an object file
@@ -98,7 +94,7 @@ class QuackVirtualMachine:
             return
 
         data = self.read_and_delete_object_files(file_name)
-        # print(f"Data read from object file: \n{data}")
+
         self.quadruples = data["quadruples"]
         self.operators = data["operators"]
         self.functions = data["functions"]
@@ -107,7 +103,7 @@ class QuackVirtualMachine:
 
         self.reconstruct_memory()
 
-        # self.process_quadruples()
+        self.process_quadruples()
 
 
 if __name__ == "__main__":
