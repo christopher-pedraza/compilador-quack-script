@@ -28,6 +28,7 @@ from TransformerClasses import (
     ProgramNode,
     ReturnNode,
     ParamNode,
+    FuncCallFactorNode,
 )
 
 # from MemoryManager import MemoryAddress
@@ -50,6 +51,27 @@ class QuackInterpreter:
             value = variable.address
             var_type = variable.var_type
             return value, var_type
+
+        if isinstance(expr_tree, FuncCallFactorNode):
+            func_name = expr_tree.name
+
+            return_type = self.symbol_table.get_return_type(func_name)
+
+            if return_type != "void":
+                address = self.memory_manager.get_first_available_address(
+                    var_type=return_type,
+                    space="global",
+                )
+                self.symbol_table.add_variable(
+                    name=func_name,
+                    var_type=return_type,
+                    containerName=self.global_container_name,
+                    address=address,
+                )
+                self.quack_quadruple.add_quadruple("=", None, None, address)
+            else:
+                raise TypeMismatchError(f"Function '{func_name}' does not return a value, cannot assign to variable.")
+            return address, return_type
 
         elif isinstance(expr_tree, CteNumNode) or isinstance(expr_tree, CteStringNode):
             var_type = type(expr_tree.value).__name__
@@ -170,6 +192,7 @@ class QuackInterpreter:
         elif isinstance(ir, PrintNode):
             for value in ir.values:
                 value, value_type = self.evaluate_expression(value)
+                print(value)
                 self.quack_quadruple.add_quadruple("print", None, None, value)
 
         ###################################################################################
@@ -210,15 +233,6 @@ class QuackInterpreter:
 
         ###################################################################################
         elif isinstance(ir, FunctionDeclNode):
-            """
-            class FunctionDeclNode:
-                name: str
-                return_type: Union[TypeNode, Literal["void"]]
-                params: ParamsNode
-                body: BodyNode
-                var_decls: List[VarDeclNode]
-            """
-
             func_name = ir.name.name
             func_return_type = ir.return_type
             func_params = ir.params.params
@@ -229,7 +243,6 @@ class QuackInterpreter:
             self.current_memory_space = "local"
 
             self.symbol_table.add_function(name=func_name, return_type=func_return_type)
-            print(self.symbol_table.get_str_representation())
 
             for param in func_params:
                 self.execute(param)
@@ -275,19 +288,20 @@ class QuackInterpreter:
 
             self.quack_quadruple.add_quadruple("gosub", None, None, func_name)
 
-            return_type = self.symbol_table.get_return_type(func_name)
-            if return_type != "void":
-                address = self.memory_manager.get_first_available_address(
-                    var_type=return_type,
-                    space=self.global_container_name,
-                )
-                self.symbol_table.add_variable(
-                    name=func_name,
-                    var_type=return_type,
-                    containerName=self.global_container_name,
-                    address=address,
-                )
-                self.quack_quadruple.add_quadruple("=", None, None, address)
+            # return_type = self.symbol_table.get_return_type(func_name)
+
+            # if return_type != "void":
+            #     address = self.memory_manager.get_first_available_address(
+            #         var_type=return_type,
+            #         space="global",
+            #     )
+            #     self.symbol_table.add_variable(
+            #         name=func_name,
+            #         var_type=return_type,
+            #         containerName=self.global_container_name,
+            #         address=address,
+            #     )
+            #     self.quack_quadruple.add_quadruple("=", None, None, address)
 
         ###################################################################################
         elif isinstance(ir, ReturnNode):

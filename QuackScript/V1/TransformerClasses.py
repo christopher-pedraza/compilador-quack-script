@@ -142,6 +142,11 @@ class FuncCallNode:
 
 
 @dataclass
+class FuncCallFactorNode:
+    name: str
+
+
+@dataclass
 class ProgramNode:
     name: str
     global_decls: List[VarDeclNode]

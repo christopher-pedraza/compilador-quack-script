@@ -71,16 +71,18 @@ function: return_type id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> funct
         | return_type id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
         | return_type id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
 
-func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
-         | id LPAREN expresion RPAREN SEMICOLON -> func_call_single_param
-         | id LPAREN expresion (COMMA expresion)+ RPAREN SEMICOLON -> func_call_multiple_params
+func_call: id LPAREN RPAREN -> func_call_no_params
+         | id LPAREN expresion RPAREN -> func_call_single_param
+         | id LPAREN expresion (COMMA expresion)+ RPAREN -> func_call_multiple_params
+
+func_call_stmt: func_call SEMICOLON
 
 return: RETURN expresion SEMICOLON -> return_expresion
 
 ?statement: assign
           | condition
           | cycle
-          | func_call
+          | func_call_stmt
           | print
           | return
 

@@ -23,6 +23,7 @@ from TransformerClasses import (
     FuncCallNode,
     ProgramNode,
     ReturnNode,
+    FuncCallFactorNode,
 )
 
 
@@ -64,6 +65,7 @@ class QuackTransformer(Transformer):
           | PLUS cte_num -> positive_cte_num
           | MINUS cte_num -> negative_cte_num
           | LPAREN expresion RPAREN -> parenthesis_expresion
+          | func_call -> factor_func_call
     """
 
     def factor_id(self, id):
@@ -86,6 +88,9 @@ class QuackTransformer(Transformer):
 
     def parenthesis_expresion(self, lpar, expresion, rpar):
         return expresion
+
+    def factor_func_call(self, func_call):
+        return FuncCallFactorNode(name=str(func_call.name.name))
 
     """
     ?term: factor
@@ -162,7 +167,7 @@ class QuackTransformer(Transformer):
 
     """
     body: LBRACE RBRACE -> empty_body
-    | LBRACE statement+ RBRACE -> body_statements
+        | LBRACE statement+ RBRACE -> body_statements
     """
 
     def empty_body(self, lbrace, rbrace):
@@ -293,15 +298,15 @@ class QuackTransformer(Transformer):
         return ReturnNode(expresion=expresion)
 
     """
-    func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
-             | id LPAREN expresion RPAREN SEMICOLON -> func_call_single_param
-             | id LPAREN expresion (COMMA expresion)+ RPAREN SEMICOLON -> func_call_multiple_params
+    func_call: id LPAREN RPAREN -> func_call_no_params
+             | id LPAREN expresion RPAREN -> func_call_single_param
+             | id LPAREN expresion (COMMA expresion)+ RPAREN -> func_call_multiple_params
     """
 
-    def func_call_no_params(self, id, lpar, rpar, semicolon):
+    def func_call_no_params(self, id, lpar, rpar):
         return FuncCallNode(name=id, args=[])
 
-    def func_call_single_param(self, id, lpar, expresion, rpar, semicolon):
+    def func_call_single_param(self, id, lpar, expresion, rpar):
         return FuncCallNode(name=id, args=[expresion])
 
     def func_call_multiple_params(self, id, lpar, expresion, *args):
@@ -309,6 +314,13 @@ class QuackTransformer(Transformer):
         for i in range(1, len(args) - 1, 2):
             arguments.append(args[i])
         return FuncCallNode(name=id, args=arguments)
+
+    """
+    func_call_stmt: func_call SEMICOLON
+    """
+
+    def func_call_stmt(self, func_call, semicolon):
+        return func_call
 
     """
     program: program_pt1 program_pt2 MAIN body END -> program_no_decl
