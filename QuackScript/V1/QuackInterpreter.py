@@ -30,8 +30,6 @@ from TransformerClasses import (
     ParamNode,
 )
 
-# from MemoryManager import MemoryAddress
-
 
 class QuackInterpreter:
     def __init__(self, symbol_table, quack_quadruple, memory_manager):
@@ -43,14 +41,14 @@ class QuackInterpreter:
         self.quack_quadruple = quack_quadruple
         self.current_memory_space = "global"
 
-    def process_func_call(self, func_call):
+    def __process_func_call(self, func_call):
         func_name = func_call.name.name
         func_args = func_call.args
 
         self.quack_quadruple.add_quadruple("era", None, None, func_name)
 
         for arg in func_args:
-            arg_value, arg_type = self.evaluate_expression(arg)
+            arg_value, arg_type = self.__evaluate_expression(arg)
             self.quack_quadruple.add_quadruple("param", None, None, arg_value)
 
         self.quack_quadruple.add_quadruple("gosub", None, None, func_name)
@@ -59,7 +57,7 @@ class QuackInterpreter:
 
         return return_type
 
-    def evaluate_expression(self, expr_tree):
+    def __evaluate_expression(self, expr_tree):
         if isinstance(expr_tree, IdNode):
             var_name = expr_tree.name
             variable = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
@@ -69,7 +67,7 @@ class QuackInterpreter:
 
         if isinstance(expr_tree, FuncCallNode):
             func_name = expr_tree.name.name
-            return_type = self.process_func_call(expr_tree)
+            return_type = self.__process_func_call(expr_tree)
 
             if return_type != "void":
                 if self.symbol_table.get_function(self.global_container_name).is_symbol_declared(name=func_name):
@@ -127,8 +125,8 @@ class QuackInterpreter:
             or isinstance(expr_tree, LogicalAndNode)
             or isinstance(expr_tree, LogicalOrNode)
         ):
-            left_value, left_type = self.evaluate_expression(expr_tree.left)
-            right_value, right_type = self.evaluate_expression(expr_tree.right)
+            left_value, left_type = self.__evaluate_expression(expr_tree.left)
+            right_value, right_type = self.__evaluate_expression(expr_tree.right)
 
             result_type = self.semantic_cube.get_type(left_type, right_type, expr_tree.op)
 
@@ -163,7 +161,7 @@ class QuackInterpreter:
             var_name = ir.var_name
             variable = self.symbol_table.get_variable(name=var_name, containerName=self.current_container)
 
-            value, value_type = self.evaluate_expression(ir.expr)
+            value, value_type = self.__evaluate_expression(ir.expr)
 
             if self.semantic_cube.is_decl_valid(variable.var_type, value_type):
                 self.quack_quadruple.add_quadruple("=", value, None, variable.address)
@@ -178,7 +176,7 @@ class QuackInterpreter:
 
             value, value_type = (None, None)
             if ir.init_value:
-                value, value_type = self.evaluate_expression(ir.init_value)
+                value, value_type = self.__evaluate_expression(ir.init_value)
                 if not self.semantic_cube.is_decl_valid(var_type, value_type):
                     raise TypeMismatchError(
                         f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'"
@@ -206,7 +204,7 @@ class QuackInterpreter:
         ###################################################################################
         elif isinstance(ir, WhileNode):
             self.quack_quadruple.add_return()
-            condition = self.evaluate_expression(ir.condition)
+            condition = self.__evaluate_expression(ir.condition)
 
             self.quack_quadruple.push_jump()
             self.quack_quadruple.add_jump(type="gotoF", condition=condition[0])
@@ -221,12 +219,12 @@ class QuackInterpreter:
         ###################################################################################
         elif isinstance(ir, PrintNode):
             for value in ir.values:
-                value, value_type = self.evaluate_expression(value)
+                value, value_type = self.__evaluate_expression(value)
                 self.quack_quadruple.add_quadruple("print", None, None, value)
 
         ###################################################################################
         elif isinstance(ir, IfNode):
-            value, value_type = self.evaluate_expression(ir.condition)
+            value, value_type = self.__evaluate_expression(ir.condition)
 
             self.quack_quadruple.push_jump()
             self.quack_quadruple.add_jump(type="gotoF", condition=value)
@@ -239,7 +237,7 @@ class QuackInterpreter:
 
         ###################################################################################
         elif isinstance(ir, IfElseNode):
-            value, value_type = self.evaluate_expression(ir.condition)
+            value, value_type = self.__evaluate_expression(ir.condition)
 
             self.quack_quadruple.push_jump()
             self.quack_quadruple.add_jump(type="gotoF", condition=value, target=None)
@@ -306,11 +304,11 @@ class QuackInterpreter:
 
         ###################################################################################
         elif isinstance(ir, FuncCallNode):
-            self.process_func_call(ir)
+            self.__process_func_call(ir)
 
         ###################################################################################
         elif isinstance(ir, ReturnNode):
-            return_value = self.evaluate_expression(ir.expresion)
+            return_value = self.__evaluate_expression(ir.expresion)
             self.quack_quadruple.add_quadruple("return", None, None, return_value[0])
 
         ###################################################################################
