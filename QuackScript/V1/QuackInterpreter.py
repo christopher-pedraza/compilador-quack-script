@@ -41,27 +41,6 @@ class QuackInterpreter:
         self.quack_quadruple = quack_quadruple
         self.current_memory_space = "global"
 
-    # def _resolve_operand(self, node):
-    #     if isinstance(node, MemoryAddress):
-    #         value = node.address
-    #         value_type = node.var_type
-    #     elif isinstance(node, tuple) and node[0] == "id":
-    #         value = node[1]
-    #         value_type = node[2]
-    #     else:
-    #         value = self.evaluate_expression(node)
-    #         value_type = type(value).__name__
-
-    #     # Second pass: unwrap if result is a quadruple
-    #     if isinstance(value, MemoryAddress):
-    #         value_type = value.var_type
-    #         value = value.address
-    #     elif isinstance(value, tuple) and value[0] == "id":
-    #         value_type = value[2]
-    #         value = value[1]
-
-    #     return value, value_type
-
     def evaluate_expression(self, expr_tree):
         if isinstance(expr_tree, IdNode):
             var_name = expr_tree.name
@@ -108,7 +87,7 @@ class QuackInterpreter:
                 raise DivisionByZeroError("Division by zero is not allowed.")
 
             address = self.memory_manager.get_first_available_address(
-                var_type=result_type,
+                var_type=f"t{result_type}",
                 space=self.current_memory_space,
             )
 
@@ -139,10 +118,13 @@ class QuackInterpreter:
             var_type = ir.var_type
 
             #########Esto se puede mejorar######
-            value, value_type = self.evaluate_expression(ir.init_value) if ir.init_value else (None, None)
-
-            if ir.init_value and not self.semantic_cube.is_decl_valid(var_type, value_type):
-                raise TypeMismatchError(f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'")
+            value, value_type = (None, None)
+            if ir.init_value:
+                value, value_type = self.evaluate_expression(ir.init_value)
+                if not self.semantic_cube.is_decl_valid(var_type, value_type):
+                    raise TypeMismatchError(
+                        f"Cannot assign value of type '{value_type}' to variable of type '{var_type}'"
+                    )
             ####################################
 
             for var_name in ir.names:
@@ -229,8 +211,6 @@ class QuackInterpreter:
             for func in ir.functions:
                 self.execute(func)
 
-            self.current_memory_space = "temp"
             self.execute(ir.main_body)
-            self.current_memory_space = "global"
         else:
             raise UnknownIRTypeError(f"Unknown IR type: {type(ir)}")
