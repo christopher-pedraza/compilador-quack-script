@@ -314,7 +314,6 @@ class QuackTransformer(Transformer):
         return ProgramNode(name=program_pt2, global_decls=[], functions=funcs, main_body=body)
 
     def program_decl_func(self, program_pt1, program_pt2, *args):
-        id = program_pt2
         body = args[-2]
         decls = []
         funcs = []
