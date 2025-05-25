@@ -58,7 +58,7 @@ class QuackInterpreter:
             return_type = self.symbol_table.get_return_type(func_name)
 
             if return_type != "void":
-                address = self.memory_manager.get_first_available_address(
+                func_address = self.memory_manager.get_first_available_address(
                     var_type=return_type,
                     space="global",
                 )
@@ -66,12 +66,20 @@ class QuackInterpreter:
                     name=func_name,
                     var_type=return_type,
                     containerName=self.global_container_name,
-                    address=address,
+                    address=func_address,
                 )
-                self.quack_quadruple.add_quadruple("=", None, None, address)
+                temp_address = self.memory_manager.get_first_available_address(
+                    var_type=f"t_{return_type}",
+                    space="global",
+                )
+                self.symbol_table.add_temp(
+                    var_type=f"t_{return_type}",
+                    containerName=self.global_container_name,
+                )
+                self.quack_quadruple.add_quadruple("=", func_address, None, temp_address)
             else:
                 raise TypeMismatchError(f"Function '{func_name}' does not return a value, cannot assign to variable.")
-            return address, return_type
+            return temp_address, return_type
 
         elif isinstance(expr_tree, CteNumNode) or isinstance(expr_tree, CteStringNode):
             var_type = type(expr_tree.value).__name__
@@ -110,7 +118,7 @@ class QuackInterpreter:
             if expr_tree.op == "/" and right_value == 0:
                 raise DivisionByZeroError("Division by zero is not allowed.")
 
-            address = self.memory_manager.get_first_available_address(
+            func_address = self.memory_manager.get_first_available_address(
                 var_type=f"t_{result_type}",
                 space=self.current_memory_space,
             )
@@ -120,13 +128,13 @@ class QuackInterpreter:
             )
 
             result = self.quack_quadruple.add_quadruple(
-                op=expr_tree.op, arg1=left_value, arg2=right_value, result=address
+                op=expr_tree.op, arg1=left_value, arg2=right_value, result=func_address
             )
             return result, result_type
 
         else:
-            print("Oye, llegué aquí, qué procede?")
-            return expr_tree
+            raise UnsupportedOperationError(f"Unsupported expression type: {type(expr_tree)}")
+            # return expr_tree
 
     def execute(self, ir):
         if isinstance(ir, AssignNode):
@@ -192,7 +200,6 @@ class QuackInterpreter:
         elif isinstance(ir, PrintNode):
             for value in ir.values:
                 value, value_type = self.evaluate_expression(value)
-                print(value)
                 self.quack_quadruple.add_quadruple("print", None, None, value)
 
         ###################################################################################

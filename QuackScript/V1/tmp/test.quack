@@ -1,19 +1,16 @@
 // Prueba: Función con parámetros
 program TestParams;
+var res_suma: int;
+
 int sum(a: int, b: int) [
     var result: int = a + b;
     {
-        print("Sum:", result);
         return result;
     }
 ];
-void subs(a: int, b: int) [
-    {
-        print("Subs:", a-b);
-    }
-];
+
 main {
-    print(sum(3, 4));
-    subs(3, 4);
+    res_suma = sum(3, 4);
+    print(res_suma);
 }
 end
