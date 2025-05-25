@@ -125,13 +125,13 @@ class SymbolTable:
 
     def get_variable(self, name: str, containerName: str) -> Symbol:
         """Get a variable from the specified container."""
-        container = self.get_container(containerName)
+        container = self.get_function(containerName)
         # Check if the symbol is declared in the specified container
         if container.is_symbol_declared(name):
             return container.get_symbol(name)
         # If not, check in the global container
         else:
-            container = self.get_container(self.global_container_name)
+            container = self.get_function(self.global_container_name)
             if container.is_symbol_declared(name):
                 return container.get_symbol(name)
             else:
@@ -147,7 +147,7 @@ class SymbolTable:
     ) -> None:
         """Add a variable to the specified container."""
         variable = Symbol(name=name, var_type=var_type, isConstant=isConstant, address=address)
-        container = self.get_container(containerName)
+        container = self.get_function(containerName)
         container.add_symbol(variable)
         container.required_space[var_type] = container.required_space.get(var_type, 0) + 1
 
@@ -160,11 +160,11 @@ class SymbolTable:
             containerName=containerName,
             address=address,
         )
-        container = self.get_container(containerName)
+        container = self.get_function(containerName)
         container.param_signature.append(var_type)
 
     def add_temp(self, var_type: str, containerName: str):
-        container = self.get_container(containerName)
+        container = self.get_function(containerName)
         container.required_space[var_type] = container.required_space.get(var_type, 0) + 1
 
     def add_function(self, name: str, return_type: str) -> None:
@@ -178,11 +178,15 @@ class SymbolTable:
         self.add_function(id, None)
         self.global_container_name = id
 
-    def get_container(self, name: str) -> Container:
+    def get_function(self, name: str) -> Container:
         """Get a container by name."""
         if name not in self.containers:
             raise NameNotFoundError(f"Container {name} not found.")
         return self.containers.get(name)
+
+    def is_function_declared(self, name: str) -> bool:
+        """Check if a function is declared."""
+        return name in self.containers
 
     def add_constant(
         self, address: int, value: Union[int, float, str, bool], value_type: Literal["int", "float", "str", "bool"]
@@ -192,7 +196,7 @@ class SymbolTable:
 
     def get_return_type(self, containerName: str) -> str:
         """Get the return type of a container."""
-        container = self.get_container(containerName)
+        container = self.get_function(containerName)
         if container.return_type is None:
             raise ValueError(f"Container '{containerName}' has no return type.")
         return container.return_type

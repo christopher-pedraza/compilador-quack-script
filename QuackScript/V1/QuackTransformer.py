@@ -90,7 +90,8 @@ class QuackTransformer(Transformer):
         return expresion
 
     def factor_func_call(self, func_call):
-        return FuncCallFactorNode(name=str(func_call.name.name))
+        return FuncCallNode(name=func_call.name, args=func_call.args)
+        # return FuncCallFactorNode(name=str(func_call.name.name))
 
     """
     ?term: factor
