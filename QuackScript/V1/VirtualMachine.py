@@ -113,8 +113,11 @@ class QuackVirtualMachine:
             op, arg1, arg2, result = quadruple
             # print(f"{current_pos}: {(op, arg1, arg2, result)}")
 
-            value1 = self.memory_manager.get_memory(arg1) if arg1 is not None else None
-            value2 = self.memory_manager.get_memory(arg2) if arg2 is not None else None
+            value1, value2 = arg1, arg2
+            if arg1 is not None and isinstance(arg1, int):
+                value1 = self.memory_manager.get_memory(arg1)
+            if arg2 is not None and isinstance(arg2, int):
+                value2 = self.memory_manager.get_memory(arg2)
 
             match op:
                 case _ if op == op_add:
@@ -179,7 +182,9 @@ class QuackVirtualMachine:
                         continue
 
                 case _ if op == op_assign:
+                    print(f"Assigning {value1} to {result}")
                     self.memory_manager.set_memory(index=result, value=value1)
+                    print(f"Memory after assignment: {self.memory_manager}")
 
                 case _ if op == op_print:
                     value = self.memory_manager.get_memory(result)
@@ -218,9 +223,13 @@ class QuackVirtualMachine:
                     continue
 
                 case _ if op == op_return:
-                    return_address = self.functions[result].return_address
+                    print("Error 1", self.functions[value1])
+                    return_address = self.functions[value1].return_address
+                    print("Error 2", return_address)
                     return_value = self.memory_manager.get_memory(result)
+                    print("Error 3")
                     return_type = self.memory_manager.get_var_type_from_address(result)
+                    print("Error 4")
                     if return_address is not None:
                         # If the return address is specified, set the return value in the global memory
                         self.memory_manager.set_memory(index=return_address, value=return_value)

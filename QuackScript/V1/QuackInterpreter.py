@@ -62,7 +62,12 @@ class QuackInterpreter:
                     f"Argument {i + 1} of function '{func_name}' expects type '{param_signature[i]}', but got '{arg_type}'"
                 )
 
-            self.quack_quadruple.add_quadruple("param", None, None, arg_value)
+            address_in_function = self.memory_manager.get_first_available_address(
+                var_type=arg_type,
+                space="local",
+            )
+
+            self.quack_quadruple.add_quadruple("param", arg_value, None, address_in_function)
 
         self.quack_quadruple.add_quadruple("gosub", None, None, func_name)
 
@@ -107,6 +112,7 @@ class QuackInterpreter:
                     containerName=self.global_container_name,
                 )
                 self.quack_quadruple.add_quadruple("=", func_address, None, temp_address)
+                self.symbol_table.get_function(func_name).return_address = func_address
 
                 return temp_address, return_type
             else:
@@ -321,7 +327,7 @@ class QuackInterpreter:
                 containerName=self.current_container,
                 address=address,
             )
-            self.quack_quadruple.add_quadruple("=", None, None, address)
+            # self.quack_quadruple.add_quadruple("=", None, None, address)
 
         ###################################################################################
         elif isinstance(ir, FuncCallNode):
@@ -330,7 +336,7 @@ class QuackInterpreter:
         ###################################################################################
         elif isinstance(ir, ReturnNode):
             return_value = self.__evaluate_expression(ir.expresion)
-            self.quack_quadruple.add_quadruple("return", None, None, return_value[0])
+            self.quack_quadruple.add_quadruple("return", self.current_container, None, return_value[0])
 
         ###################################################################################
         elif isinstance(ir, ProgramNode):

@@ -1,6 +1,7 @@
 from QuackCompiler import compile_program
 from VirtualMachine import QuackVirtualMachine
 import sys
+import traceback
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -17,4 +18,8 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(f"File {input_file} not found.")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print("An unexpected error occurred!")
+        print(f"Type: {type(e).__name__}")
+        print(f"Message: {e}")
+        print("Traceback:")
+        traceback.print_exc()
