@@ -20,6 +20,12 @@ class OperatorsInterface:
             "gotoT": 14,
             "=": 15,
             "print": 16,
+            "era": 17,
+            "param": 18,
+            "gosub": 19,
+            "return": 20,
+            "endFunc": 21,
+            "end": 22,
         }
 
     def get_operator(self, op: str):
@@ -98,6 +104,19 @@ class QuackQuadruple:
         else:
             raise IndexError("Jump index out of range")
 
+    def get_str_representation(self, pretty: bool = False):
+        """Get a string representation of the quadruples."""
+        lines = []
+        for i, quadruple in enumerate(self.quadruples):
+            op = quadruple[0]
+            op_str = next((k for k, v in self.operators.operators.items() if v == op), op) if pretty else op
+            lines.append(f"{i}: ({op_str}, {quadruple[1]}, {quadruple[2]}, {quadruple[3]})")
+        return "\n".join(lines)
+
     def __str__(self):
         """Get a string representation of the quadruples."""
         return "\n".join([f"{i}: {quadruple}" for i, quadruple in enumerate(self.quadruples)])
+
+    def __repr__(self):
+        """Get a string representation of the quadruples."""
+        return self.__str__()

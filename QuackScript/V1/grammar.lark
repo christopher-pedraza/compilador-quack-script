@@ -14,21 +14,28 @@ factor: id -> factor_id
       | PLUS cte_num -> positive_cte_num
       | MINUS cte_num -> negative_cte_num
       | LPAREN expresion RPAREN -> parenthesis_expresion
+      | func_call -> factor_func_call
 
 ?term: factor
-     | factor (MULT factor)+ -> term_mult
-     | factor (DIV factor)+ -> term_div
+     | term MULT factor -> term_mult
+     | term DIV factor -> term_div
 
 ?exp: term
-    | term (PLUS term)+ -> exp_plus
-    | term (MINUS term)+ -> exp_minus
+    | exp PLUS term -> exp_plus
+    | exp MINUS term -> exp_minus
 
-?expresion: exp
-          | exp comparison_op exp -> expresion_comparison_op
-          | exp logic_cond exp -> expresion_logic_cond
+?comparison: exp
+           | exp comparison_op exp -> binary_comparison
 
-?comparison_op: GT | LT | NE | EE | GTE | LTE
-?logic_cond: AND | OR
+?logical_and: comparison
+            | logical_and AND comparison -> binary_logical_and
+
+?logical_or: logical_and
+           | logical_or OR logical_and -> binary_logical_or
+
+?expresion: logical_or
+
+comparison_op: GT | LT | NE | EE | GTE | LTE
 
 ?var_type: "float" -> float_type
          | "int" -> int_type
@@ -56,26 +63,36 @@ var_decl: VAR id COLON var_type SEMICOLON -> var_single_decl_no_assign
 ?params: id COLON var_type -> param
        | id COLON var_type (COMMA id COLON var_type)+ -> params_list
 
-// TODO: modificar diagramas para que permita multiples variables
-function: VOID id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
-        | VOID id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
-        | VOID id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
-        | VOID id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
+?return_type: "void" -> void
+            | var_type -> return_type
 
-func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
-         | id LPAREN expresion RPAREN SEMICOLON -> func_call_single_param
-         | id LPAREN expresion (COMMA expresion)+ RPAREN SEMICOLON -> func_call_multiple_params
+function: return_type id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
+        | return_type id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
+        | return_type id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
+        | return_type id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
+
+func_call: id LPAREN RPAREN -> func_call_no_params
+         | id LPAREN expresion RPAREN -> func_call_single_param
+         | id LPAREN expresion (COMMA expresion)+ RPAREN -> func_call_multiple_params
+
+func_call_stmt: func_call SEMICOLON
+
+return: RETURN expresion SEMICOLON -> return_expresion
 
 ?statement: assign
           | condition
           | cycle
-          | func_call
+          | func_call_stmt
           | print
+          | return
 
-program: PROGRAM id SEMICOLON MAIN body END -> program_no_decl
-       | PROGRAM id SEMICOLON (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
-       | PROGRAM id SEMICOLON function+ MAIN body END -> program_func_no_decl
-       | PROGRAM id SEMICOLON (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
+program: program_pt1 program_pt2 MAIN body END -> program_no_decl
+       | program_pt1 program_pt2 (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
+       | program_pt1 program_pt2 function+ MAIN body END -> program_func_no_decl
+       | program_pt1 program_pt2 (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
+
+program_pt1: PROGRAM
+program_pt2: id SEMICOLON
 
 // 
 // Tokens 
@@ -95,6 +112,7 @@ ELSE: "else"
 PRINT: "print"
 AND: "and"
 OR: "or"
+RETURN: "return"
 
 // SIMBOLOS
 ASSIGN: "="

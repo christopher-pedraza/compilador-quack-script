@@ -1,184 +1,278 @@
-from Exceptions import SymbolRedeclarationError, \
-                       ParameterRedeclarationError, \
-                       ParameterMismatchError, \
-                       InvalidParameterIndexError, \
-                       NameNotFoundError, \
-                       CannotModifyConstantError, \
-                       ContainerRedeclarationError
+from Exceptions import (
+    SymbolRedeclarationError,
+    ParameterRedeclarationError,
+    ParameterMismatchError,
+    InvalidParameterIndexError,
+    NameNotFoundError,
+    CannotModifyConstantError,
+    ContainerRedeclarationError,
+    ReservedWordError,
+)
 
+from dataclasses import dataclass
+from typing import Union, Literal
+
+
+@dataclass
 class Symbol:
-    def __init__(self, name, var_type, value=None, category="var", param_index=None):
-        self.name = name
-        self.var_type = var_type
-        self.value = value
-        self.category = category
-        self.param_index = param_index
+    name: str
+    var_type: Literal["int", "float", "str", "bool"]
+    isConstant: bool = False
+    address: int = None
+
+    def __post_init__(self):
+        if not isinstance(self.name, str):
+            raise TypeError(f"Invalid type for symbol name: {type(self.name)}. Must be str.")
+        if self.var_type not in ["int", "float", "str", "bool"]:
+            raise ValueError(f"Invalid type: {self.var_type}. Must be 'int', 'float', 'str', or 'bool'.")
+
+
+@dataclass
+class Parameter:
+    name: str
+    var_type: Literal["int", "float", "str", "bool"]
+
 
 class Container:
-    def __init__(self, name, body=None):
+    def __init__(self, name, return_type: Literal["int", "float", None]):
         self.name = name
+        self.return_type = return_type
+        self.return_address = None
+        self.initial_position = None
         self.symbols = {}
-        self.params = {}
-        self.body = body
+        self.param_signature = []
+        self.required_space = {}
+        self.reserved_words = [
+            "if",
+            "else",
+            "while",
+            "do",
+            "int",
+            "float",
+            "program",
+            "main",
+            "void",
+            "end",
+            "const",
+            "var",
+            "print",
+            "and",
+            "or",
+        ]
 
     def add_symbol(self, symbol: Symbol) -> None:
         """Add a symbol to the container."""
+        if symbol.name in self.reserved_words:
+            raise ReservedWordError(f"Symbol '{symbol.name}' is a reserved word and cannot be used as an identifier.")
         if symbol.name in self.symbols:
             raise SymbolRedeclarationError(f"Symbol '{symbol.name}' already exists in '{self.name}'.")
         self.symbols[symbol.name] = symbol
 
-    def add_param(self, symbol: Symbol) -> None:
-        """Add a parameter to the container."""
-        if symbol.name in self.params:
-            raise ParameterRedeclarationError(f"Parameter '{symbol.name}' already exists in '{self.name}'.")
-        self.params[symbol.name] = symbol
-
-    def set_params_values(self, values: list) -> None:
-        """Set the values of parameters in the container."""
-        if len(values) != len(self.params):
-            raise ParameterMismatchError(f"Number of values does not match number of parameters in '{self.name}'.")
-
-        # Update params in order of their param_index
-        for param in sorted(self.params.values(), key=lambda p: p.param_index):
-            if param.param_index is not None:
-                param.value = values[param.param_index]
-            else:
-                raise InvalidParameterIndexError(f"Parameter '{param.name}' does not have a valid index.")
-
     def get_symbol(self, name: str) -> Symbol:
         """Get a symbol from the container."""
-        if name in self.params:
-            return self.params.get(name)
-        elif name in self.symbols:
+        if name in self.symbols:
             return self.symbols.get(name)
         else:
             raise NameNotFoundError(f"Symbol '{name}' not found in '{self.name}'.")
 
-    def update_symbol(self, name: str, value) -> None:
-        """Update the value of a symbol in the container."""
-        if name not in self.symbols and name not in self.params:
-            raise NameNotFoundError(f"Symbol '{name}' not found in '{self.name}'.")
-        symbol = self.get_symbol(name)
-        if symbol.category == "const":
-            raise CannotModifyConstantError(f"Cannot modify constant '{name}'.")
-        symbol.value = value
-
     def is_symbol_declared(self, name: str) -> bool:
         """Check if a symbol is declared in the container."""
-        return name in self.symbols or name in self.params
-    
-    def clean_params_values(self) -> None:
-        """Reset the values of parameters in the container."""
-        for param in self.params.values():
-            param.value = None
+        return name in self.symbols
+
+    def set_initial_position(self, position: int) -> None:
+        """Set the initial position of the container."""
+        self.initial_position = position
+
+    def get_param_signature(self) -> list:
+        """Get the parameter signature of the container."""
+        return self.param_signature
+
+    def clear(self) -> None:
+        """Clear the container's symbols."""
+        self.symbols.clear()
+
+
+@dataclass
+class Constant:
+    value: Union[int, float, str, bool]
+    var_type: Literal["int", "float", "str", "bool"]
+
+    def __post_init__(self):
+        if not isinstance(self.value, (int, float, str, bool)):
+            raise TypeError(f"Invalid type for constant value: {type(self.value)}. Must be int, float, str, or bool.")
+
+
+class ConstantsTable:
+    def __init__(self):
+        self.constants = {}
+        self.required_space = {"int": 0, "float": 0, "str": 0}
+
+    def add_constant(
+        self, address: int, value: Union[int, float, str, bool], value_type: Literal["int", "float", "str", "bool"]
+    ) -> None:
+        """Add a constant to the table."""
+        if address not in self.constants:
+            self.constants[address] = Constant(value=value, var_type=value_type)
+            self.required_space[value_type] += 1
+
+    def check_and_get_address(self, value: Union[int, float, str, bool]) -> int:
+        """Check if a constant exists and retrieve its address."""
+        for address, constant in self.constants.items():
+            if constant.value == value:
+                return address
+        return None
+
 
 class SymbolTable:
     def __init__(self):
         self.containers = {}
-        self.add_container(Container("global", None))
+        self.global_container_name = "global"
+        self.constants_table = ConstantsTable()
 
-    def get_container(self, name: str) -> Container:
+    def get_variable(self, name: str, containerName: str) -> Symbol:
+        """Get a variable from the specified container."""
+        container = self.get_function(containerName)
+        # Check if the symbol is declared in the specified container
+        if container.is_symbol_declared(name):
+            return container.get_symbol(name)
+        # If not, check in the global container
+        else:
+            container = self.get_function(self.global_container_name)
+            if container.is_symbol_declared(name):
+                return container.get_symbol(name)
+            else:
+                raise NameNotFoundError(f"Symbol '{name}' not found in '{containerName}' or global container.")
+
+    def add_variable(
+        self,
+        name: str,
+        var_type: str,
+        containerName: str,
+        isConstant: bool = False,
+        address: int = None,
+    ) -> None:
+        """Add a variable to the specified container."""
+        variable = Symbol(name=name, var_type=var_type, isConstant=isConstant, address=address)
+        container = self.get_function(containerName)
+        container.add_symbol(variable)
+        container.required_space[var_type] = container.required_space.get(var_type, 0) + 1
+
+    def add_parameter(self, name: str, var_type: str, containerName: str, address: int) -> None:
+        """Add a parameter to the specified container."""
+        self.add_variable(
+            name=name,
+            var_type=var_type,
+            isConstant=False,
+            containerName=containerName,
+            address=address,
+        )
+        container = self.get_function(containerName)
+        container.param_signature.append(var_type)
+
+    def add_temp(self, var_type: str, containerName: str):
+        container = self.get_function(containerName)
+        container.required_space[var_type] = container.required_space.get(var_type, 0) + 1
+
+    def add_function(self, name: str, return_type: str) -> None:
+        """Add a function as a container"""
+        if name in self.containers:
+            raise ContainerRedeclarationError(f"Container '{name}' already exists.")
+        self.containers[name] = Container(name=name, return_type=return_type)
+
+    def create_global_container(self, id):
+        """Create a global container with the given id."""
+        self.add_function(id, None)
+        self.global_container_name = id
+
+    def get_function(self, name: str) -> Container:
         """Get a container by name."""
         if name not in self.containers:
             raise NameNotFoundError(f"Container {name} not found.")
         return self.containers.get(name)
 
-    def add_container(self, container: Container) -> None:
-        """Add a new container to the symbol table."""
-        if container.name in self.containers:
-            raise ContainerRedeclarationError(f"Container '{container.name}' already exists.")
-        self.containers[container.name] = container
+    def is_function_declared(self, name: str) -> bool:
+        """Check if a function is declared."""
+        return name in self.containers
 
-    def __add_symbol(self, symbol: Symbol, containerName: str) -> None:
-        """Add a symbol to the specified container."""
-        container = self.get_container(containerName)
-        container.add_symbol(symbol)
+    def add_constant(
+        self, address: int, value: Union[int, float, str, bool], value_type: Literal["int", "float", "str", "bool"]
+    ) -> None:
+        """Add a constant to the constants table."""
+        self.constants_table.add_constant(address=address, value=value, value_type=value_type)
 
-    def __get_symbol(self, name: str, containerName: str) -> Symbol:
-        """Get a symbol from the specified container."""
-        container = self.get_container(containerName)
-        if container.is_symbol_declared(name):
-            return container.get_symbol(name)
+    def get_return_type(self, containerName: str) -> str:
+        """Get the return type of a container."""
+        container = self.get_function(containerName)
+        if container.return_type is None:
+            raise ValueError(f"Container '{containerName}' has no return type.")
+        return container.return_type
+
+    def get_str_representation(self) -> str:
+        """Return a table-like string representation of the symbol table."""
+        lines = []
+
+        # Global container
+        gcontainer = self.containers.get(self.global_container_name)
+        lines.append(f"Global Container: {self.global_container_name}")
+        lines.append(f"Initial Position: {gcontainer.initial_position if gcontainer else 'N/A'}")
+        if gcontainer and gcontainer.symbols:
+            lines.append(f"{'Name':<15} {'Type':<10} {'Const':<6} {'Address':<10}")
+            for symbol in gcontainer.symbols.values():
+                lines.append(
+                    f"{symbol.name:<15} {symbol.var_type:<10} {str(symbol.isConstant):<6} {str(symbol.address):<10}"
+                )
+            # Show required space for global container
+            if gcontainer.required_space:
+                lines.append("Required Space:")
+                for vtype, amount in gcontainer.required_space.items():
+                    lines.append(f"  {vtype}: {amount}")
         else:
-            container = self.containers["global"]
-            if container.is_symbol_declared(name):
-                return container.get_symbol(name)
+            lines.append("  (No symbols)")
+        lines.append("")
+
+        # Other containers (functions)
+        for cname, container in self.containers.items():
+            if cname == self.global_container_name:
+                continue
+            lines.append(f"Container: {cname}")
+            lines.append(
+                f"Initial Position: {container.initial_position if container.initial_position is not None else 'N/A'}"
+            )
+            lines.append(f"Return Type: {container.return_type}")
+            # Symbols
+            lines.append(f"{'Name':<15} {'Type':<10} {'Const':<6} {'Address':<10}")
+            if not container.symbols:
+                lines.append("  (No symbols)")
+            for symbol in container.symbols.values():
+                lines.append(
+                    f"{symbol.name:<15} {symbol.var_type:<10} {str(symbol.isConstant):<6} {str(symbol.address):<10}"
+                )
+            # Parameters
+            if container.param_signature:
+                lines.append("Parameters:")
+                for idx, param_type in enumerate(container.param_signature):
+                    lines.append(f"  {idx + 1}. {param_type}")
             else:
-                raise NameNotFoundError(f"Symbol '{name}' not found in '{containerName}' or global container.")
-            
-    def __update_symbol(self, name: str, value, containerName: str) -> None:
-        """Update the value of a symbol in the specified container."""
-        container = self.get_container(containerName)
-        if container.is_symbol_declared(name):
-            container.update_symbol(name, value)
+                lines.append("Parameters: None")
+            # Show required space for this container
+            if container.required_space:
+                lines.append("Required Space:")
+                for vtype, amount in container.required_space.items():
+                    lines.append(f"  {vtype}: {amount}")
+            lines.append("")
+
+        # Constants table
+        lines.append("Constants Table:")
+        if self.constants_table.constants:
+            lines.append(f"{'Address':<10} {'Value':<20} {'Type':<10}")
+            for address, constant in self.constants_table.constants.items():
+                lines.append(f"{str(address):<10} {str(constant.value):<20} {constant.var_type:<10}")
         else:
-            container = self.containers["global"]
-            if container.is_symbol_declared(name):
-                container.update_symbol(name, value)
-            else:
-                raise NameNotFoundError(f"Symbol '{name}' not found in '{containerName}' or global container.")
-            
-    def add_variable(self, name: str, var_type: str, value=None, category="var", containerName: str = "global", param_index: int = None) -> None:
-        """Add a variable to the specified container."""
-        variable = Symbol(name=name, var_type=var_type, value=value, category=category, param_index=param_index)
-        self.__add_symbol(variable, containerName)
+            lines.append("  (No constants)")
+        lines.append("")
 
-    def add_parameter(self, name: str, var_type: str, containerName: str, param_index: int = None) -> None:
-        """Add a parameter to the specified container."""
-        variable = Symbol(name=name, var_type=var_type, category="param", param_index=param_index)
-        container = self.get_container(containerName)
-        container.add_param(variable)
+        return "\n".join(lines)
 
-    def get_variable(self, name: str, containerName: str) -> Symbol:
-        """Get a variable from the specified container."""
-        return self.__get_symbol(name, containerName).value
-    
-    def get_variable_type(self, name: str, containerName: str) -> str:
-        """Get the type of a variable from the specified container."""
-        return self.__get_symbol(name, containerName).var_type
-    
-    def update_variable(self, name: str, value, containerName: str) -> None:
-        """Update the value of a variable in the specified container."""
-        self.__update_symbol(name, value, containerName)
-
-    def add_function(self, name: str, params: list, body) -> None:
-        """Add a function as a container"""
-        self.add_container(Container(name, body))
-        
-        for i, param in enumerate(params):
-            param_name, param_type = param
-            self.add_parameter(name=param_name, var_type=param_type, containerName=name, param_index=i)
-        
-    def update_params_values(self, containerName: str, values: list) -> None:
-        """Set the values of parameters in the specified container."""
-        container = self.get_container(containerName)
-        container.set_params_values(values)
-
-    def clean_params_values(self, containerName: str) -> None:
-        """Reset the values of parameters in the specified container."""
-        container = self.get_container(containerName)
-        container.clean_params_values()
-        
-    def display(self) -> None:
-        """Display the contents of the symbol table."""
-        for container_name, container in self.containers.items():
-            print(f"Container: {container_name}")
-            print("  Parameters:")
-            for param_name, param in container.params.items():
-                print(f"  {param_name}: {param.var_type}, {param.value}, {param.category}, {param.param_index}")
-            print("  Symbols:")
-            for symbol_name, symbol in container.symbols.items():
-                print(f"  {symbol_name}: {symbol.var_type}, {symbol.value}, {symbol.category}, {symbol.param_index}")
-
-    def get_str_representation(self):
+    def __str__(self):
         """String representation of the symbol table."""
-        result = ""
-        for container_name, container in self.containers.items():
-            result += f"Container: {container_name}\n"
-            result += "  Parameters:\n"
-            for param_name, param in container.params.items():
-                result += f"  {param_name}: {param.var_type}, {param.value}, {param.category}, {param.param_index}\n"
-            result += "  Symbols:\n"
-            for symbol_name, symbol in container.symbols.items():
-                result += f"  {symbol_name}: {symbol.var_type}, {symbol.value}, {symbol.category}, {symbol.param_index}\n"
-        return result
+        return self.get_str_representation()

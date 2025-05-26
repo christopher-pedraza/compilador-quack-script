@@ -3,6 +3,6 @@ program TestPrint;
 var num1: int = 25;
 var num2: float = 2.5 + num1;
 main {
-    print("Num1:", num1, ", Num2:", num2);
+    print("Num1: ", num1, "\nNum2: ", num2);
 }
 end

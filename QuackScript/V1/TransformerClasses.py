@@ -107,7 +107,7 @@ class VarDeclNode:
     names: List[str]
     var_type: TypeNode
     init_value: Optional["ExprNode"] = None
-    category: Literal["var", "const", "param"] = "var"
+    isConstant: bool = False
 
 
 @dataclass
@@ -124,9 +124,15 @@ class ParamsNode:
 @dataclass
 class FunctionDeclNode:
     name: str
+    return_type: Union[TypeNode, Literal["void"]]
     params: ParamsNode
     body: BodyNode
     var_decls: List[VarDeclNode]
+
+
+@dataclass
+class ReturnNode:
+    expresion: "ExprNode"
 
 
 @dataclass

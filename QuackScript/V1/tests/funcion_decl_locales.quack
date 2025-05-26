@@ -4,7 +4,7 @@ void add_and_print(x: int, y: int) [
     var result: int;
     {
         result = x + y;
-        print("Result:", result);
+        print("Result: ", result);
     }
 ];
 main {

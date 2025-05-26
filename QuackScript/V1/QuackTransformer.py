@@ -1,34 +1,61 @@
 from lark import Lark, Transformer, v_args, Tree, Token
-
+from SymbolTable import SymbolTable
+from TransformerClasses import (
+    IdNode,
+    CteNumNode,
+    CteStringNode,
+    ArithmeticOpNode,
+    UnaryOpNode,
+    MultiplicativeOpNode,
+    ComparisonNode,
+    LogicalAndNode,
+    LogicalOrNode,
+    AssignNode,
+    BodyNode,
+    PrintNode,
+    WhileNode,
+    IfNode,
+    IfElseNode,
+    VarDeclNode,
+    ParamsNode,
+    ParamNode,
+    FunctionDeclNode,
+    FuncCallNode,
+    ProgramNode,
+    ReturnNode,
+)
 
 
 @v_args(inline=True)
 class QuackTransformer(Transformer):
-    def __init__(self, symbol_table):
-        pass
+    def __init__(self):
+        self.symbol_table = None
 
     """
     id: CNAME
     """
+
     def id(self, value):
-        return str(value)
-    
+        return IdNode(name=str(value))
+
     """
     cte_num: INT -> int
            | FLOAT -> float
     """
+
     def int(self, value):
         return int(value)
-    
+
     def float(self, value):
         return float(value)
 
     """
     cte_string: ESCAPED_STRING
     """
+
     def cte_string(self, value):
-        return ("cte_string", str(value)[1:-1]) 
-    
+        return CteStringNode(value=str(value)[1:-1])
+
     """
     factor: id -> factor_id
           | PLUS id -> positive_factor_id
@@ -37,102 +64,94 @@ class QuackTransformer(Transformer):
           | PLUS cte_num -> positive_cte_num
           | MINUS cte_num -> negative_cte_num
           | LPAREN expresion RPAREN -> parenthesis_expresion
+          | func_call -> factor_func_call
     """
+
     def factor_id(self, id):
-        return ("id", id)
-    
+        return id
+
     def positive_factor_id(self, id):
-        return ("id", id)
-    
-    def negative_factor_id(self, id):
-        return ("negative_id", id)
-    
+        return id
+
+    def negative_factor_id(self, minus, id):
+        return ArithmeticOpNode(op="-", left=CteNumNode(0), right=id)
+
     def factor_cte_num(self, cte_num):
-        return ("cte_num", cte_num)
-    
+        return CteNumNode(value=cte_num)
+
     def positive_cte_num(self, plus, cte_num):
-        return ("cte_num", cte_num)
+        return CteNumNode(value=cte_num)
 
     def negative_cte_num(self, minus, cte_num):
-        return ("negative_cte_num", cte_num)
-    
+        return ArithmeticOpNode(op="-", left=CteNumNode(0), right=CteNumNode(cte_num))
+
     def parenthesis_expresion(self, lpar, expresion, rpar):
         return expresion
-    
+
+    def factor_func_call(self, func_call):
+        return FuncCallNode(name=func_call.name, args=func_call.args)
+        # return FuncCallFactorNode(name=str(func_call.name.name))
+
     """
     ?term: factor
-         | factor (MULT factor)+ -> term_mult
-         | factor (DIV factor)+ -> term_div
+        | term MULT factor -> term_mult
+        | term DIV factor -> term_div
     """
-    # def term_mult(self, factor1, mult, factor2):
-    #     return ("term_mult", factor1, factor2)
-    def term_mult(self, factor1, *args):
-        factors = [factor1]
-        for i in range(1, len(args), 2):
-            factors.append(args[i])
-        # Create a nested structure for multiplication
-        result = factors[0]
-        for factor in factors[1:]:
-            result = ("term_mult", result, factor)
-        return result
-    
-    # def term_div(self, factor1, div, factor2):
-    #     return ("term_div", factor1, factor2)
-    def term_div(self, factor1, *args):
-        factors = [factor1]
-        for i in range(1, len(args), 2):
-            factors.append(args[i])
-        # Create a nested structure for division
-        result = factors[0]
-        for factor in factors[1:]:
-            result = ("term_div", result, factor)
-        return result
+
+    def term_mult(self, term, mult, factor):
+        return MultiplicativeOpNode(op="*", left=term, right=factor)
+
+    def term_div(self, term, div, factor):
+        return MultiplicativeOpNode(op="/", left=term, right=factor)
 
     """
     ?exp: term
-        | term (PLUS term)+ -> exp_plus
-        | term (MINUS term)+ -> exp_minus
+        | exp PLUS term -> exp_plus
+        | exp MINUS term -> exp_minus
     """
-    # def exp_plus(self, term1, plus, term2):
-    #     return ("exp_plus", term1, term2)
-    def exp_plus(self, term1, *args):
-        terms = [term1]
-        for i in range(1, len(args), 2):
-            terms.append(args[i])
-        # Create a nested structure for addition
-        result = terms[0]
-        for term in terms[1:]:
-            result = ("exp_plus", result, term)
-        return result
-    
-    # def exp_minus(self, term1, minus, term2):
-    #     return ("exp_minus", term1, term2)
-    def exp_minus(self, term1, *args):
-        terms = [term1]
-        for i in range(1, len(args), 2):
-            terms.append(args[i])
-        # Create a nested structure for subtraction
-        result = terms[0]
-        for term in terms[1:]:
-            result = ("exp_minus", result, term)
-        return result
 
-    
+    def exp_plus(self, exp, plus, term):
+        return ArithmeticOpNode(op="+", left=exp, right=term)
+
+    def exp_minus(self, exp, minus, term):
+        return ArithmeticOpNode(op="-", left=exp, right=term)
+
     """
-    ?expresion: exp
-              | exp comparison_op exp -> expresion_comparison_op
-              | exp logic_cond exp -> expresion_logic_cond
+    ?comparison: exp
+               | exp comparison_op exp -> binary_comparison
     """
-    def expresion_comparison_op(self, exp1, comparison_op, exp2):
-        return ("expresion_comparison_op", exp1, comparison_op, exp2)
-        
-    def expresion_logic_cond(self, exp1, logic_cond, exp2):
-        return ("expresion_logic_cond", exp1, logic_cond, exp2)
-    
+
+    def binary_comparison(self, exp1, comparison_op, exp2):
+        return ComparisonNode(op=comparison_op, left=exp1, right=exp2)
+
+    """
+    ?logical_and: comparison
+                | logical_and AND comparison -> binary_logical_and
+    """
+
+    def binary_logical_and(self, logical_and, and_, comparison):
+        return LogicalAndNode(op="and", left=logical_and, right=comparison)
+
+    """
+    ?logical_or: logical_and
+               | logical_or OR logical_and -> binary_logical_or
+    """
+
+    def binary_logical_or(self, logical_or, or_, logical_and):
+        return LogicalOrNode(op="or", left=logical_or, right=logical_and)
+
+    """
+    comparison_op: GT | LT | NE | EE | GTE | LTE
+    """
+
+    def comparison_op(self, value):
+        return str(value)
+
     """
     ?var_type: "float" -> float_type
              | "int" -> int_type
     """
+
     def int_type(self):
         return "int"
 
@@ -142,165 +161,212 @@ class QuackTransformer(Transformer):
     """
     assign: id ASSIGN expresion SEMICOLON
     """
+
     def assign(self, id, assign, expresion, semicolon):
-        return ("assign", id, expresion)
-    
+        return AssignNode(var_name=id.name, expr=expresion)
+
     """
     body: LBRACE RBRACE -> empty_body
-    | LBRACE statement+ RBRACE -> body_statements
+        | LBRACE statement+ RBRACE -> body_statements
     """
+
     def empty_body(self, lbrace, rbrace):
-        return ("empty_body",)
-    
+        return BodyNode(statements=[])
+
     def body_statements(self, lbrace, *statements):
-        # Exclude the last RBRACE and return the statements as a list
-        return ("body_statements", list(statements[:-1]))
-    
+        return BodyNode(statements=list(statements[:-1]))
+
     """
     print: PRINT LPAREN (expresion | cte_string) RPAREN SEMICOLON -> print_single
          | PRINT LPAREN (expresion | cte_string) (COMMA (expresion | cte_string))+ RPAREN SEMICOLON -> print_multiple
     """
+
     def print_single(self, print_, lpar, content, rpar, semicolon):
-        return ("print", [content])
-    
+        return PrintNode(values=[content])
+
     def print_multiple(self, print_, lpar, content, *args):
         cont = [content]  # Start with the first content
-        for i in range(1, len(args)-2, 2):
+        for i in range(1, len(args) - 2, 2):
             cont.append(args[i])
-        return ("print", cont)
+        return PrintNode(values=cont)
 
     """
     cycle: WHILE LPAREN expresion RPAREN DO body SEMICOLON
     """
+
     def cycle(self, while_, lpar, expresion, rpar, do, body, semicolon):
-        return ("cycle", expresion, body)
-    
+        return WhileNode(condition=expresion, body=body)
+
     """
     condition: IF LPAREN expresion RPAREN body SEMICOLON -> condition_if
              | IF LPAREN expresion RPAREN body ELSE body SEMICOLON -> condition_if_else
     """
+
     def condition_if(self, if_, lpar, expresion, rpar, body, semicolon):
-        return ("condition_if", expresion, body)
-    
+        return IfNode(condition=expresion, then_body=body)
+
     def condition_if_else(self, if_, lpar, expresion, rpar, body1, else_, body2, semicolon):
-        return ("condition_if_else", expresion, body1, body2)
-    
+        return IfElseNode(condition=expresion, then_body=body1, else_body=body2)
+
     """
     const_decl: CONST id COLON var_type ASSIGN expresion SEMICOLON
     """
+
     def const_decl(self, const, id, colon, var_type, assign, expresion, semicolon):
-        return ("var_decl", [id], var_type, expresion, "const")
-    
+        return VarDeclNode(names=[id], var_type=var_type, init_value=expresion, isConstant=True)
+
     """
     var_decl: VAR id COLON var_type SEMICOLON -> var_single_decl_no_assign
             | VAR id COLON var_type ASSIGN expresion SEMICOLON -> var_single_decl_assign
             | VAR id (COMMA id)+ COLON var_type SEMICOLON -> var_multi_decl_no_assign
             | VAR id (COMMA id)+ COLON var_type ASSIGN expresion SEMICOLON -> var_multi_decl_assign
     """
+
     def var_single_decl_no_assign(self, var, id, colon, var_type, semicolon):
-        return ("var_decl", [id], var_type, None, "var")
-    
+        return VarDeclNode(names=[id], var_type=var_type, isConstant=False)
+
     def var_single_decl_assign(self, var, id, colon, var_type, assign, expresion, semicolon):
-        return ("var_decl", [id], var_type, expresion, "var")
-    
+        return VarDeclNode(names=[id], var_type=var_type, init_value=expresion, isConstant=False)
+
     def var_multi_decl_no_assign(self, var, id, *args):
         ids = [id]
-        for i in range(0, len(args)-1, 2):
+        for i in range(0, len(args) - 1, 2):
             ids.append(args[i - 1])
-        return ("var_decl", ids, args[-1], None, "var")
-    
+        return VarDeclNode(names=ids, var_type=args[-1], isConstant=False)
+
     def var_multi_decl_assign(self, var, id, *args):
         ids = [id]
-        for i in range(1, len(args)-5, 2):
+        for i in range(1, len(args) - 5, 2):
             ids.append(args[i])
-        return ("var_decl", ids, args[-4], args[-2], "var")
-    
+        return VarDeclNode(names=ids, var_type=args[-4], init_value=args[-2], isConstant=False)
+
     """
     ?params: id COLON var_type -> param
            | id COLON var_type (COMMA id COLON var_type)+ -> params_list
     """
-    def param(self, id, colon, type):
-        return ("params", [(id, type)])
-    
-    def params_list(self, id, colon, type, comma, *args):
-        params = ("params", [(id, type)])
-        for i in range(0, len(args)-1, 4):
-            params[1].append((args[i], args[i + 2]))
-        return params
-    
-    """
-    function: VOID id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
-            | VOID id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
-            | VOID id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
-            | VOID id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
-    """
-    def function_no_params_no_var_decl(self, void, id, lpar, rpar, lbracket, body, rbracket, semicolon):
-        return ("function_decl", id, [], body, [])
-    
-    def function_no_var_decl(self, void, id, lpar, params, rpar, lbracket, body, rbracket, semicolon):
-        return ("function_decl", id, params, body, [])
-    
-    def function_params_var_decl(self, void, id, lpar, params, rpar, lbracket, *args):
-        body = args[-3]
-        var_decl = []
-        for i in range(0, len(args)-3):
-            var_decl.append(args[i])
-        return ("function_decl", id, params, body, var_decl)
-    
-    def function_no_params(self, void, id, lpar, rpar, lbracket, *args):
-        body = args[-3]
-        var_decl = []
-        for i in range(0, len(args)-3):
-            var_decl.append(args[i])
-        return ("function_decl", id, [], body, var_decl)
+
+    def param(self, id, colon, type_):
+        return ParamsNode(params=[ParamNode(name=id, param_type=type_)])
+
+    def params_list(self, id, colon, type_, comma, *args):
+        params = [ParamNode(name=id, param_type=type_)]
+        for i in range(0, len(args) - 1, 4):
+            params.append(ParamNode(name=args[i], param_type=args[i + 2]))
+        return ParamsNode(params=params)
 
     """
-    func_call: id LPAREN RPAREN SEMICOLON -> func_call_no_params
-             | id LPAREN expresion RPAREN SEMICOLON -> func_call_single_param
-             | id LPAREN expresion (COMMA expresion)+ RPAREN SEMICOLON -> func_call_multiple_params
+    ?return_type: "void" -> void
+                | var_type -> return_type
     """
-    def func_call_no_params(self, id, lpar, rpar, semicolon):
-        return ("func_call", id, [])
-    
-    def func_call_single_param(self, id, lpar, expresion, rpar, semicolon):
-        return ("func_call", id, [expresion])
-    
+
+    def void(self):
+        return "void"
+
+    def return_type(self, var_type):
+        return var_type
+
+    """
+    function: return_type id LPAREN RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_params_no_var_decl
+            | return_type id LPAREN params RPAREN LBRACKET body RBRACKET SEMICOLON -> function_no_var_decl
+            | return_type id LPAREN params RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_params_var_decl
+            | return_type id LPAREN RPAREN LBRACKET var_decl+ body RBRACKET SEMICOLON -> function_no_params
+    """
+
+    def function_no_params_no_var_decl(self, return_type, id, lpar, rpar, lbracket, body, rbracket, semicolon):
+        return FunctionDeclNode(name=id, return_type=return_type, params=ParamsNode(params=[]), body=body, var_decls=[])
+
+    def function_no_var_decl(self, return_type, id, lpar, params, rpar, lbracket, body, rbracket, semicolon):
+        return FunctionDeclNode(name=id, return_type=return_type, params=params, body=body, var_decls=[])
+
+    def function_params_var_decl(self, return_type, id, lpar, params, rpar, lbracket, *args):
+        body = args[-3]
+        var_decls = list(args[:-3])
+        return FunctionDeclNode(name=id, return_type=return_type, params=params, body=body, var_decls=var_decls)
+
+    def function_no_params(self, return_type, id, lpar, rpar, lbracket, *args):
+        body = args[-3]
+        var_decls = list(args[:-3])
+        return FunctionDeclNode(
+            name=id, return_type=return_type, params=ParamsNode(params=[]), body=body, var_decls=var_decls
+        )
+
+    """
+    return: RETURN expresion SEMICOLON -> return_expresion
+    """
+
+    def return_expresion(self, return_, expresion, semicolon):
+        return ReturnNode(expresion=expresion)
+
+    """
+    func_call: id LPAREN RPAREN -> func_call_no_params
+             | id LPAREN expresion RPAREN -> func_call_single_param
+             | id LPAREN expresion (COMMA expresion)+ RPAREN -> func_call_multiple_params
+    """
+
+    def func_call_no_params(self, id, lpar, rpar):
+        return FuncCallNode(name=id, args=[])
+
+    def func_call_single_param(self, id, lpar, expresion, rpar):
+        return FuncCallNode(name=id, args=[expresion])
+
     def func_call_multiple_params(self, id, lpar, expresion, *args):
-        params = [expresion]
-        for i in range(1, len(args)-1, 2):
-            params.append(args[i])
-        return ("func_call", id, params)
-        
+        arguments = [expresion]
+        for i in range(1, len(args) - 1, 2):
+            arguments.append(args[i])
+        return FuncCallNode(name=id, args=arguments)
+
     """
-    program: PROGRAM id SEMICOLON MAIN body END -> program_no_decl
-           | PROGRAM id SEMICOLON (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
-           | PROGRAM id SEMICOLON function+ MAIN body END -> program_func_no_decl
-           | PROGRAM id SEMICOLON (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
+    func_call_stmt: func_call SEMICOLON
     """
-    def program_no_decl(self, program, id, semicolon, main, body, end):
-        return ("program", id, [], [], body)
-     
-    def program_decl_no_func(self, program, id, semicolon, *args):
+
+    def func_call_stmt(self, func_call, semicolon):
+        return func_call
+
+    """
+    program: program_pt1 program_pt2 MAIN body END -> program_no_decl
+           | program_pt1 program_pt2 (const_decl | var_decl)+ MAIN body END -> program_decl_no_func
+           | program_pt1 program_pt2 function+ MAIN body END -> program_func_no_decl
+           | program_pt1 program_pt2 (const_decl | var_decl)+ function+ MAIN body END -> program_decl_func
+    """
+
+    def program_no_decl(self, program_pt1, program_pt2, main, body, end):
+        return ProgramNode(name=program_pt2, global_decls=[], functions=[], main_body=body)
+
+    def program_decl_no_func(self, program_pt1, program_pt2, *args):
         body = args[-2]
         decls = []
-        for i in range(0, len(args)-3):
+        for i in range(0, len(args) - 3):
             decls.append(args[i])
-        return ("program", id, decls, [], body)
-    
-    def program_func_no_decl(self, program, id, semicolon, *args):
+        return ProgramNode(name=program_pt2, global_decls=decls, functions=[], main_body=body)
+
+    def program_func_no_decl(self, program_pt1, program_pt2, *args):
         body = args[-2]
         funcs = []
-        for i in range(0, len(args)-3):
+        for i in range(0, len(args) - 3):
             funcs.append(args[i])
-        return ("program", id, [], funcs, body)
-    
-    def program_decl_func(self, program, id, semicolon, *args):
+        return ProgramNode(name=program_pt2, global_decls=[], functions=funcs, main_body=body)
+
+    def program_decl_func(self, program_pt1, program_pt2, *args):
         body = args[-2]
         decls = []
         funcs = []
-        for i in range(0, len(args)-3):
-            if args[i][0] == "var_decl":
-                decls.append(args[i])
-            else:
-                funcs.append(args[i])
-        return ("program", id, decls, funcs, body)
+        for i in range(0, len(args) - 3):
+            item = args[i]
+            if isinstance(item, VarDeclNode):
+                decls.append(item)
+            elif isinstance(item, FunctionDeclNode):
+                funcs.append(item)
+        return ProgramNode(name=program_pt2, global_decls=decls, functions=funcs, main_body=body)
+
+    """
+    ?program_pt1: PROGRAM
+    ?program_pt2: id SEMICOLON
+    """
+
+    def program_pt1(self, program):
+        self.symbol_table = SymbolTable()
+        return program
+
+    def program_pt2(self, id, semicolon):
+        self.symbol_table.create_global_container(id.name)
+        return id.name
