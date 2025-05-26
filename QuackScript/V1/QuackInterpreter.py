@@ -340,7 +340,7 @@ class QuackInterpreter:
                 self.execute(func)
 
             self.quack_quadruple.update_jump(
-                index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
+                index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index() - 1
             )
 
             self.execute(ir.main_body)

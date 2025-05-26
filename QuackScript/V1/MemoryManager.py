@@ -99,7 +99,6 @@ class Memory:
             start, end = config["address_range"]
             if start <= address <= end:
                 return var_type
-        raise ValueError(f"Address {address} not found in any memory space.")
 
 
 @dataclass
@@ -159,12 +158,21 @@ class MemoryManager:
         self.next_available[space][var_type] += 1
         return addr
 
-    def get_memory(self, space_name: str, index: int):
-        """Get the memory for a specific space and index."""
-        if space_name not in self.memory_spaces:
-            raise KeyError(f"Memory space {space_name} not found.")
-        var_type = self.memory_spaces[space_name].get_var_type_from_address(index)
-        return self.memory_spaces[space_name].get_memory(var_type=var_type, index=index)
+    # def get_memory(self, space_name: str, index: int):
+    #     """Get the memory for a specific space and index."""
+    #     if space_name not in self.memory_spaces:
+    #         raise KeyError(f"Memory space {space_name} not found.")
+    #     var_type = self.memory_spaces[space_name].get_var_type_from_address(index)
+    #     return self.memory_spaces[space_name].get_memory(var_type=var_type,
+    #     index=index)
+
+    def get_memory(self, index: int) -> Union[int, float, str, bool]:
+        """Get the memory for a specific index across all memory spaces."""
+        for space_name, memory in self.memory_spaces.items():
+            var_type = memory.get_var_type_from_address(index)
+            if var_type:
+                return memory.get_memory(var_type=var_type, index=index)
+        raise ValueError(f"Address {index} not found in any memory space.")
 
     def add_memory(self, space_name: str, var_type: str, value: Union[int, float, str, bool]):
         """Add a value to the memory for a specific space and var type."""
@@ -172,11 +180,20 @@ class MemoryManager:
             raise KeyError(f"Memory space {space_name} not found.")
         return self.memory_spaces[space_name].add_memory(var_type=var_type, value=value)
 
-    def set_memory(self, space_name: str, var_type: str, index: int, value: Union[int, float, str, bool]):
-        """Set the memory for a specific space and var type."""
-        if space_name not in self.memory_spaces:
-            raise KeyError(f"Memory space {space_name} not found.")
-        return self.memory_spaces[space_name].set_memory(var_type=var_type, index=index, value=value)
+    # def set_memory(self, space_name: str, var_type: str, index: int, value: Union[int, float, str, bool]):
+    #     """Set the memory for a specific space and var type."""
+    #     if space_name not in self.memory_spaces:
+    #         raise KeyError(f"Memory space {space_name} not found.")
+    #     return self.memory_spaces[space_name].set_memory(var_type=var_type,
+    #     index=index, value=value)
+    def set_memory(self, index: int, value: Union[int, float, str, bool]):
+        """Set the memory for a specific index across all memory spaces."""
+        for space_name, memory in self.memory_spaces.items():
+            var_type = memory.get_var_type_from_address(index)
+            if var_type:
+                memory.set_memory(var_type=var_type, index=index, value=value)
+                return
+        raise ValueError(f"Address {index} not found in any memory space.")
 
     def replace_memory_space(self, space_name: str, new_memory: Memory) -> Memory:
         """Replace an existing memory space with a new Memory object."""
@@ -187,6 +204,14 @@ class MemoryManager:
         current_space = self.memory_spaces[space_name]
         self.memory_spaces[space_name] = new_memory
         return current_space
+
+    def get_var_type_from_address(self, address: int) -> str:
+        """Get the variable type from the address across all memory spaces."""
+        for space_name, memory in self.memory_spaces.items():
+            var_type = memory.get_var_type_from_address(address)
+            if var_type:
+                return var_type
+        raise ValueError(f"Address {address} not found in any memory space.")
 
     def get_str_representation(self) -> str:
         """Return a table-like string representation of the memory manager."""

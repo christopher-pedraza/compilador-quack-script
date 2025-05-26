@@ -29,6 +29,18 @@ class QuackVirtualMachine:
         os.remove(file_name)
         return data
 
+    def display_quads(self):
+        """
+        Displays the quadruples in a readable format.
+        """
+        # Flip the operators dictionary for better readability
+        ops = {v: k for k, v in self.operators.items()}
+
+        for i, quad in enumerate(self.quadruples):
+            op, arg1, arg2, result = quad
+            op_str = ops.get(op, op)
+            print(f"{i}: ({op_str}, {arg1}, {arg2}, {result})")
+
     def process_quadruples(self):
         """
         Processes the quadruples and executes them.
@@ -37,13 +49,32 @@ class QuackVirtualMachine:
         current_pos = 0
         quadruple = (None, None, None, None)
 
+        self.display_quads()
+
         while quadruple[0] != self.operators["end"]:
             quadruple = self.quadruples[current_pos]
             op, arg1, arg2, result = quadruple
-            print((op, arg1, arg2, result))
+            print(f"{current_pos}: {(op, arg1, arg2, result)}")
 
-            if op == self.operators["="]:
-                self.memory_manager.set_memory()
+            if op == self.operators["+"]:
+                value1 = self.memory_manager.get_memory(arg1)
+                value2 = self.memory_manager.get_memory(arg2)
+
+                result_value = value1 + value2
+
+                self.memory_manager.set_memory(index=result, value=result_value)
+
+                print(self.memory_manager)
+
+            elif op == self.operators["print"]:
+                value = self.memory_manager.get_memory(result)
+                print(value)
+
+            if op == self.operators["goto"]:
+                current_pos = result
+
+            # if op == self.operators["="]:
+            #     self.memory_manager.set_memory()
 
             if op == self.operators["end"]:
                 print("End of program.")
@@ -51,7 +82,6 @@ class QuackVirtualMachine:
 
             # Update current index
             current_pos += 1
-            break
 
     def reconstruct_memory(self):
         """ "
@@ -81,9 +111,7 @@ class QuackVirtualMachine:
         constants = self.constant_table.constants
         if constants:
             for address, constant in constants.items():
-                self.memory_manager.set_memory(
-                    space_name="constant", var_type=constant.var_type, value=constant.value, index=address
-                )
+                self.memory_manager.set_memory(index=address, value=constant.value)
 
     def translate_program(self, file_name):
         """
@@ -102,6 +130,8 @@ class QuackVirtualMachine:
         self.global_container_name = data["global_container_name"]
 
         self.reconstruct_memory()
+
+        print(self.memory_manager.get_memory(12000))
 
         self.process_quadruples()
 
