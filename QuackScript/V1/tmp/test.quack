@@ -1,17 +1,69 @@
-// Prueba: Función con parámetros
-program TestParams;
-void sum(a: int, b: int) [
+// Programa ejemplo combinando todas las reglas
+
+program AllInOne;
+const PI: float = 3.14159;
+var radius: float = 2.5;
+var area: float;
+var isPositive: int;
+
+void greet() [
     {
-        print("Sum: ", a + b, "\n");
+        print("\nBienvenido al programa All-In-One!\n\n");
     }
 ];
-void subs(a: int, b: int) [
+
+void calculateArea(r: float) [
+    var temp_area: float;
     {
-        print("Subs: ", a - b, "\n");
+        temp_area = PI * r * r;
+        print("Área calculada:", temp_area, "\n");
     }
 ];
+
+void checkSign(value: int) [
+    {
+        if (value > 0) {
+            print(value, " es positivo.\n");
+        } else {
+            print("No es positivo\n");
+        };
+    }
+];
+
+void countDown(start: int) [
+    {
+        while (start >= 1) do {
+            print(start, "\n");
+            start = start - 1;
+        };
+    }
+];
+
 main {
-    sum(3, 4);
-    subs(3, 4);
+    greet();
+    
+    // Asignar y mostrar área
+    area = PI * radius * radius;
+    print("Área del círculo:", area, "\n");
+
+    // Usar función con parámetro
+    calculateArea(3.0);
+
+    // Condicionales
+    isPositive = 10;
+    if (isPositive != 0) {
+        print("isPositive no es cero.\n");
+    };
+
+    // Más condicionales anidados
+    checkSign(-5);
+    checkSign(0);
+    checkSign(7);
+
+    // Ciclo while
+    countDown(5);
+
+    // Print múltiple
+    print("Fin ", "del ", "programa.\n", "Gracias por usar All-In-One!");
 }
 end

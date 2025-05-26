@@ -8,7 +8,7 @@ var isPositive: int;
 
 void greet() [
     {
-        print("Bienvenido al programa All-In-One!");
+        print("\nBienvenido al programa All-In-One!\n\n");
     }
 ];
 
@@ -16,16 +16,16 @@ void calculateArea(r: float) [
     var temp_area: float;
     {
         temp_area = PI * r * r;
-        print("Área calculada:", temp_area);
+        print("Área calculada:", temp_area, "\n");
     }
 ];
 
 void checkSign(value: int) [
     {
         if (value > 0) {
-            print(value, " es positivo.");
+            print(value, " es positivo.\n");
         } else {
-            print("No es positivo");
+            print("No es positivo\n");
         };
     }
 ];
@@ -33,7 +33,7 @@ void checkSign(value: int) [
 void countDown(start: int) [
     {
         while (start >= 1) do {
-            print(start);
+            print(start, "\n");
             start = start - 1;
         };
     }
@@ -44,7 +44,7 @@ main {
     
     // Asignar y mostrar área
     area = PI * radius * radius;
-    print("Área del círculo:", area);
+    print("Área del círculo:", area, "\n");
 
     // Usar función con parámetro
     calculateArea(3.0);
@@ -52,7 +52,7 @@ main {
     // Condicionales
     isPositive = 10;
     if (isPositive != 0) {
-        print("isPositive no es cero.");
+        print("isPositive no es cero.\n");
     };
 
     // Más condicionales anidados
@@ -64,6 +64,6 @@ main {
     countDown(5);
 
     // Print múltiple
-    print("Fin", "del", "programa.", "Gracias por usar All-In-One!");
+    print("Fin ", "del ", "programa.\n", "Gracias por usar All-In-One!");
 }
 end
