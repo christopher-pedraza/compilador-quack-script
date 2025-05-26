@@ -158,14 +158,6 @@ class MemoryManager:
         self.next_available[space][var_type] += 1
         return addr
 
-    # def get_memory(self, space_name: str, index: int):
-    #     """Get the memory for a specific space and index."""
-    #     if space_name not in self.memory_spaces:
-    #         raise KeyError(f"Memory space {space_name} not found.")
-    #     var_type = self.memory_spaces[space_name].get_var_type_from_address(index)
-    #     return self.memory_spaces[space_name].get_memory(var_type=var_type,
-    #     index=index)
-
     def get_memory(self, index: int) -> Union[int, float, str, bool]:
         """Get the memory for a specific index across all memory spaces."""
         for space_name, memory in self.memory_spaces.items():
@@ -180,12 +172,6 @@ class MemoryManager:
             raise KeyError(f"Memory space {space_name} not found.")
         return self.memory_spaces[space_name].add_memory(var_type=var_type, value=value)
 
-    # def set_memory(self, space_name: str, var_type: str, index: int, value: Union[int, float, str, bool]):
-    #     """Set the memory for a specific space and var type."""
-    #     if space_name not in self.memory_spaces:
-    #         raise KeyError(f"Memory space {space_name} not found.")
-    #     return self.memory_spaces[space_name].set_memory(var_type=var_type,
-    #     index=index, value=value)
     def set_memory(self, index: int, value: Union[int, float, str, bool]):
         """Set the memory for a specific index across all memory spaces."""
         for space_name, memory in self.memory_spaces.items():

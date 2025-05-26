@@ -50,28 +50,72 @@ class QuackVirtualMachine:
         quadruple = (None, None, None, None)
 
         self.display_quads()
+        print("\n\n\n\n")
 
         while quadruple[0] != self.operators["end"]:
             quadruple = self.quadruples[current_pos]
             op, arg1, arg2, result = quadruple
-            print(f"{current_pos}: {(op, arg1, arg2, result)}")
+            # print(f"{current_pos}: {(op, arg1, arg2, result)}")
+
+            value1 = self.memory_manager.get_memory(arg1) if arg1 is not None else None
+            value2 = self.memory_manager.get_memory(arg2) if arg2 is not None else None
 
             if op == self.operators["+"]:
-                value1 = self.memory_manager.get_memory(arg1)
-                value2 = self.memory_manager.get_memory(arg2)
-
                 result_value = value1 + value2
-
                 self.memory_manager.set_memory(index=result, value=result_value)
-
-                print(self.memory_manager)
-
+            elif op == self.operators["-"]:
+                result_value = value1 - value2
+                self.memory_manager.set_memory(index=result, value=result_value)
+            elif op == self.operators["*"]:
+                result_value = value1 * value2
+                self.memory_manager.set_memory(index=result, value=result_value)
+            elif op == self.operators["/"]:
+                if value2 == 0:
+                    print("Error: Division by zero.")
+                    break
+                result_value = value1 / value2
+                self.memory_manager.set_memory(index=result, value=result_value)
+            elif op == self.operators["<"]:
+                result_value = value1 < value2
+                result_value = int(result_value)  # Convert boolean to int
+                self.memory_manager.set_memory(index=result, value=result_value)
+            elif op == self.operators["<="]:
+                result_value = value1 <= value2
+                result_value = int(result_value)
+                self.memory_manager.set_memory(index=result, value=result_value)
+            elif op == self.operators[">"]:
+                result_value = value1 > value2
+                result_value = int(result_value)
+                self.memory_manager.set_memory(index=result, value=result_value)
+            elif op == self.operators[">="]:
+                result_value = value1 >= value2
+                result_value = int(result_value)
+                self.memory_manager.set_memory(index=result, value=result_value)
+            elif op == self.operators["=="]:
+                result_value = value1 == value2
+                result_value = int(result_value)
+                self.memory_manager.set_memory(index=result, value=result_value)
+            elif op == self.operators["and"]:
+                result_value = value1 and value2
+                result_value = int(result_value)
+                self.memory_manager.set_memory(index=result, value=result_value)
+            elif op == self.operators["or"]:
+                result_value = value1 or value2
+                result_value = int(result_value)
+                self.memory_manager.set_memory(index=result, value=result_value)
+            if op == self.operators["goto"]:
+                current_pos = result
+            elif op == self.operators["gotoF"]:
+                if not bool(value1):
+                    current_pos = result
+            elif op == self.operators["gotoT"]:
+                if bool(value1):
+                    current_pos = result
+            elif op == self.operators["="]:
+                self.memory_manager.set_memory(index=result, value=value1)
             elif op == self.operators["print"]:
                 value = self.memory_manager.get_memory(result)
                 print(value)
-
-            if op == self.operators["goto"]:
-                current_pos = result
 
             # if op == self.operators["="]:
             #     self.memory_manager.set_memory()
