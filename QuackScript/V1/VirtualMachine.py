@@ -1,6 +1,6 @@
 import pickle
 import os
-from MemoryManager import MemoryManager
+from MemoryManager import MemoryManager, Memory
 
 
 class QuackVirtualMachine:
@@ -21,6 +21,7 @@ class QuackVirtualMachine:
         self.constant_table = None
         self.functions = None
         self.global_container_name = None
+        self.sleeping_stack = []
 
     def read_and_delete_object_files(self, file_name):
         # print(f"Reading object file: {file_name}")
@@ -33,7 +34,6 @@ class QuackVirtualMachine:
         """
         Displays the quadruples in a readable format.
         """
-        # Flip the operators dictionary for better readability
         ops = {v: k for k, v in self.operators.items()}
 
         for i, quad in enumerate(self.quadruples):
@@ -41,16 +41,72 @@ class QuackVirtualMachine:
             op_str = ops.get(op, op)
             print(f"{i}: ({op_str}, {arg1}, {arg2}, {result})")
 
+    def swap_local_memory(self, local_memory: Memory = None):
+        if "local" in self.memory_manager.memory_spaces:
+            if local_memory is None:
+                local_memory = Memory(
+                    mapping={
+                        "int": ((7000, 7999), 0),
+                        "float": ((8000, 8999), 0),
+                        "t_int": ((9000, 9999), 0),
+                        "t_float": ((10000, 10999), 0),
+                        "t_bool": ((11000, 11999), 0),
+                    }
+                )
+
+            previous_local = self.memory_manager.replace_memory_space(space_name="local", new_memory=local_memory)
+            return previous_local
+        else:
+            (
+                self.memory_manager.add_memory_space(
+                    space_name="local",
+                    mapping={
+                        "int": ((7000, 7999), 0),
+                        "float": ((8000, 8999), 0),
+                        "t_int": ((9000, 9999), 0),
+                        "t_float": ((10000, 10999), 0),
+                        "t_bool": ((11000, 11999), 0),
+                    },
+                ),
+            )
+
+            return None
+
     def process_quadruples(self):
         """
         Processes the quadruples and executes them.
         This method should be implemented to handle the execution logic.
         """
         current_pos = 0
+        go_back_stack = []
         quadruple = (None, None, None, None)
 
         self.display_quads()
         print("\n\n\n\n")
+
+        # Assign operator values to local variables for match-case
+        op_add = self.operators["+"]
+        op_sub = self.operators["-"]
+        op_mul = self.operators["*"]
+        op_div = self.operators["/"]
+        op_lt = self.operators["<"]
+        op_lte = self.operators["<="]
+        op_gt = self.operators[">"]
+        op_gte = self.operators[">="]
+        op_eq = self.operators["=="]
+        op_and = self.operators["and"]
+        op_or = self.operators["or"]
+        op_goto = self.operators["goto"]
+        op_gotoF = self.operators["gotoF"]
+        op_gotoT = self.operators["gotoT"]
+        op_assign = self.operators["="]
+        op_print = self.operators["print"]
+        op_era = self.operators["era"]
+        op_param = self.operators["param"]
+        op_gosub = self.operators["gosub"]
+        op_return = self.operators["return"]
+        op_endFunc = self.operators["endFunc"]
+        op_end = self.operators["end"]
 
         while quadruple[0] != self.operators["end"]:
             quadruple = self.quadruples[current_pos]
@@ -60,69 +116,131 @@ class QuackVirtualMachine:
             value1 = self.memory_manager.get_memory(arg1) if arg1 is not None else None
             value2 = self.memory_manager.get_memory(arg2) if arg2 is not None else None
 
-            if op == self.operators["+"]:
-                result_value = value1 + value2
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators["-"]:
-                result_value = value1 - value2
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators["*"]:
-                result_value = value1 * value2
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators["/"]:
-                if value2 == 0:
-                    print("Error: Division by zero.")
+            match op:
+                case _ if op == op_add:
+                    result_value = value1 + value2
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_sub:
+                    result_value = value1 - value2
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_mul:
+                    result_value = value1 * value2
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_div:
+                    if value2 == 0:
+                        print("Error: Division by zero.")
+                        break
+                    result_value = value1 / value2
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_lt:
+                    result_value = int(value1 < value2)
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_lte:
+                    result_value = int(value1 <= value2)
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_gt:
+                    result_value = int(value1 > value2)
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_gte:
+                    result_value = int(value1 >= value2)
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_eq:
+                    result_value = int(value1 == value2)
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_and:
+                    result_value = int(value1 and value2)
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_or:
+                    result_value = int(value1 or value2)
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_goto:
+                    current_pos = result
+                    continue
+
+                case _ if op == op_gotoF:
+                    if not bool(value1):
+                        current_pos = result
+                        continue
+
+                case _ if op == op_gotoT:
+                    if bool(value1):
+                        current_pos = result
+                        continue
+
+                case _ if op == op_assign:
+                    self.memory_manager.set_memory(index=result, value=value1)
+
+                case _ if op == op_print:
+                    value = self.memory_manager.get_memory(result)
+                    if isinstance(value, str):
+                        print(value.encode().decode("unicode_escape"), end="")
+                    else:
+                        print(value, end="")
+
+                case _ if op == op_era:
+                    required_space = self.functions[result].required_space
+
+                    new_local_memory = (
+                        Memory(
+                            mapping={
+                                "int": ((7000, 7999), required_space.get("int", 0)),
+                                "float": ((8000, 8999), required_space.get("float", 0)),
+                                "t_int": ((9000, 9999), required_space.get("t_int", 0)),
+                                "t_float": ((10000, 10999), required_space.get("t_float", 0)),
+                                "t_bool": ((11000, 11999), required_space.get("t_bool", 0)),
+                            }
+                        ),
+                    )
+
+                    prev_local_memory = self.swap_local_memory(new_local_memory)
+                    if prev_local_memory:
+                        self.sleeping_stack.append(prev_local_memory)
+
+                case _ if op == op_param:
+                    self.memory_manager.set_memory(index=result, value=value1)
+
+                case _ if op == op_gosub:
+                    # Save the next position to return to it later
+                    go_back_stack.append(current_pos + 1)
+                    # Set the new position to the function's start
+                    current_pos = self.functions[result].initial_position
+                    continue
+
+                case _ if op == op_return:
+                    return_address = self.functions[result].return_address
+                    return_value = self.memory_manager.get_memory(result)
+                    return_type = self.memory_manager.get_var_type_from_address(result)
+                    if return_address is not None:
+                        # If the return address is specified, set the return value in the global memory
+                        self.memory_manager.set_memory(index=return_address, value=return_value)
+                    else:
+                        self.memory_manager.add_memory(space_name="global", var_type=return_type, value=return_value)
+
+                case _ if op == op_endFunc:
+                    # Restore the previous local memory
+                    if self.sleeping_stack:
+                        previous_local_memory = self.sleeping_stack.pop()
+                        self.swap_local_memory(previous_local_memory)
+                    else:
+                        self.swap_local_memory()
+
+                    current_pos = go_back_stack.pop() if go_back_stack else 0
+                    continue
+
+                case _ if op == op_end:
+                    print("\n\n\n\nEnd of program.")
                     break
-                result_value = value1 / value2
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators["<"]:
-                result_value = value1 < value2
-                result_value = int(result_value)  # Convert boolean to int
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators["<="]:
-                result_value = value1 <= value2
-                result_value = int(result_value)
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators[">"]:
-                result_value = value1 > value2
-                result_value = int(result_value)
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators[">="]:
-                result_value = value1 >= value2
-                result_value = int(result_value)
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators["=="]:
-                result_value = value1 == value2
-                result_value = int(result_value)
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators["and"]:
-                result_value = value1 and value2
-                result_value = int(result_value)
-                self.memory_manager.set_memory(index=result, value=result_value)
-            elif op == self.operators["or"]:
-                result_value = value1 or value2
-                result_value = int(result_value)
-                self.memory_manager.set_memory(index=result, value=result_value)
-            if op == self.operators["goto"]:
-                current_pos = result
-            elif op == self.operators["gotoF"]:
-                if not bool(value1):
-                    current_pos = result
-            elif op == self.operators["gotoT"]:
-                if bool(value1):
-                    current_pos = result
-            elif op == self.operators["="]:
-                self.memory_manager.set_memory(index=result, value=value1)
-            elif op == self.operators["print"]:
-                value = self.memory_manager.get_memory(result)
-                print(value)
-
-            # if op == self.operators["="]:
-            #     self.memory_manager.set_memory()
-
-            if op == self.operators["end"]:
-                print("End of program.")
-                break
 
             # Update current index
             current_pos += 1
@@ -174,8 +292,6 @@ class QuackVirtualMachine:
         self.global_container_name = data["global_container_name"]
 
         self.reconstruct_memory()
-
-        print(self.memory_manager.get_memory(12000))
 
         self.process_quadruples()
 

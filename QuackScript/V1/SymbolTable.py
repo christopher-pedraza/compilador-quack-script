@@ -37,6 +37,7 @@ class Container:
     def __init__(self, name, return_type: Literal["int", "float", None]):
         self.name = name
         self.return_type = return_type
+        self.return_address = None
         self.initial_position = None
         self.symbols = {}
         self.param_signature = []
@@ -213,6 +214,7 @@ class SymbolTable:
         # Global container
         gcontainer = self.containers.get(self.global_container_name)
         lines.append(f"Global Container: {self.global_container_name}")
+        lines.append(f"Initial Position: {gcontainer.initial_position if gcontainer else 'N/A'}")
         if gcontainer and gcontainer.symbols:
             lines.append(f"{'Name':<15} {'Type':<10} {'Const':<6} {'Address':<10}")
             for symbol in gcontainer.symbols.values():
@@ -233,6 +235,9 @@ class SymbolTable:
             if cname == self.global_container_name:
                 continue
             lines.append(f"Container: {cname}")
+            lines.append(
+                f"Initial Position: {container.initial_position if container.initial_position is not None else 'N/A'}"
+            )
             lines.append(f"Return Type: {container.return_type}")
             # Symbols
             lines.append(f"{'Name':<15} {'Type':<10} {'Const':<6} {'Address':<10}")
