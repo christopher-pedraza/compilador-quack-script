@@ -30,6 +30,8 @@ from TransformerClasses import (
     ParamNode,
 )
 
+from MemoryManager import Memory
+
 
 class QuackInterpreter:
     def __init__(self, symbol_table, quack_quadruple, memory_manager):
@@ -44,6 +46,19 @@ class QuackInterpreter:
     def __process_func_call(self, func_call):
         func_name = func_call.name.name
         func_args = func_call.args
+
+        old_memory = self.memory_manager.replace_memory_space(
+            "local",
+            Memory(
+                mapping={
+                    "int": ((7000, 7999), 0),
+                    "float": ((8000, 8999), 0),
+                    "t_int": ((9000, 9999), 0),
+                    "t_float": ((10000, 10999), 0),
+                    "t_bool": ((11000, 11999), 0),
+                }
+            ),
+        )
 
         self.quack_quadruple.add_quadruple("era", None, None, func_name)
 
@@ -72,6 +87,8 @@ class QuackInterpreter:
         self.quack_quadruple.add_quadruple("gosub", None, None, func_name)
 
         return_type = self.symbol_table.get_return_type(func_name)
+
+        self.memory_manager.replace_memory_space("local", old_memory)
 
         return return_type
 
@@ -291,6 +308,19 @@ class QuackInterpreter:
             self.current_container = func_name
             self.current_memory_space = "local"
 
+            old_memory = self.memory_manager.replace_memory_space(
+                "local",
+                Memory(
+                    mapping={
+                        "int": ((7000, 7999), 0),
+                        "float": ((8000, 8999), 0),
+                        "t_int": ((9000, 9999), 0),
+                        "t_float": ((10000, 10999), 0),
+                        "t_bool": ((11000, 11999), 0),
+                    }
+                ),
+            )
+
             self.symbol_table.add_function(name=func_name, return_type=func_return_type)
 
             starting_index = self.quack_quadruple.get_current_index()
@@ -309,8 +339,9 @@ class QuackInterpreter:
 
             self.current_container = self.global_container_name
             self.current_memory_space = "global"
-            self.memory_manager.reset_local_temp_memory()
             self.symbol_table.get_function(func_name).clear()
+
+            self.memory_manager.replace_memory_space("local", old_memory)
 
         ###################################################################################
         elif isinstance(ir, ParamNode):

@@ -17,6 +17,7 @@ from typing import Union, List, Optional, Literal, Dict, Tuple
 @dataclass
 class Memory:
     memory: Dict
+    next_available: Dict[str, int]
 
     def __init__(self, mapping: Dict[str, Tuple[Tuple[int, int], Optional[int]]]):
         """
@@ -25,6 +26,7 @@ class Memory:
         and values are the amount to allocate (int) or None (do not allocate).
         """
         self.memory = {}
+        self.next_available = {}
         for var_type, config in mapping.items():
             addres_range, amount = config
 
@@ -32,6 +34,7 @@ class Memory:
                 self.memory[var_type] = {}
 
             self.memory[var_type]["address_range"] = addres_range
+            self.next_available[var_type] = addres_range[0]
 
             if amount is not None:
                 if not isinstance(amount, int) or amount < 0:
@@ -100,13 +103,27 @@ class Memory:
             if start <= address <= end:
                 return var_type
 
+    def get_first_available_address(self, var_type: str) -> int:
+        """
+        Returns the first available address for the given var_type, and increments the counter.
+        Does not store anything in memory.
+        """
+        if var_type not in self.next_available:
+            raise ValueError(f"No such var_type: {var_type}")
+        addr = self.next_available[var_type]
+        end_addr = self.memory[var_type]["address_range"][1]
+        if addr > end_addr:
+            raise MemoryError(f"No available addresses left for type {var_type}.")
+        self.next_available[var_type] += 1
+        return addr
+
 
 @dataclass
 class MemoryManager:
     memory_spaces: Dict[str, Memory]
 
     def __init__(self, mappings: Dict[str, Dict[str, Tuple[Tuple[int, int], Optional[int]]]] = None):
-        self.memory_spaces = {}  # Ensure this is initialized before use
+        self.memory_spaces = {}
         if mappings is None:
             mappings = {
                 "global": {
@@ -129,11 +146,8 @@ class MemoryManager:
                     "str": ((14000, 14999), None),
                 },
             }
-        self.next_available = {s: {} for s in ["global", "local", "constant"]}
         for space_name, mapping in mappings.items():
             self.add_memory_space(space_name=space_name, mapping=mapping)
-            for var_type, (addr_range, _) in mapping.items():
-                self.next_available[space_name][var_type] = addr_range[0]
 
     def add_memory_space(self, space_name: str, mapping: Dict[str, Tuple[Tuple[int, int], Optional[int]]]):
         """
@@ -149,14 +163,9 @@ class MemoryManager:
         Returns the first available address for the given space and var_type, and increments the counter.
         Does not store anything in memory.
         """
-        if space not in self.next_available or var_type not in self.next_available[space]:
-            raise ValueError(f"No such space/var_type: {space}/{var_type}")
-        addr = self.next_available[space][var_type]
-        end_addr = self.memory_spaces[space].memory[var_type]["address_range"][1]
-        if addr > end_addr:
-            raise MemoryError(f"No available addresses left in {space} for type {var_type}.")
-        self.next_available[space][var_type] += 1
-        return addr
+        if space not in self.memory_spaces:
+            raise ValueError(f"No such space: {space}")
+        return self.memory_spaces[space].get_first_available_address(var_type)
 
     def get_memory(self, index: int) -> Union[int, float, str, bool]:
         """Get the memory for a specific index across all memory spaces."""
@@ -215,9 +224,10 @@ class MemoryManager:
 
     def reset_local_temp_memory(self):
         """Reset the temporary memory spaces."""
-        for var_type in self.memory_spaces["local"].memory:
-            start = self.memory_spaces["local"].memory[var_type]["address_range"][0]
-            self.next_available["local"][var_type] = start
+        if "local" in self.memory_spaces:
+            for var_type in self.memory_spaces["local"].memory:
+                start = self.memory_spaces["local"].memory[var_type]["address_range"][0]
+                self.memory_spaces["local"].next_available[var_type] = start
 
 
 if __name__ == "__main__":

@@ -81,8 +81,8 @@ class QuackVirtualMachine:
         go_back_stack = []
         quadruple = (None, None, None, None)
 
-        self.display_quads()
-        print("\n\n\n\n")
+        # self.display_quads()
+        # print("\n\n\n\n")
 
         # Assign operator values to local variables for match-case
         op_add = self.operators["+"]
@@ -111,7 +111,8 @@ class QuackVirtualMachine:
         while quadruple[0] != self.operators["end"]:
             quadruple = self.quadruples[current_pos]
             op, arg1, arg2, result = quadruple
-            # print(f"{current_pos}: {(op, arg1, arg2, result)}")
+
+            # print(f"Executing quadruple: {quadruple}")
 
             value1, value2 = arg1, arg2
             if arg1 is not None and isinstance(arg1, int):
@@ -182,9 +183,7 @@ class QuackVirtualMachine:
                         continue
 
                 case _ if op == op_assign:
-                    print(f"Assigning {value1} to {result}")
                     self.memory_manager.set_memory(index=result, value=value1)
-                    print(f"Memory after assignment: {self.memory_manager}")
 
                 case _ if op == op_print:
                     value = self.memory_manager.get_memory(result)
@@ -196,16 +195,14 @@ class QuackVirtualMachine:
                 case _ if op == op_era:
                     required_space = self.functions[result].required_space
 
-                    new_local_memory = (
-                        Memory(
-                            mapping={
-                                "int": ((7000, 7999), required_space.get("int", 0)),
-                                "float": ((8000, 8999), required_space.get("float", 0)),
-                                "t_int": ((9000, 9999), required_space.get("t_int", 0)),
-                                "t_float": ((10000, 10999), required_space.get("t_float", 0)),
-                                "t_bool": ((11000, 11999), required_space.get("t_bool", 0)),
-                            }
-                        ),
+                    new_local_memory = Memory(
+                        mapping={
+                            "int": ((7000, 7999), required_space.get("int", 0)),
+                            "float": ((8000, 8999), required_space.get("float", 0)),
+                            "t_int": ((9000, 9999), required_space.get("t_int", 0)),
+                            "t_float": ((10000, 10999), required_space.get("t_float", 0)),
+                            "t_bool": ((11000, 11999), required_space.get("t_bool", 0)),
+                        }
                     )
 
                     prev_local_memory = self.swap_local_memory(new_local_memory)
@@ -223,13 +220,9 @@ class QuackVirtualMachine:
                     continue
 
                 case _ if op == op_return:
-                    print("Error 1", self.functions[value1])
                     return_address = self.functions[value1].return_address
-                    print("Error 2", return_address)
                     return_value = self.memory_manager.get_memory(result)
-                    print("Error 3")
                     return_type = self.memory_manager.get_var_type_from_address(result)
-                    print("Error 4")
                     if return_address is not None:
                         # If the return address is specified, set the return value in the global memory
                         self.memory_manager.set_memory(index=return_address, value=return_value)
@@ -248,7 +241,6 @@ class QuackVirtualMachine:
                     continue
 
                 case _ if op == op_end:
-                    print("\n\n\n\nEnd of program.")
                     break
 
             # Update current index
