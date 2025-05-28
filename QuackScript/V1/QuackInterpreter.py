@@ -315,6 +315,7 @@ class QuackInterpreter:
             self.symbol_table.add_function(name=func_name, return_type=func_return_type)
 
             starting_index = self.quack_quadruple.get_current_index()
+            self.symbol_table.get_function(func_name).initial_position = starting_index
 
             for param in func_params:
                 self.execute(param)
@@ -325,8 +326,6 @@ class QuackInterpreter:
             self.execute(func_body)
 
             self.quack_quadruple.add_quadruple("endFunc", None, None, None)
-
-            self.symbol_table.get_function(func_name).initial_position = starting_index
 
             self.current_container = self.global_container_name
             self.current_memory_space = "global"
@@ -349,7 +348,6 @@ class QuackInterpreter:
                 containerName=self.current_container,
                 address=address,
             )
-            # self.quack_quadruple.add_quadruple("=", None, None, address)
 
         ###################################################################################
         elif isinstance(ir, FuncCallNode):
