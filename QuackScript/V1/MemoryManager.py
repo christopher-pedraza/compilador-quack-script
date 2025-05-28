@@ -1,17 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, List, Optional, Literal, Dict, Tuple
-
-
-# @dataclass
-# class MemoryAddress:
-#     address: int
-#     var_type: Literal["int", "float", "str", "bool"]
-
-#     def __post_init__(self):
-#         if not isinstance(self.address, int):
-#             raise TypeError(f"Invalid type for address: {type(self.address)}. Must be int.")
-#         if self.var_type not in ["int", "float", "str", "bool"]:
-#             raise ValueError(f"Invalid type: {self.var_type}. Must be 'int', 'float', 'str', or 'bool'.")
+from typing import Union, Optional, Dict, Tuple
 
 
 @dataclass
@@ -131,19 +119,17 @@ class MemoryManager:
                     "float": ((2000, 2999), None),
                     "t_int": ((3000, 3999), None),
                     "t_float": ((4000, 4999), None),
-                    "t_bool": ((5000, 6999), None),
                 },
                 "local": {
-                    "int": ((7000, 7999), None),
-                    "float": ((8000, 8999), None),
-                    "t_int": ((9000, 9999), None),
-                    "t_float": ((10000, 10999), None),
-                    "t_bool": ((11000, 11999), None),
+                    "int": ((5000, 5999), None),
+                    "float": ((6000, 6999), None),
+                    "t_int": ((7000, 7999), None),
+                    "t_float": ((8000, 8999), None),
                 },
                 "constant": {
-                    "int": ((12000, 12999), None),
-                    "float": ((13000, 13999), None),
-                    "str": ((14000, 14999), None),
+                    "int": ((9000, 9999), None),
+                    "float": ((10000, 10999), None),
+                    "str": ((11000, 11999), None),
                 },
             }
         for space_name, mapping in mappings.items():

@@ -1,12 +1,14 @@
 import logging
-import sys
 import os
-from lark import Lark, logger, UnexpectedInput
-from QuackTransformer import QuackTransformer
+import pickle
+import sys
+
+from lark import Lark, UnexpectedInput, logger
+
+from MemoryManager import MemoryManager
 from QuackInterpreter import QuackInterpreter
 from QuackQuadruple import QuackQuadruple
-from MemoryManager import MemoryManager
-import pickle
+from QuackTransformer import QuackTransformer
 
 logger.setLevel(logging.DEBUG)
 
@@ -32,7 +34,6 @@ def generate_obj_file(quadruples, symbol_table, output_file):
     }
     with open(output_file, "wb") as f:
         pickle.dump(data, f)
-    # print(f"Object file generated: {output_file}")
 
 
 def parse_program(program):

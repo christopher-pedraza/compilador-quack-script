@@ -1,36 +1,32 @@
-from SemanticCube import SemanticCube
-
 from Exceptions import (
-    UnsupportedOperationError,
-    DivisionByZeroError,
     TypeMismatchError,
     UnknownIRTypeError,
+    UnsupportedOperationError,
 )
-
+from MemoryManager import Memory
+from SemanticCube import SemanticCube
 from TransformerClasses import (
-    IdNode,
-    CteNumNode,
-    CteStringNode,
     ArithmeticOpNode,
-    MultiplicativeOpNode,
-    ComparisonNode,
-    LogicalAndNode,
-    LogicalOrNode,
     AssignNode,
     BodyNode,
-    PrintNode,
-    WhileNode,
-    IfNode,
-    IfElseNode,
-    VarDeclNode,
-    FunctionDeclNode,
+    ComparisonNode,
+    CteNumNode,
+    CteStringNode,
     FuncCallNode,
+    FunctionDeclNode,
+    IdNode,
+    IfElseNode,
+    IfNode,
+    LogicalAndNode,
+    LogicalOrNode,
+    MultiplicativeOpNode,
+    ParamNode,
+    PrintNode,
     ProgramNode,
     ReturnNode,
-    ParamNode,
+    VarDeclNode,
+    WhileNode,
 )
-
-from MemoryManager import Memory
 
 
 class QuackInterpreter:
@@ -51,11 +47,10 @@ class QuackInterpreter:
             "local",
             Memory(
                 mapping={
-                    "int": ((7000, 7999), 0),
-                    "float": ((8000, 8999), 0),
-                    "t_int": ((9000, 9999), 0),
-                    "t_float": ((10000, 10999), 0),
-                    "t_bool": ((11000, 11999), 0),
+                    "int": ((5000, 5999), 0),
+                    "float": ((6000, 6999), 0),
+                    "t_int": ((7000, 7999), 0),
+                    "t_float": ((8000, 8999), 0),
                 }
             ),
         )
@@ -170,9 +165,6 @@ class QuackInterpreter:
                 raise UnsupportedOperationError(
                     f"Unsupported operation '{expr_tree.op}' for types '{left_type}' and '{right_type}'"
                 )
-
-            if expr_tree.op == "/" and right_value == 0:
-                raise DivisionByZeroError("Division by zero is not allowed.")
 
             func_address = self.memory_manager.get_first_available_address(
                 var_type=f"t_{result_type}",
@@ -312,11 +304,10 @@ class QuackInterpreter:
                 "local",
                 Memory(
                     mapping={
-                        "int": ((7000, 7999), 0),
-                        "float": ((8000, 8999), 0),
-                        "t_int": ((9000, 9999), 0),
-                        "t_float": ((10000, 10999), 0),
-                        "t_bool": ((11000, 11999), 0),
+                        "int": ((5000, 5999), 0),
+                        "float": ((6000, 6999), 0),
+                        "t_int": ((7000, 7999), 0),
+                        "t_float": ((8000, 8999), 0),
                     }
                 ),
             )

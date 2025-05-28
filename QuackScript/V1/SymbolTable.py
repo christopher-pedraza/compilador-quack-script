@@ -1,16 +1,12 @@
-from Exceptions import (
-    SymbolRedeclarationError,
-    ParameterRedeclarationError,
-    ParameterMismatchError,
-    InvalidParameterIndexError,
-    NameNotFoundError,
-    CannotModifyConstantError,
-    ContainerRedeclarationError,
-    ReservedWordError,
-)
-
 from dataclasses import dataclass
-from typing import Union, Literal
+from typing import Literal, Union
+
+from Exceptions import (
+    ContainerRedeclarationError,
+    NameNotFoundError,
+    ReservedWordError,
+    SymbolRedeclarationError,
+)
 
 
 @dataclass
@@ -58,6 +54,7 @@ class Container:
             "print",
             "and",
             "or",
+            "return",
         ]
 
     def add_symbol(self, symbol: Symbol) -> None:

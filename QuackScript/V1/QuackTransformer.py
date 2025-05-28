@@ -1,28 +1,28 @@
-from lark import Lark, Transformer, v_args, Tree, Token
+from lark import Transformer, v_args
+
 from SymbolTable import SymbolTable
 from TransformerClasses import (
-    IdNode,
-    CteNumNode,
-    CteStringNode,
     ArithmeticOpNode,
-    UnaryOpNode,
-    MultiplicativeOpNode,
-    ComparisonNode,
-    LogicalAndNode,
-    LogicalOrNode,
     AssignNode,
     BodyNode,
-    PrintNode,
-    WhileNode,
-    IfNode,
-    IfElseNode,
-    VarDeclNode,
-    ParamsNode,
-    ParamNode,
-    FunctionDeclNode,
+    ComparisonNode,
+    CteNumNode,
+    CteStringNode,
     FuncCallNode,
+    FunctionDeclNode,
+    IdNode,
+    IfElseNode,
+    IfNode,
+    LogicalAndNode,
+    LogicalOrNode,
+    MultiplicativeOpNode,
+    ParamNode,
+    ParamsNode,
+    PrintNode,
     ProgramNode,
     ReturnNode,
+    VarDeclNode,
+    WhileNode,
 )
 
 

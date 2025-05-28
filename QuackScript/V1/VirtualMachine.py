@@ -46,11 +46,10 @@ class QuackVirtualMachine:
             if local_memory is None:
                 local_memory = Memory(
                     mapping={
-                        "int": ((7000, 7999), 0),
-                        "float": ((8000, 8999), 0),
-                        "t_int": ((9000, 9999), 0),
-                        "t_float": ((10000, 10999), 0),
-                        "t_bool": ((11000, 11999), 0),
+                        "int": ((5000, 5999), 0),
+                        "float": ((6000, 6999), 0),
+                        "t_int": ((7000, 7999), 0),
+                        "t_float": ((8000, 8999), 0),
                     }
                 )
 
@@ -61,11 +60,10 @@ class QuackVirtualMachine:
                 self.memory_manager.add_memory_space(
                     space_name="local",
                     mapping={
-                        "int": ((7000, 7999), 0),
-                        "float": ((8000, 8999), 0),
-                        "t_int": ((9000, 9999), 0),
-                        "t_float": ((10000, 10999), 0),
-                        "t_bool": ((11000, 11999), 0),
+                        "int": ((5000, 5999), 0),
+                        "float": ((6000, 6999), 0),
+                        "t_int": ((7000, 7999), 0),
+                        "t_float": ((8000, 8999), 0),
                     },
                 ),
             )
@@ -80,9 +78,6 @@ class QuackVirtualMachine:
         current_pos = 0
         go_back_stack = []
         quadruple = (None, None, None, None)
-
-        # self.display_quads()
-        # print("\n\n\n\n")
 
         # Assign operator values to local variables for match-case
         op_add = self.operators["+"]
@@ -112,60 +107,57 @@ class QuackVirtualMachine:
             quadruple = self.quadruples[current_pos]
             op, arg1, arg2, result = quadruple
 
-            # print(f"Executing quadruple: {quadruple}")
-
-            value1, value2 = arg1, arg2
             if arg1 is not None and isinstance(arg1, int):
-                value1 = self.memory_manager.get_memory(arg1)
+                arg1 = self.memory_manager.get_memory(arg1)
             if arg2 is not None and isinstance(arg2, int):
-                value2 = self.memory_manager.get_memory(arg2)
+                arg2 = self.memory_manager.get_memory(arg2)
 
             match op:
                 case _ if op == op_add:
-                    result_value = value1 + value2
+                    result_value = arg1 + arg2
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_sub:
-                    result_value = value1 - value2
+                    result_value = arg1 - arg2
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_mul:
-                    result_value = value1 * value2
+                    result_value = arg1 * arg2
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_div:
-                    if value2 == 0:
+                    if arg2 == 0:
                         print("Error: Division by zero.")
                         break
-                    result_value = value1 / value2
+                    result_value = arg1 / arg2
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_lt:
-                    result_value = int(value1 < value2)
+                    result_value = int(arg1 < arg2)
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_lte:
-                    result_value = int(value1 <= value2)
+                    result_value = int(arg1 <= arg2)
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_gt:
-                    result_value = int(value1 > value2)
+                    result_value = int(arg1 > arg2)
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_gte:
-                    result_value = int(value1 >= value2)
+                    result_value = int(arg1 >= arg2)
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_eq:
-                    result_value = int(value1 == value2)
+                    result_value = int(arg1 == arg2)
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_and:
-                    result_value = int(value1 and value2)
+                    result_value = int(arg1 and arg2)
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_or:
-                    result_value = int(value1 or value2)
+                    result_value = int(arg1 or arg2)
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_goto:
@@ -173,17 +165,17 @@ class QuackVirtualMachine:
                     continue
 
                 case _ if op == op_gotoF:
-                    if not bool(value1):
+                    if not bool(arg1):
                         current_pos = result
                         continue
 
                 case _ if op == op_gotoT:
-                    if bool(value1):
+                    if bool(arg1):
                         current_pos = result
                         continue
 
                 case _ if op == op_assign:
-                    self.memory_manager.set_memory(index=result, value=value1)
+                    self.memory_manager.set_memory(index=result, value=arg1)
 
                 case _ if op == op_print:
                     value = self.memory_manager.get_memory(result)
@@ -197,11 +189,10 @@ class QuackVirtualMachine:
 
                     new_local_memory = Memory(
                         mapping={
-                            "int": ((7000, 7999), required_space.get("int", 0)),
-                            "float": ((8000, 8999), required_space.get("float", 0)),
-                            "t_int": ((9000, 9999), required_space.get("t_int", 0)),
-                            "t_float": ((10000, 10999), required_space.get("t_float", 0)),
-                            "t_bool": ((11000, 11999), required_space.get("t_bool", 0)),
+                            "int": ((5000, 5999), required_space.get("int", 0)),
+                            "float": ((6000, 6999), required_space.get("float", 0)),
+                            "t_int": ((7000, 7999), required_space.get("t_int", 0)),
+                            "t_float": ((8000, 8999), required_space.get("t_float", 0)),
                         }
                     )
 
@@ -210,7 +201,7 @@ class QuackVirtualMachine:
                         self.sleeping_stack.append(prev_local_memory)
 
                 case _ if op == op_param:
-                    self.memory_manager.set_memory(index=result, value=value1)
+                    self.memory_manager.set_memory(index=result, value=arg1)
 
                 case _ if op == op_gosub:
                     # Save the next position to return to it later
@@ -220,7 +211,7 @@ class QuackVirtualMachine:
                     continue
 
                 case _ if op == op_return:
-                    return_address = self.functions[value1].return_address
+                    return_address = self.functions[arg1].return_address
                     return_value = self.memory_manager.get_memory(result)
                     return_type = self.memory_manager.get_var_type_from_address(result)
                     if return_address is not None:
@@ -247,7 +238,7 @@ class QuackVirtualMachine:
             current_pos += 1
 
     def reconstruct_memory(self):
-        """ "
+        """
         Reconstructs the memory manager and constant table.
         """
         constants_required_space = self.constant_table.required_space
@@ -260,12 +251,11 @@ class QuackVirtualMachine:
                     "float": ((2000, 2999), global_required_space.get("float", 0)),
                     "t_int": ((3000, 3999), global_required_space.get("t_int", 0)),
                     "t_float": ((4000, 4999), global_required_space.get("t_float", 0)),
-                    "t_bool": ((5000, 6999), global_required_space.get("t_bool", 0)),
                 },
                 "constant": {
-                    "int": ((12000, 12999), constants_required_space.get("int", 0)),
-                    "float": ((13000, 13999), constants_required_space.get("float", 0)),
-                    "str": ((14000, 14999), constants_required_space.get("str", 0)),
+                    "int": ((9000, 9999), constants_required_space.get("int", 0)),
+                    "float": ((10000, 10999), constants_required_space.get("float", 0)),
+                    "str": ((11000, 11999), constants_required_space.get("str", 0)),
                 },
             }
         )
