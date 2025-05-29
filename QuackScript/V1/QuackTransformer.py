@@ -1,28 +1,28 @@
-from lark import Lark, Transformer, v_args, Tree, Token
+from lark import Transformer, v_args
+
 from SymbolTable import SymbolTable
 from TransformerClasses import (
-    IdNode,
-    CteNumNode,
-    CteStringNode,
     ArithmeticOpNode,
-    UnaryOpNode,
-    MultiplicativeOpNode,
-    ComparisonNode,
-    LogicalAndNode,
-    LogicalOrNode,
     AssignNode,
     BodyNode,
-    PrintNode,
-    WhileNode,
-    IfNode,
-    IfElseNode,
-    VarDeclNode,
-    ParamsNode,
-    ParamNode,
-    FunctionDeclNode,
+    ComparisonNode,
+    CteNumNode,
+    CteStringNode,
     FuncCallNode,
+    FunctionDeclNode,
+    IdNode,
+    IfElseNode,
+    IfNode,
+    LogicalAndNode,
+    LogicalOrNode,
+    MultiplicativeOpNode,
+    ParamNode,
+    ParamsNode,
+    PrintNode,
     ProgramNode,
     ReturnNode,
+    VarDeclNode,
+    WhileNode,
 )
 
 
@@ -230,9 +230,9 @@ class QuackTransformer(Transformer):
 
     def var_multi_decl_no_assign(self, var, id, *args):
         ids = [id]
-        for i in range(0, len(args) - 1, 2):
-            ids.append(args[i - 1])
-        return VarDeclNode(names=ids, var_type=args[-1], isConstant=False)
+        for i in range(1, len(args) - 3, 2):
+            ids.append(args[i])
+        return VarDeclNode(names=ids, var_type=args[-2], isConstant=False)
 
     def var_multi_decl_assign(self, var, id, *args):
         ids = [id]

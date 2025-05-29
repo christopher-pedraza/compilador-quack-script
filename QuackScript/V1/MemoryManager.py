@@ -1,17 +1,5 @@
 from dataclasses import dataclass
-from typing import Union, List, Optional, Literal, Dict, Tuple
-
-
-# @dataclass
-# class MemoryAddress:
-#     address: int
-#     var_type: Literal["int", "float", "str", "bool"]
-
-#     def __post_init__(self):
-#         if not isinstance(self.address, int):
-#             raise TypeError(f"Invalid type for address: {type(self.address)}. Must be int.")
-#         if self.var_type not in ["int", "float", "str", "bool"]:
-#             raise ValueError(f"Invalid type: {self.var_type}. Must be 'int', 'float', 'str', or 'bool'.")
+from typing import Union, Optional, Dict, Tuple
 
 
 @dataclass
@@ -57,25 +45,21 @@ class Memory:
 
     def set_memory(
         self,
-        var_type: str,
         index: int,
         value: Union[int, float, str, bool],
     ):
-        """Set the memory for a specific var type."""
-        if var_type not in self.memory:
-            raise KeyError(f"Memory for type {var_type} not found.")
-        start, end = self.memory[var_type]["address_range"]
-
-        if index < start or index > end:
-            raise IndexError(f"Index {index} out of range for type {var_type}.")
-
-        if index - start >= len(self.memory[var_type]["allocated"]):
-            # Extend the allocated list if the index is greater than the current size
-            self.memory[var_type]["allocated"].extend(
-                [None] * (index - start - len(self.memory[var_type]["allocated"]) + 1)
-            )
-
-        self.memory[var_type]["allocated"][index - start] = value
+        """Set the memory for a specific index, automatically determining var type."""
+        for var_type, config in self.memory.items():
+            start, end = config["address_range"]
+            if start <= index <= end:
+                if index - start >= len(self.memory[var_type]["allocated"]):
+                    # Extend the allocated list if the index is greater than the current size
+                    self.memory[var_type]["allocated"].extend(
+                        [None] * (index - start - len(self.memory[var_type]["allocated"]) + 1)
+                    )
+                self.memory[var_type]["allocated"][index - start] = value
+                return
+        raise ValueError(f"Address {index} not found in any var type.")
 
     def add_memory(
         self,
@@ -131,19 +115,17 @@ class MemoryManager:
                     "float": ((2000, 2999), None),
                     "t_int": ((3000, 3999), None),
                     "t_float": ((4000, 4999), None),
-                    "t_bool": ((5000, 6999), None),
                 },
                 "local": {
-                    "int": ((7000, 7999), None),
-                    "float": ((8000, 8999), None),
-                    "t_int": ((9000, 9999), None),
-                    "t_float": ((10000, 10999), None),
-                    "t_bool": ((11000, 11999), None),
+                    "int": ((5000, 5999), None),
+                    "float": ((6000, 6999), None),
+                    "t_int": ((7000, 7999), None),
+                    "t_float": ((8000, 8999), None),
                 },
                 "constant": {
-                    "int": ((12000, 12999), None),
-                    "float": ((13000, 13999), None),
-                    "str": ((14000, 14999), None),
+                    "int": ((9000, 9999), None),
+                    "float": ((10000, 10999), None),
+                    "str": ((11000, 11999), None),
                 },
             }
         for space_name, mapping in mappings.items():
@@ -186,7 +168,7 @@ class MemoryManager:
         for space_name, memory in self.memory_spaces.items():
             var_type = memory.get_var_type_from_address(index)
             if var_type:
-                memory.set_memory(var_type=var_type, index=index, value=value)
+                memory.set_memory(index=index, value=value)
                 return
         raise ValueError(f"Address {index} not found in any memory space.")
 
@@ -266,3 +248,19 @@ if __name__ == "__main__":
     print("New memory space:\n", mm.memory_spaces["local"], "\n\n")
     mm.replace_memory_space("local", old_memory)  # Restore the old memory space
     print("Restored memory space:\n", mm.memory_spaces["local"], "\n\n")
+
+    mem = Memory(
+        mapping={
+            "int": ((7000, 7999), 10),
+            "float": ((8000, 8999), 5),
+            "t_int": ((9000, 9999), 0),
+            "t_float": ((10000, 10999), 0),
+            "t_bool": ((11000, 11999), 0),
+        }
+    )
+
+    mem.set_memory(7000, 42)
+    mem.set_memory(8000, 3.14)
+    print("Memory after setting values:")
+    print(mem.get_memory("int", 7000))  # Should print 42
+    print(mem.get_memory("float", 8000))  # Should print 3.14

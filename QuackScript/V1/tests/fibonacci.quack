@@ -1,0 +1,72 @@
+// Prueba: Fibonacci iterativo y recursivo
+
+program Fibonacci;
+
+void fibonacci_iterativo(n: int) [
+    var a, b, tmp, count: int;
+    {
+      if (n <= 0) {
+        print("Introduce un numero entero positivo!");
+        return -1;
+      };
+
+      a = 0;
+      b = 1;
+      count = 0;
+
+      while (count < n) do {
+        print("->", a);
+        tmp = a;
+        a = b;
+        b = tmp + b;
+        count = count + 1;
+      };
+        
+    }
+];
+
+int fibonacci_recursivo(n: int) [
+    var fib1, fib2: int;
+    {
+      if (n < 0) {
+        return -1;
+      };
+      if (n == 0) {
+        return 0;
+      };
+      if (n == 1) {
+        return 1;
+      };
+      if (n > 1) {
+        fib1 = fibonacci_recursivo(n - 1);
+        fib2 = fibonacci_recursivo(n - 2);
+        return fib1 + fib2;
+      };
+      
+    }
+];
+
+void fibonacci_recursivo_secuencia(n: int) [
+  var i: int = 0;
+  {
+    if (n <= 0) {
+      print("Introduce un numero entero positivo!");
+    }
+    else {
+      while (i < n) do {
+        print("->", fibonacci_recursivo(i));
+        i = i + 1;
+      };
+    };
+  }
+];
+
+main {
+    print("Fibonacci iterativo:");
+    fibonacci_iterativo(5);
+    print("\n");
+    print("Fibonacci recursivo:");
+    fibonacci_recursivo_secuencia(5);
+    print("\n");
+}
+end
