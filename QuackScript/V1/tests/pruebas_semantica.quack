@@ -6,7 +6,7 @@ var y: int = (x <= 2) or (0);
 main {
     print(y);
     if(y) {
-        print("Entre!", x);
+        print("\nEntre!\n", x);
     };
 }
 end

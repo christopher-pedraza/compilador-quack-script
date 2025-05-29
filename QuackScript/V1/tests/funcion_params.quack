@@ -2,12 +2,12 @@
 program TestParams;
 void sum(a: int, b: int) [
     {
-        print("Sum:", a + b);
+        print("\nSum:", a + b);
     }
 ];
 void subs(a: int, b: int) [
     {
-        print("Subs:", a-b);
+        print("\nSubs:", a-b);
     }
 ];
 main {
