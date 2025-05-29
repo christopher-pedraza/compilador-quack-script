@@ -1,0 +1,21 @@
+// Prueba: Instrucción print con varias expresiones y cadenas
+program TestPrint;
+var num1: int = 25;
+
+int suma(a: int, b: int) [
+    {
+        return a+b;
+    }
+];
+
+main {
+    print("factor_id: ", num1);
+    print("\npositive_factor_id: ", +num1);
+    print("\nnegative_factor_id: ", -num1);
+    print("\nfactor_cte_num: ", 25);
+    print("\npositive_cte_num: ", +25);
+    print("\nnegative_cte_num: ", -25);
+    print("\nparenthesis_expresion: ", (2*5+15));
+    print("\nfactor_func_call: ", suma(10, 15));
+}
+end

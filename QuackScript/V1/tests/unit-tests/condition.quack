@@ -1,0 +1,17 @@
+// Prueba: Instrucción print con varias expresiones y cadenas
+program TestPrint;
+var n: int = 1;
+const TOTAL: int = 10;
+
+
+main {
+    while (n <= TOTAL) do {
+        print(n);
+        if (n == TOTAL/2) {
+            print(" - La mitad?");
+        };
+        print("\n");
+        n = n + 1;
+    };
+}
+end

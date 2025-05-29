@@ -80,6 +80,7 @@ class QuackVirtualMachine:
         op_gt = self.operators[">"]
         op_gte = self.operators[">="]
         op_eq = self.operators["=="]
+        op_ne = self.operators["!="]
         op_and = self.operators["and"]
         op_or = self.operators["or"]
         op_goto = self.operators["goto"]
@@ -145,6 +146,10 @@ class QuackVirtualMachine:
 
                 case _ if op == op_eq:
                     result_value = int(arg1 == arg2)
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_ne:
+                    result_value = int(arg1 != arg2)
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_and:

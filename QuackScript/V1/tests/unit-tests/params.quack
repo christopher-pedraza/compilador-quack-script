@@ -1,0 +1,28 @@
+// Prueba: Instrucción print con varias expresiones y cadenas
+program TestPrint;
+var num1: int = 25;
+
+void func_0_param() [
+    {
+        print("Cero parametros!\n");
+    }
+];
+
+void func_1_param(a: int) [
+    {
+        print("Un parametro: ", a, "\n");
+    }
+];
+
+void func_2_param(a: int, b: int) [
+    {
+        print("Dos parametros: ", a, ", ", b, "\n");
+    }
+];
+
+main {
+    func_0_param();
+    func_1_param(1);
+    func_2_param(1, 2);
+}
+end

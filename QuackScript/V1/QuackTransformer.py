@@ -70,7 +70,7 @@ class QuackTransformer(Transformer):
     def factor_id(self, id):
         return id
 
-    def positive_factor_id(self, id):
+    def positive_factor_id(self, plus, id):
         return id
 
     def negative_factor_id(self, minus, id):

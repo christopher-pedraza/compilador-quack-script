@@ -1,0 +1,14 @@
+// Prueba: Instrucción print con varias expresiones y cadenas
+program TestPrint;
+var num1: int;
+
+void display(a: int, b: float, num3: int) [
+    var c: int;
+    var d: float;
+    {
+    }
+];
+
+main {
+}
+end

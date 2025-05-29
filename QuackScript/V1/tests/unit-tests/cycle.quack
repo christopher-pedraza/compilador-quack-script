@@ -1,0 +1,12 @@
+// Prueba: Instrucción print con varias expresiones y cadenas
+program TestPrint;
+var n: int = 0;
+
+
+main {
+    while (n < 5) do {
+        print(n+1, "\n");
+        n = n + 1;
+    };
+}
+end
