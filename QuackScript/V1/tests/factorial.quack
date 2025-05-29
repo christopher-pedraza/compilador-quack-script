@@ -1,0 +1,42 @@
+// Prueba: Factorial iterativo
+
+program Factorial;
+
+int factorial_iterativo(n: int) [
+    var result, i: int;
+    {
+        if (n < 0) {
+            return -1;
+        };
+        result = 1;
+        i = 2;
+
+        while (i <= n) do {
+            result = result * i;
+            i = i + 1;
+        };
+        return result;
+    }
+];
+
+int factorial_recursivo(n: int) [
+    {
+        if (n < 0) {
+            return -1;
+        };
+
+        if (n == 0 or n == 1) {
+            return 1;
+        };
+
+        if (n > 1) {
+            return n * factorial_recursivo(n - 1);
+        };
+    }
+];
+
+main {
+    print("Factorial iterativo: ", factorial_iterativo(5), "\n");
+    print("Factorial recursivo: ", factorial_recursivo(5), "\n");
+}
+end

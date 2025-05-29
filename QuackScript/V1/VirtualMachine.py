@@ -22,6 +22,7 @@ class QuackVirtualMachine:
         self.functions = None
         self.global_container_name = None
         self.sleeping_stack = []
+        self.next_local_memory = None
 
     def read_and_delete_object_files(self, file_name):
         # print(f"Reading object file: {file_name}")
@@ -41,18 +42,8 @@ class QuackVirtualMachine:
             op_str = ops.get(op, op)
             print(f"{i}: ({op_str}, {arg1}, {arg2}, {result})")
 
-    def swap_local_memory(self, local_memory: Memory = None):
+    def swap_local_memory(self, local_memory: Memory):
         if "local" in self.memory_manager.memory_spaces:
-            if local_memory is None:
-                local_memory = Memory(
-                    mapping={
-                        "int": ((5000, 5999), 0),
-                        "float": ((6000, 6999), 0),
-                        "t_int": ((7000, 7999), 0),
-                        "t_float": ((8000, 8999), 0),
-                    }
-                )
-
             previous_local = self.memory_manager.replace_memory_space(space_name="local", new_memory=local_memory)
             return previous_local
         else:
@@ -111,6 +102,10 @@ class QuackVirtualMachine:
                 arg1 = self.memory_manager.get_memory(arg1)
             if arg2 is not None and isinstance(arg2, int):
                 arg2 = self.memory_manager.get_memory(arg2)
+
+            # print("\n" * 2)
+            # print("-" * 50)
+            # print(f"Processing quadruple: {quadruple}")
 
             match op:
                 case _ if op == op_add:
@@ -195,15 +190,16 @@ class QuackVirtualMachine:
                             "t_float": ((8000, 8999), required_space.get("t_float", 0)),
                         }
                     )
+                    self.next_local_memory = new_local_memory
 
-                    prev_local_memory = self.swap_local_memory(new_local_memory)
+                case _ if op == op_param:
+                    self.next_local_memory.set_memory(index=result, value=arg1)
+
+                case _ if op == op_gosub:
+                    prev_local_memory = self.swap_local_memory(self.next_local_memory)
                     if prev_local_memory:
                         self.sleeping_stack.append(prev_local_memory)
 
-                case _ if op == op_param:
-                    self.memory_manager.set_memory(index=result, value=arg1)
-
-                case _ if op == op_gosub:
                     # Save the next position to return to it later
                     go_back_stack.append(current_pos + 1)
                     # Set the new position to the function's start
@@ -226,7 +222,15 @@ class QuackVirtualMachine:
                         previous_local_memory = self.sleeping_stack.pop()
                         self.swap_local_memory(previous_local_memory)
                     else:
-                        self.swap_local_memory()
+                        mem = Memory(
+                            mapping={
+                                "int": ((5000, 5999), 0),
+                                "float": ((6000, 6999), 0),
+                                "t_int": ((7000, 7999), 0),
+                                "t_float": ((8000, 8999), 0),
+                            }
+                        )
+                        self.swap_local_memory(mem)
 
                     current_pos = go_back_stack.pop() if go_back_stack else 0
                     continue
@@ -251,6 +255,12 @@ class QuackVirtualMachine:
                     "float": ((2000, 2999), global_required_space.get("float", 0)),
                     "t_int": ((3000, 3999), global_required_space.get("t_int", 0)),
                     "t_float": ((4000, 4999), global_required_space.get("t_float", 0)),
+                },
+                "local": {
+                    "int": ((5000, 5999), 0),
+                    "float": ((6000, 6999), 0),
+                    "t_int": ((7000, 7999), 0),
+                    "t_float": ((8000, 8999), 0),
                 },
                 "constant": {
                     "int": ((9000, 9999), constants_required_space.get("int", 0)),

@@ -230,9 +230,9 @@ class QuackTransformer(Transformer):
 
     def var_multi_decl_no_assign(self, var, id, *args):
         ids = [id]
-        for i in range(0, len(args) - 1, 2):
-            ids.append(args[i - 1])
-        return VarDeclNode(names=ids, var_type=args[-1], isConstant=False)
+        for i in range(1, len(args) - 3, 2):
+            ids.append(args[i])
+        return VarDeclNode(names=ids, var_type=args[-2], isConstant=False)
 
     def var_multi_decl_assign(self, var, id, *args):
         ids = [id]
