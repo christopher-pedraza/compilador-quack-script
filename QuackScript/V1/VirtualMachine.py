@@ -208,6 +208,7 @@ class QuackVirtualMachine:
 
                 case _ if op == op_return:
                     return_address = self.functions[arg1].return_address
+
                     return_value = self.memory_manager.get_memory(result)
                     return_type = self.memory_manager.get_var_type_from_address(result)
                     if return_address is not None:
@@ -218,6 +219,15 @@ class QuackVirtualMachine:
                     current_pos = self.functions[arg1].final_position
 
                 case _ if op == op_endFunc:
+                    func_name = result
+
+                    # Validate if the function has a return value
+                    return_type = self.functions[func_name].return_type
+                    if return_type in ["int", "float"]:
+                        return_value = self.memory_manager.get_memory(index=self.functions[func_name].return_address)
+                        if return_value is None:
+                            raise ValueError(f"Function {func_name} has no return value set.")
+
                     # Restore the previous local memory
                     if self.sleeping_stack:
                         previous_local_memory = self.sleeping_stack.pop()

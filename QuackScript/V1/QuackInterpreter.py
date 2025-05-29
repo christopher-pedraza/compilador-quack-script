@@ -328,7 +328,7 @@ class QuackInterpreter:
             final_index = self.quack_quadruple.get_current_index()
             self.symbol_table.get_function(func_name).final_position = final_index - 1
 
-            self.quack_quadruple.add_quadruple("endFunc", None, None, None)
+            self.quack_quadruple.add_quadruple("endFunc", None, None, func_name)
 
             self.current_container = self.global_container_name
             self.current_memory_space = "global"

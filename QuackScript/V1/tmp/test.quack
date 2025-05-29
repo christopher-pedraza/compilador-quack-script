@@ -1,69 +1,24 @@
-// Programa ejemplo combinando todas las reglas
+// Prueba: Factorial iterativo y recursivo
 
-program AllInOne;
-const PI: float = 3.14159;
-var radius: float = 2.5;
-var area: float;
-var isPositive: int;
+program Factorial;
 
-void greet() [
+int factorial_iterativo(n: int) [
+    var result, i: int;
     {
-        print("\nBienvenido al programa All-In-One!\n\n");
-    }
-];
-
-void calculateArea(r: float) [
-    var temp_area: float;
-    {
-        temp_area = PI * r * r;
-        print("Área calculada:", temp_area, "\n");
-    }
-];
-
-void checkSign(value: int) [
-    {
-        if (value > 0) {
-            print(value, " es positivo.\n");
-        } else {
-            print("No es positivo\n");
+        if (n < 0) {
+            return -1;
         };
-    }
-];
+        result = 1;
+        i = 2;
 
-void countDown(start: int) [
-    {
-        while (start >= 1) do {
-            print(start, "\n");
-            start = start - 1;
+        while (i <= n) do {
+            result = result * i;
+            i = i + 1;
         };
     }
 ];
 
 main {
-    greet();
-    
-    // Asignar y mostrar área
-    area = PI * radius * radius;
-    print("Área del círculo:", area, "\n");
-
-    // Usar función con parámetro
-    calculateArea(3.0);
-
-    // Condicionales
-    isPositive = 10;
-    if (isPositive != 0) {
-        print("isPositive no es cero.\n");
-    };
-
-    // Más condicionales anidados
-    checkSign(-5);
-    checkSign(0);
-    checkSign(7);
-
-    // Ciclo while
-    countDown(5);
-
-    // Print múltiple
-    print("Fin ", "del ", "programa.\n", "Gracias por usar All-In-One!");
+    print("Factorial iterativo: ", factorial_iterativo(5), "\n");
 }
 end
