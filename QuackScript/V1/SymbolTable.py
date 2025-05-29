@@ -35,6 +35,7 @@ class Container:
         self.return_type = return_type
         self.return_address = None
         self.initial_position = None
+        self.final_position = None
         self.symbols = {}
         self.param_signature = []
         self.required_space = {}

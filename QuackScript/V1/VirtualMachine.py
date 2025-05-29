@@ -215,6 +215,7 @@ class QuackVirtualMachine:
                         self.memory_manager.set_memory(index=return_address, value=return_value)
                     else:
                         self.memory_manager.add_memory(space_name="global", var_type=return_type, value=return_value)
+                    current_pos = self.functions[arg1].final_position
 
                 case _ if op == op_endFunc:
                     # Restore the previous local memory
