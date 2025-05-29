@@ -39,19 +39,12 @@ class QuackQuadruple:
         self.jumps_stack = []
         self.returns_stack = []
         self.quadruples = deque()
-        self.current_memory_space = 0
         self.current_index = 0
         self.operators = OperatorsInterface()
 
     def get_current_index(self):
         """Get the current index."""
         return self.current_index
-
-    def get_current_memory_space(self):
-        """Get the current memory space."""
-        current = self.current_memory_space
-        self.current_memory_space += 1
-        return current
 
     def add_quadruple(
         self, op: str, arg1: str, arg2: str, result: str = None, memory_space: str = None, result_type: str = None

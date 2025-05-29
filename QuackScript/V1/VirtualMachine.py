@@ -104,10 +104,6 @@ class QuackVirtualMachine:
             if arg2 is not None and isinstance(arg2, int):
                 arg2 = self.memory_manager.get_memory(arg2)
 
-            # print("\n" * 2)
-            # print("-" * 50)
-            # print(f"Processing quadruple: {quadruple}")
-
             match op:
                 case _ if op == op_add:
                     result_value = arg1 + arg2
