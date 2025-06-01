@@ -117,11 +117,11 @@ class QuackInterpreter:
                     )
                 temp_address = self.memory_manager.get_first_available_address(
                     var_type=f"t_{return_type}",
-                    space="global",
+                    space=self.current_memory_space,
                 )
                 self.symbol_table.add_temp(
                     var_type=f"t_{return_type}",
-                    containerName=self.global_container_name,
+                    containerName=self.current_container,
                 )
                 self.quack_quadruple.add_quadruple("=", func_address, None, temp_address)
                 self.symbol_table.get_function(func_name).return_address = func_address
