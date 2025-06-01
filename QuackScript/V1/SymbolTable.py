@@ -8,6 +8,25 @@ from Exceptions import (
     SymbolRedeclarationError,
 )
 
+RESERVED_WORDS = [
+    "if",
+    "else",
+    "while",
+    "do",
+    "int",
+    "float",
+    "program",
+    "main",
+    "void",
+    "end",
+    "const",
+    "var",
+    "print",
+    "and",
+    "or",
+    "return",
+]
+
 
 @dataclass
 class Symbol:
@@ -39,28 +58,10 @@ class Container:
         self.symbols = {}
         self.param_signature = []
         self.required_space = {}
-        self.reserved_words = [
-            "if",
-            "else",
-            "while",
-            "do",
-            "int",
-            "float",
-            "program",
-            "main",
-            "void",
-            "end",
-            "const",
-            "var",
-            "print",
-            "and",
-            "or",
-            "return",
-        ]
 
     def add_symbol(self, symbol: Symbol) -> None:
         """Add a symbol to the container."""
-        if symbol.name in self.reserved_words:
+        if symbol.name in RESERVED_WORDS:
             raise ReservedWordError(f"Symbol '{symbol.name}' is a reserved word and cannot be used as an identifier.")
         if symbol.name in self.symbols:
             raise SymbolRedeclarationError(f"Symbol '{symbol.name}' already exists in '{self.name}'.")
