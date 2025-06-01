@@ -9,7 +9,7 @@ parser = Lark(grammar, start="start", parser="lalr")
 
 def parse_test(program_text):
     try:
-        tree = parser.parse(program_text)
+        parser.parse(program_text)
         print("✅ Parsed successfully.")
         return True
     except UnexpectedInput as e:
