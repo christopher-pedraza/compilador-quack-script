@@ -1,8 +1,10 @@
-// Prueba: Instrucción print con varias expresiones y cadenas
+// Regla de la gramática a probar: "var_decl"
 program TestPrint;
 var num1: int;
 var num2: float;
 var num3: int;
+const num4: int = 100;
+const num5: float = 50.50;
 
 void display(a: int, b: float, num3: int) [
     var c: int;
@@ -26,7 +28,7 @@ void display(a: int, b: float, num3: int) [
 ];
 
 main {
-    print("Variables globales: \n");
+    print("Variables globales:");
     num1 = 101;
     num2 = 102.0;
     num3 = 103;
@@ -39,6 +41,7 @@ main {
     print("\nnum1:\t", num1);
     print("\nnum2:\t", num2);
     print("\nnum3:\t", num3);
-
+    print("\nnum4 (const):\t", num4);
+    print("\nnum5 (const):\t", num5);
 }
 end

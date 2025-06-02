@@ -1,6 +1,7 @@
-import pickle
 import os
-from MemoryManager import MemoryManager, Memory
+import pickle
+
+from MemoryManager import Memory, MemoryManager
 
 
 class QuackVirtualMachine:
@@ -209,7 +210,6 @@ class QuackVirtualMachine:
 
                 case _ if op == op_return:
                     return_address = self.functions[arg1].return_address
-
                     return_value = self.memory_manager.get_memory(result)
                     return_type = self.memory_manager.get_var_type_from_address(result)
                     if return_address is not None:

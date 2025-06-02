@@ -10,6 +10,10 @@ if __name__ == "__main__":
 
     input_file = sys.argv[1]
 
+    if not input_file.endswith(".quack"):
+        print("Error: Input file must have a .quack extension.")
+        sys.exit(1)
+
     qvm = QuackVirtualMachine()
 
     try:

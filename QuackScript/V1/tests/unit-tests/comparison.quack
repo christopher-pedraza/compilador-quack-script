@@ -1,4 +1,4 @@
-// Prueba: Instrucción print con varias expresiones y cadenas
+// Regla de la gramática a probar: "comparison"
 program TestPrint;
 
 main {

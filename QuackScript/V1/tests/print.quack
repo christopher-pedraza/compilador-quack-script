@@ -1,8 +1,0 @@
-// Prueba: Instrucción print con varias expresiones y cadenas
-program TestPrint;
-var num1: int = 25;
-var num2: float = 2.5 + num1;
-main {
-    print("Num1: ", num1, "\nNum2: ", num2);
-}
-end

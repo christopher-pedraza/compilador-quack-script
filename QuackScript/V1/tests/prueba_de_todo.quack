@@ -64,6 +64,6 @@ main {
     countDown(5);
 
     // Print múltiple
-    print("Fin ", "del ", "programa.\n", "Gracias por usar All-In-One!");
+    print("Fin ", "del ", "programa.\n");
 }
 end

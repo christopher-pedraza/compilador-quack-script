@@ -1,4 +1,4 @@
-// Prueba: Instrucción print con varias expresiones y cadenas
+// Regla de la gramática a probar: "functions"
 program TestPrint;
 var num1: int = 25;
 const PI: float = 3.14;

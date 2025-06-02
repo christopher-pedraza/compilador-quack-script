@@ -1,8 +1,7 @@
-// Prueba: Instrucción print con varias expresiones y cadenas
+// Regla de la gramática a probar: "condition"
 program TestPrint;
 var n: int = 1;
 const TOTAL: int = 10;
-
 
 main {
     while (n <= TOTAL) do {

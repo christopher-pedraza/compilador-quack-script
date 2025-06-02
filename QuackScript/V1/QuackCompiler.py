@@ -69,8 +69,6 @@ def compile_program(input_file, output_file):
             program = file.read()
         tree, ir, symbol_table, quadruples, memory = parse_program(program)
         generate_obj_file(quadruples, symbol_table, output_file)
-    except FileNotFoundError:
-        print(f"File {input_file} not found.")
     except Exception as e:
         print(f"An error occurred: {e}")
 
