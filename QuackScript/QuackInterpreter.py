@@ -117,11 +117,11 @@ class QuackInterpreter:
                     )
                 temp_address = self.memory_manager.get_first_available_address(
                     var_type=f"t_{return_type}",
-                    space="global",
+                    space=self.current_memory_space,
                 )
                 self.symbol_table.add_temp(
                     var_type=f"t_{return_type}",
-                    containerName=self.global_container_name,
+                    containerName=self.current_container,
                 )
                 self.quack_quadruple.add_quadruple("=", func_address, None, temp_address)
                 self.symbol_table.get_function(func_name).return_address = func_address
@@ -201,7 +201,6 @@ class QuackInterpreter:
                     f"Cannot assign type '{value_type}' to variable '{var_name}' of type '{variable.var_type}'"
                 )
 
-        ###################################################################################
         elif isinstance(ir, VarDeclNode):
             var_type = ir.var_type
 
@@ -227,12 +226,10 @@ class QuackInterpreter:
                 )
                 self.quack_quadruple.add_quadruple("=", value, None, address)
 
-        ###################################################################################
         elif isinstance(ir, BodyNode):
             for statement in ir.statements:
                 self.execute(statement)
 
-        ###################################################################################
         elif isinstance(ir, WhileNode):
             self.quack_quadruple.add_return()
             condition = self.__evaluate_expression(ir.condition)
@@ -247,13 +244,11 @@ class QuackInterpreter:
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
 
-        ###################################################################################
         elif isinstance(ir, PrintNode):
             for value in ir.values:
                 value, value_type = self.__evaluate_expression(value)
                 self.quack_quadruple.add_quadruple("print", None, None, value)
 
-        ###################################################################################
         elif isinstance(ir, IfNode):
             value, value_type = self.__evaluate_expression(ir.condition)
 
@@ -266,7 +261,6 @@ class QuackInterpreter:
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
 
-        ###################################################################################
         elif isinstance(ir, IfElseNode):
             value, value_type = self.__evaluate_expression(ir.condition)
 
@@ -289,7 +283,6 @@ class QuackInterpreter:
                 index=self.quack_quadruple.pop_jump(), target=self.quack_quadruple.get_current_index()
             )
 
-        ###################################################################################
         elif isinstance(ir, FunctionDeclNode):
             func_name = ir.name.name
             func_return_type = ir.return_type
@@ -336,7 +329,6 @@ class QuackInterpreter:
 
             self.memory_manager.replace_memory_space("local", old_memory)
 
-        ###################################################################################
         elif isinstance(ir, ParamNode):
             param_name = ir.name.name
             param_type = ir.param_type
@@ -352,16 +344,13 @@ class QuackInterpreter:
                 address=address,
             )
 
-        ###################################################################################
         elif isinstance(ir, FuncCallNode):
             self.__process_func_call(ir)
 
-        ###################################################################################
         elif isinstance(ir, ReturnNode):
             return_value = self.__evaluate_expression(ir.expresion)
             self.quack_quadruple.add_quadruple("return", self.current_container, None, return_value[0])
 
-        ###################################################################################
         elif isinstance(ir, ProgramNode):
             for decl in ir.global_decls:
                 self.execute(decl)

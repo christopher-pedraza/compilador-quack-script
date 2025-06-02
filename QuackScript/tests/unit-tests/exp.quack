@@ -1,0 +1,15 @@
+// Regla de la gramática a probar: "exp"
+program TestPrint;
+var num1: int = 25;
+
+int suma(a: int, b: int) [
+    {
+        return a+b;
+    }
+];
+
+main {
+    print("exp_plus: ", num1 + suma(2, 3));
+    print("\nexp_minus: ", (1E2 / 10) - 25);
+}
+end

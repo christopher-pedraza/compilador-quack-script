@@ -1,0 +1,58 @@
+// Regla de la gramática a probar: "functions"
+program TestPrint;
+var num1: int = 25;
+const PI: float = 3.14;
+
+void func_0_param() [
+    {
+        print("Cero parametros!\n");
+    }
+];
+
+void func_1_param(a: int) [
+    {
+        print("Un parametro: ", a, "\n");
+    }
+];
+
+void func_2_param(a: int, b: int) [
+    {
+        print("Dos parametros: ", a, ", ", b, "\n");
+    }
+];
+
+void func_param_vars(a: int) [
+    var b: int = 2;
+    {
+        print("Parametro: ", a, "\nVar local: ", b, "\n");
+    }
+];
+
+void func_no_param_vars() [
+    var a: int = 2;
+    {
+        print("Sin parametros pero var local: ", a, "\n");
+    }
+];
+
+float get_area(r: float) [
+
+    {
+        return r * r * PI;
+    }
+];
+
+main {
+    func_0_param();
+    print("\n");
+    func_1_param(1);
+    print("\n");
+    func_2_param(1, 2);
+    print("\n");
+    func_no_param_vars();
+    print("\n");
+    func_param_vars(25/5);
+    print("\n");
+    print("Area del circulo: ", get_area(2.0));
+}
+end

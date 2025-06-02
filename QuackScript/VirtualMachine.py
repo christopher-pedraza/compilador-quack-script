@@ -1,6 +1,7 @@
-import pickle
 import os
-from MemoryManager import MemoryManager, Memory
+import pickle
+
+from MemoryManager import Memory, MemoryManager
 
 
 class QuackVirtualMachine:
@@ -80,6 +81,7 @@ class QuackVirtualMachine:
         op_gt = self.operators[">"]
         op_gte = self.operators[">="]
         op_eq = self.operators["=="]
+        op_ne = self.operators["!="]
         op_and = self.operators["and"]
         op_or = self.operators["or"]
         op_goto = self.operators["goto"]
@@ -102,10 +104,6 @@ class QuackVirtualMachine:
                 arg1 = self.memory_manager.get_memory(arg1)
             if arg2 is not None and isinstance(arg2, int):
                 arg2 = self.memory_manager.get_memory(arg2)
-
-            # print("\n" * 2)
-            # print("-" * 50)
-            # print(f"Processing quadruple: {quadruple}")
 
             match op:
                 case _ if op == op_add:
@@ -145,6 +143,10 @@ class QuackVirtualMachine:
 
                 case _ if op == op_eq:
                     result_value = int(arg1 == arg2)
+                    self.memory_manager.set_memory(index=result, value=result_value)
+
+                case _ if op == op_ne:
+                    result_value = int(arg1 != arg2)
                     self.memory_manager.set_memory(index=result, value=result_value)
 
                 case _ if op == op_and:
@@ -208,7 +210,6 @@ class QuackVirtualMachine:
 
                 case _ if op == op_return:
                     return_address = self.functions[arg1].return_address
-
                     return_value = self.memory_manager.get_memory(result)
                     return_type = self.memory_manager.get_var_type_from_address(result)
                     if return_address is not None:

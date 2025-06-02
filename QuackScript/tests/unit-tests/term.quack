@@ -1,0 +1,12 @@
+// Regla de la gramática a probar: "term"
+program TestPrint;
+var num1: int = 25;
+
+
+main {
+    print("term_mult: ", num1*25);
+    print("\nterm_mult: ", (num1 - 10)*2);
+    print("\nterm_div: ", 25/num1);
+    print("\nterm_div: ", (2E2 + 50) / 25);
+}
+end

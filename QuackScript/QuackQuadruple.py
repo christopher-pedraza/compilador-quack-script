@@ -13,19 +13,20 @@ class OperatorsInterface:
             ">": 7,
             ">=": 8,
             "==": 9,
-            "and": 10,
-            "or": 11,
-            "goto": 12,
-            "gotoF": 13,
-            "gotoT": 14,
-            "=": 15,
-            "print": 16,
-            "era": 17,
-            "param": 18,
-            "gosub": 19,
-            "return": 20,
-            "endFunc": 21,
-            "end": 22,
+            "!=": 10,
+            "and": 11,
+            "or": 12,
+            "goto": 13,
+            "gotoF": 14,
+            "gotoT": 15,
+            "=": 16,
+            "print": 17,
+            "era": 18,
+            "param": 19,
+            "gosub": 20,
+            "return": 21,
+            "endFunc": 22,
+            "end": 23,
         }
 
     def get_operator(self, op: str):
@@ -38,19 +39,12 @@ class QuackQuadruple:
         self.jumps_stack = []
         self.returns_stack = []
         self.quadruples = deque()
-        self.current_memory_space = 0
         self.current_index = 0
         self.operators = OperatorsInterface()
 
     def get_current_index(self):
         """Get the current index."""
         return self.current_index
-
-    def get_current_memory_space(self):
-        """Get the current memory space."""
-        current = self.current_memory_space
-        self.current_memory_space += 1
-        return current
 
     def add_quadruple(
         self, op: str, arg1: str, arg2: str, result: str = None, memory_space: str = None, result_type: str = None

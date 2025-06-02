@@ -38,9 +38,7 @@ int fibonacci_recursivo(n: int) [
         return 1;
       };
       if (n > 1) {
-        fib1 = fibonacci_recursivo(n - 1);
-        fib2 = fibonacci_recursivo(n - 2);
-        return fib1 + fib2;
+        return fibonacci_recursivo(n - 1) + fibonacci_recursivo(n - 2);
       };
       
     }
