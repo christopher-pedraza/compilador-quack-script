@@ -1,6 +1,12 @@
 # QuackScript Language and Compiler
 
-QuackScript is a custom programming language with a full compilation and execution pipeline. It features a robust syntax supporting various programming constructs and a virtual machine for code execution.
+QuackScript is a custom programming language with a full compilation and
+execution pipeline. It features a robust syntax supporting various programming
+constructs and a virtual machine for code execution.
+
+## Documentation (in Spanish)
+
+- For detailed information about this code, please refer to the documentation: [Documentacion.pdf](./Documentacion.pdf)
 
 ## Language Features
 
